@@ -1,0 +1,65 @@
+class EthnicitiesModel {
+  Data? data;
+  String? type;
+
+  EthnicitiesModel({this.data, this.type});
+
+  EthnicitiesModel.fromJson(Map<String, dynamic> json) {
+    data = json['data'] != null ? Data.fromJson(json['data']) : null;
+    type = json['type'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    if (this.data != null) {
+      data['data'] = this.data!.toJson();
+    }
+    data['type'] = type;
+    return data;
+  }
+}
+
+class Data {
+  bool? success;
+  String? message;
+  List<Ethnicities>? ethnicities;
+
+  Data({this.success, this.message, this.ethnicities});
+
+  Data.fromJson(Map<String, dynamic> json) {
+    success = json['success'];
+    message = json['message'];
+    if (json['ethnicities'] != null) {
+      ethnicities = <Ethnicities>[];
+      json['ethnicities'].forEach((v) {
+        ethnicities!.add(Ethnicities.fromJson(v));
+      });
+    }
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['success'] = success;
+    data['message'] = message;
+    if (ethnicities != null) {
+      data['ethnicities'] = ethnicities!.map((v) => v.toJson()).toList();
+    }
+    return data;
+  }
+}
+
+class Ethnicities {
+  String? name;
+
+  Ethnicities({this.name});
+
+  Ethnicities.fromJson(Map<String, dynamic> json) {
+    name = json['name'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['name'] = name;
+    return data;
+  }
+}
