@@ -116,8 +116,8 @@ class _SetUpProfileDialogState extends State<SetUpProfileDialog> {
                 height:widget.dimens.k50 ,
                 onPressed: () {
                   Navigator.pop(context); //
-                  widget.navigator
-                      .pushNamed(RouteManager.rTSignUpCreationView);
+                  // widget.navigator
+                  //     .pushNamed(RouteManager.rTSignUpCreationView);
                 },
                 childText: "Maybe later",
                 textStyle: TextStyle(

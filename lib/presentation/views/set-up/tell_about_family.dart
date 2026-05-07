@@ -195,7 +195,7 @@ class TellAboutYourFamilyViewState extends State<TellAboutYourFamilyView>
                       .toList() ??
                       [],
                   selectedItem: currentlyLive,
-                  hintText: "Select living arrangement",
+                  hintText: "Select who you live with ",
                   onChanged: (val) =>
                       setState(() => currentlyLive = val),
                 ),
@@ -203,7 +203,7 @@ class TellAboutYourFamilyViewState extends State<TellAboutYourFamilyView>
                 _label(context, StringManager.married),
                 widget.dimens.k3.verticalBoxPadding,
                 CustomField(
-                    hintText: "Enter married siblings count",
+                    hintText: "Enter married siblings",
                     keyboardType: TextInputType.number,
                     controller: marriedController,
                     validator: (i) => AppValidators.fieldValidator(i)),
@@ -211,7 +211,7 @@ class TellAboutYourFamilyViewState extends State<TellAboutYourFamilyView>
                 _label(context, StringManager.unmarried),
                 widget.dimens.k3.verticalBoxPadding,
                 CustomField(
-                    hintText: "Enter unmarried siblings count",
+                    hintText: "Enter unmarried siblings",
                     keyboardType: TextInputType.number,
                     controller: unmarriedController,
                     validator: (i) => AppValidators.fieldValidator(i)),
@@ -253,7 +253,7 @@ class TellAboutYourFamilyViewState extends State<TellAboutYourFamilyView>
                 _label(context, StringManager.additionalDetails),
                 widget.dimens.k3.verticalBoxPadding,
                 CustomField(
-                    hintText: "Enter additional family details",
+                    hintText: "Enter here",
                     keyboardType: TextInputType.text,
                     controller: additionalController,
                     maxLines: 3,

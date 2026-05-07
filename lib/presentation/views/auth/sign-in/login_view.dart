@@ -63,121 +63,125 @@ class _LoginViewState extends State<LoginView> {
         authVM = provider;
         return  Form(
           key: _formKey,
-          child: Column(
-crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  widget.dimens.k70.verticalBoxPadding,
-                  CircleAvatar(
-                      backgroundColor: Colors.transparent,
-                      radius:widget.dimens.k45 ,
-                      backgroundImage: AssetImage(Assets.imbIcon,)),
-                  widget.dimens.k10.verticalBoxPadding,
-                  Text(StringManager.loginHint,
-                    textAlign: TextAlign.center,
-                    style: context.textTheme.bodyLarge?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      fontSize:  widget.dimens.k30,
+          child: SingleChildScrollView(
+            physics: const NeverScrollableScrollPhysics(),
+            child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    widget.dimens.k70.verticalBoxPadding,
+                    CircleAvatar(
+                        backgroundColor: Colors.transparent,
+                        radius:widget.dimens.k45 ,
+                        backgroundImage: AssetImage(Assets.imbIcon,)),
+                    widget.dimens.k10.verticalBoxPadding,
+                    Text(StringManager.loginHint,
+                      textAlign: TextAlign.center,
+                      style: context.textTheme.bodyLarge?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        fontSize:  widget.dimens.k30,
+                      ),
                     ),
-                  ),
-                  widget.dimens.k5.verticalBoxPadding,
-                  Text(
-                    StringManager.loginSubHint,
-                    textAlign: TextAlign.center,
-                    style: context.textTheme.bodyLarge?.copyWith(
-                        fontWeight: FontWeight.w400,
-                        fontSize:  widget.dimens.k16,
-                        color: ColorManager.textColorSubTitle
+                    widget.dimens.k5.verticalBoxPadding,
+                    Text(
+                      StringManager.loginSubHint,
+                      textAlign: TextAlign.center,
+                      style: context.textTheme.bodyLarge?.copyWith(
+                          fontWeight: FontWeight.w400,
+                          fontSize:  widget.dimens.k16,
+                          color: ColorManager.textColorSubTitle
+                      ),
                     ),
-                  ),
-                ],
-              ),
-              widget.dimens.k15.verticalBoxPadding,
-              Container(
-                width: size.width,
-                height: widget.dimens.k60,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(widget.dimens.k15),
-                  color: ColorManager.loginContainer,
+                  ],
                 ),
-                child: Padding(
-                  padding: EdgeInsets.all(widget.dimens.k4),
-                  child:
-                  Row(
-                    children: [
+                widget.dimens.k15.verticalBoxPadding,
+                Container(
+                  width: size.width,
+                  height: widget.dimens.k60,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(widget.dimens.k15),
+                    color: ColorManager.loginContainer,
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.all(widget.dimens.k4),
+                    child:
+                    Row(
+                      children: [
 
-                      /// LOGIN TAB
-                      Expanded(
-                        child: PrimaryButton(
-                          onPressed: () {
-                            setState(() {
-                              selectedTab = AuthTab.login;
+                        /// LOGIN TAB
+                        Expanded(
+                          child: PrimaryButton(
+                            onPressed: () {
+                              setState(() {
+                                selectedTab = AuthTab.login;
 
-                            });
+                              });
 
 
-                          },
-                          childText: 'Login',
-                          issquare: true,
-                          color: selectedTab == AuthTab.login
-                              ? ColorManager.white
-                              : Colors.transparent,
-                          height: 50,
-                          radius: 10,
-                          textStyle: context.textTheme.bodySmall!.copyWith(
+                            },
+                            childText: 'Login',
+                            issquare: true,
                             color: selectedTab == AuthTab.login
-                                ?    ColorManager.textColor
-                                :   ColorManager.fieldTextColor,
-                            fontWeight: FontWeight.w500,
+                                ? ColorManager.white
+                                : Colors.transparent,
+                            height: 50,
+                            radius: 10,
+                            textStyle: context.textTheme.bodySmall!.copyWith(
+                              color: selectedTab == AuthTab.login
+                                  ?    ColorManager.textColor
+                                  :   ColorManager.fieldTextColor,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
                         ),
-                      ),
 
-                      widget.dimens.k8.horizontalBoxPadding,
+                        widget.dimens.k8.horizontalBoxPadding,
 
-                      /// SIGN UP TAB
-                      Expanded(
-                        child: PrimaryButton(
-                          onPressed: () {
-                            setState(() {
-                              selectedTab = AuthTab.signup;
+                        /// SIGN UP TAB
+                        Expanded(
+                          child: PrimaryButton(
+                            onPressed: () {
+                              setState(() {
+                                selectedTab = AuthTab.signup;
 
-                            });
-                          },
-                          childText: 'Sign up',
-                          issquare: true,
-                          color: selectedTab == AuthTab.signup
-                              ? ColorManager.white
-                              : Colors.transparent,
-                          height: 50,
-                          radius: 10,
-                          textStyle: context.textTheme.bodySmall!.copyWith(
+                              });
+                            },
+                            childText: 'Sign up',
+                            issquare: true,
                             color: selectedTab == AuthTab.signup
-                                ?    ColorManager.textColor
-                                :   ColorManager.fieldTextColor,
+                                ? ColorManager.white
+                                : Colors.transparent,
+                            height: 50,
+                            radius: 10,
+                            textStyle: context.textTheme.bodySmall!.copyWith(
+                              color: selectedTab == AuthTab.signup
+                                  ?    ColorManager.textColor
+                                  :   ColorManager.fieldTextColor,
 
 
-                            fontWeight: FontWeight.w500,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              Expanded(
-                child: selectedTab == AuthTab.login
-                    ?  LoginFormView()
-                    :  SignUpFormView(),
-              ),
+                SizedBox(                        // ✅ replace Expanded with SizedBox
+                  height: size.height * 0.65,   // adjust this value to fit your layout
+                  child: selectedTab == AuthTab.login
+                      ? LoginFormView()
+                      : SignUpFormView(),
+                ),
 
-            ],
-          ).padding(
-            EdgeInsets.symmetric(
-              horizontal: widget.dimens.k20,
+              ],
+            ).padding(
+              EdgeInsets.symmetric(
+                horizontal: widget.dimens.k20,
 
+              ),
             ),
           ),
         );

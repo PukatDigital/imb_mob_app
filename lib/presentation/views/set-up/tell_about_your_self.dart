@@ -158,32 +158,54 @@ class TellAboutYourSelfViewState extends State<TellAboutYourSelfView>
     context.read<IPrefHelper>().saveSetupProfile(updated);
   }
   void _openCalendarDialog(TextEditingController controller) {
+    DateTime tempSelected = _selectedDate ?? DateTime.now();
+
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        insetPadding:
-        const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16)),
-        title: Text("Select Date",
-            style: context.textTheme.titleMedium!
-                .copyWith(color: ColorManager.primary)),
-        content: SizedBox(
-          width: double.maxFinite,
-          height: 350,
-          child: CalendarView(
-            selectedDate: _selectedDate,
-            isPrevious: true,
-            onDaySelected: (selectedDay, focusedDay) {
-              setState(() {
-                _selectedDate = selectedDay;
-                controller.text =
-                "${selectedDay.year}-${selectedDay.month.toString().padLeft(2, '0')}-${selectedDay.day.toString().padLeft(2, '0')}";
-              });
-              Navigator.pop(context);
-            },
-          ),
-        ),
+      builder: (context) => StatefulBuilder(        // ✅ manages state inside dialog
+        builder: (context, setDialogState) {
+          return AlertDialog(
+            insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            title: Text("Select Date",
+                style: context.textTheme.titleMedium!
+                    .copyWith(color: ColorManager.primary)),
+            content: SizedBox(
+              width: double.maxFinite,
+              height: 350,
+              child: CalendarView(
+                selectedDate: tempSelected,
+                isPrevious: true,
+                onDaySelected: (selectedDay, focusedDay) {
+                  setDialogState(() {               // ✅ only updates inside dialog
+                    tempSelected = selectedDay;
+                  });
+                },
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),  // ✅ cancel
+                child: Text("Cancel",
+                    style: TextStyle(color: ColorManager.fieldTextColor)),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);                 // ✅ confirm then update
+                  if (mounted) {
+                    setState(() {
+                      _selectedDate = tempSelected;
+                      controller.text =
+                      "${tempSelected.year}-${tempSelected.month.toString().padLeft(2, '0')}-${tempSelected.day.toString().padLeft(2, '0')}";
+                    });
+                  }
+                },
+                child: Text("Confirm",
+                    style: TextStyle(color: ColorManager.primary)),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
@@ -325,7 +347,7 @@ class TellAboutYourSelfViewState extends State<TellAboutYourSelfView>
                   onChanged: (val) => setState(() => country = val),
                 ),
                 widget.dimens.k10.verticalBoxPadding,
-                _label(context, "Ethnicity / City"),
+                _label(context, "Which city do you live in?"),
                 widget.dimens.k3.verticalBoxPadding,
                 CustomDropDown<String>(
                   list: newDocVM.ethnicitiesModel.data?.ethnicities
@@ -333,7 +355,7 @@ class TellAboutYourSelfViewState extends State<TellAboutYourSelfView>
                       .toList() ??
                       [],
                   selectedItem: ethnicity,
-                  hintText: "Enter your ethnicity or city",
+                  hintText: "Select your city",
                   onChanged: (val) => setState(() => ethnicity = val),
                 ),
                 // CustomField(

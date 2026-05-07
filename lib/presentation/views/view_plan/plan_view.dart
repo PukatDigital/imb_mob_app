@@ -31,8 +31,9 @@ class _PlanViewState extends State<PlanView> implements Result<String> {
           body: Column(
             children: [
               _headerSection(),
-              widget.dimens.k20.verticalBoxPadding,
-              _plansSection(),
+              Expanded(                          // ✅ fixes scaffold body overflow
+                child: _plansSection(),
+              ),
             ],
           ),
         );
@@ -150,8 +151,11 @@ class _PlanViewState extends State<PlanView> implements Result<String> {
 
     return Container(
       width: size.width * 0.85,
-      margin: EdgeInsets.only(right: widget.dimens.k15),
-      padding: EdgeInsets.all(widget.dimens.k20),
+      margin: EdgeInsets.only(right: size.width * 0.04,),
+      padding: EdgeInsets.symmetric(
+        horizontal: size.width * 0.05,
+        vertical: size.height * 0.02,
+      ),
       decoration: BoxDecoration(
         color: ColorManager.white,
         borderRadius: BorderRadius.circular(widget.dimens.k20),
@@ -165,6 +169,7 @@ class _PlanViewState extends State<PlanView> implements Result<String> {
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
           /// Title + Badge
           Row(
@@ -233,10 +238,10 @@ class _PlanViewState extends State<PlanView> implements Result<String> {
           _featureItem("Better visibility in search"),
           _featureItem("Serious user advantage"),
 
-          const Spacer(),
+          SizedBox(height: size.height * 0.015),
 
           PrimaryButton(
-            height: widget.dimens.k50,
+            height: widget.dimens.k40,
             onPressed: () {
               // TODO: Purchase logic
             },

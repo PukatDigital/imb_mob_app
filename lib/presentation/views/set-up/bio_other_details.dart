@@ -167,7 +167,7 @@ class BioAndOtherDetailsViewState extends State<BioAndOtherDetailsView>
   Widget _label(BuildContext context, String text) => Text(text,
       style: context.textTheme.bodySmall?.copyWith(
           color: ColorManager.fieldHintColor,
-          fontWeight: FontWeight.w500,
+          fontWeight: FontWeight.w600,
           fontSize: 13.0));
 
   @override

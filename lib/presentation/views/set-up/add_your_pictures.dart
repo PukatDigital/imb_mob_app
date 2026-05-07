@@ -417,8 +417,8 @@ class AddYourPicturesState extends State<AddYourPictures>
 
               return Container(
                 margin: const EdgeInsets.only(right: 8),
-                width: size.width / 4.86,
-                height: widget.dimens.k90,
+                width: size.width / 5,
+                height: size.width / 4,   // ✅ slightly taller than wide
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(widget.dimens.k15),
                   border: Border.all(color: ColorManager.dropDownBroder),

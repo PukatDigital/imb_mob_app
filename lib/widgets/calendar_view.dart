@@ -65,7 +65,7 @@ class CalendarView extends BaseStateLessWidget {
               child: Text(date.day.toString(), style: context.textTheme.bodyLarge!.copyWith(color: ColorManager.white)))),
     );*/
     return CalendarDatePicker(
-      initialDate: DateTime.now(),
+      initialDate: selectedDate ?? DateTime.now(),  // ✅ use selectedDate if available
       firstDate: isPrevious ? DateTime(1980) : DateTime.now(),
       lastDate: DateTime.now(),
       onDateChanged: (date) {

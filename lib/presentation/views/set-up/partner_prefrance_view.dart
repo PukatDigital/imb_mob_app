@@ -118,7 +118,7 @@ class PartnerPreferencesViewState extends State<PartnerPreferencesView> {
                   fontSize: 13.0)),
           widget.dimens.k3.verticalBoxPadding,
           CustomField(
-            hintText: "Describe your ideal life partner",
+            hintText: "Enter here",
             keyboardType: TextInputType.text,
             controller: lifePartnerController,
             maxLines: 3,

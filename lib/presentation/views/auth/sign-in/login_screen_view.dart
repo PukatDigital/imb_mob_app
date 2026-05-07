@@ -26,6 +26,7 @@ class _LoginFormViewState extends State<LoginFormView>
     with AuthMixin<LoginFormView>  implements Result<LoginModel>{
   @override
   Widget build(BuildContext context) {
+    var size = MediaQuery.sizeOf(context);
      return Consumer <AuthViewModel> (
       builder: (context, provider, child){
         authVM = provider;
@@ -63,6 +64,7 @@ class _LoginFormViewState extends State<LoginFormView>
                 maxLines: 1,
               ),
               widget.dimens.k10.verticalBoxPadding,
+
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -165,7 +167,9 @@ class _LoginFormViewState extends State<LoginFormView>
                   ],
                 ),
               ),
-              Spacer(),
+
+
+             SizedBox(height: size.height * .05),
               authVM.apiResponse is Loading
                   ? Loader()
                   :

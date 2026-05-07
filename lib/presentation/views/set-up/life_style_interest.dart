@@ -250,7 +250,7 @@ class LifStyleInterestViewState extends State<LifStyleInterestView>
                     .toList() ??
                     [],
                 selectedItem: futurePlan,
-                hint: "Select future plan",
+                hint: "Select an option",
                 onChanged: (val) => setState(() => futurePlan = val),
               ),
               _buildDropdown(
@@ -258,7 +258,7 @@ class LifStyleInterestViewState extends State<LifStyleInterestView>
                 label: StringManager.marriageDecision,
                 list: yesNo,
                 selectedItem: marriageDecision,
-                hint: "Family involvement in marriage decision",
+                hint: "Select an option",
                 onChanged: (val) => setState(() => marriageDecision = val),
               ),
               _buildDropdown(

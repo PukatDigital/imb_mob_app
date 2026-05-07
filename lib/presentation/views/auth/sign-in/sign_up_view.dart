@@ -34,6 +34,7 @@ class _SignUpFormViewState extends State<SignUpFormView>
 
   @override
   Widget build(BuildContext context) {
+    var size = MediaQuery.sizeOf(context);
     return Form(
       key: formKey, // ✅ FIXED (using mixin formKey)
       child: Column(
@@ -49,8 +50,9 @@ class _SignUpFormViewState extends State<SignUpFormView>
             controller: email,
             validator: (input) => AppValidators.fieldValidator(input),
           ),
+         //const Spacer(),
 
-          const Spacer(),
+         SizedBox(height: size.height * .20),
 
           /// 🔹 SIGN UP BUTTON
           PrimaryButton(
