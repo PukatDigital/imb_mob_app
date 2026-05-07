@@ -232,6 +232,7 @@ class _BlockListViewState extends State<BlockListView>
               blockData.addToBlockUser(
                   data,this
               );
+
               // setState(() {
               //   // selectedTab = AuthTab.signup;
               //
