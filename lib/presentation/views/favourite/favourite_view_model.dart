@@ -5,10 +5,11 @@ import '../../../application/common/log.dart';
 import '../../../application/core/result.dart';
 import '../../../application/network/result.dart';
 import '../../../base/base_view_model.dart';
+import '../../../data/models/get_profile_model/profile_details_model.dart';
 
 class FavouriteViewListModel extends BaseViewModel {
   FavouriteProfileModel favouriteProfileModel = FavouriteProfileModel();
-
+  ProfileDetailsModel profileDetailsModel =ProfileDetailsModel();
   Future<void> getFavouriteProfile(
       Result result, {
         required String profileId,
@@ -40,6 +41,25 @@ class FavouriteViewListModel extends BaseViewModel {
     apiResponse.fold(
       onSuccess: result.onSuccess,
       onError: result.onError,
+    );
+  }
+  Future<void> getAllProfileDetails(Result result, {required String profileId}) async {
+    apiResponse = Loading();
+    notifyListeners();
+
+    apiResponse = await api.getAllProfileDetails({"profile_id": profileId});
+
+    apiResponse.fold<ProfileDetailsModel>(
+      onSuccess: (res) {
+        profileDetailsModel = res;
+        d("✅ Profile Details: ${res.toJson()}");
+        notifyListeners();
+        result.onSuccess("success");
+      },
+      onError: (err) {
+        d("❌ Profile Details error: $err");
+        result.onError(err);
+      },
     );
   }
 }

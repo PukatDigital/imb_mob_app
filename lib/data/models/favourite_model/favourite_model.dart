@@ -75,6 +75,9 @@ class FavouriteProfiles {
   String? userId;
   String? profileName;
   String? profilePicture;
+  String? dateOfBirth;
+  int? age;
+  String? ethnicity;
   String? addedOn;
 
   FavouriteProfiles(
@@ -82,6 +85,9 @@ class FavouriteProfiles {
         this.userId,
         this.profileName,
         this.profilePicture,
+        this.dateOfBirth,
+        this.age,
+        this.ethnicity,
         this.addedOn});
 
   FavouriteProfiles.fromJson(Map<String, dynamic> json) {
@@ -89,6 +95,9 @@ class FavouriteProfiles {
     userId = json['user_id'];
     profileName = json['profile_name'];
     profilePicture = json['profile_picture'];
+    dateOfBirth = json['date_of_birth'];
+    age = json['age'];
+    ethnicity = json['ethnicity'];
     addedOn = json['added_on'];
   }
 
@@ -98,6 +107,9 @@ class FavouriteProfiles {
     data['user_id'] = this.userId;
     data['profile_name'] = this.profileName;
     data['profile_picture'] = this.profilePicture;
+    data['date_of_birth'] = this.dateOfBirth;
+    data['age'] = this.age;
+    data['ethnicity'] = this.ethnicity;
     data['added_on'] = this.addedOn;
     return data;
   }

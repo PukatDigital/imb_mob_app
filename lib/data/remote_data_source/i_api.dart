@@ -38,8 +38,11 @@ abstract class IApi {
   Future<ApiResponse> addToFavourite(Map<String, dynamic> data);
   Future<ApiResponse> addToBlock(Map<String, dynamic> data);
   Future<ApiResponse> addToReport(Map<String, dynamic> data);
+
   Future<ApiResponse> getBlockProfile(Map<String, dynamic> data);
   Future<ApiResponse> getFavouriteProfile(Map<String, dynamic> data);
+  Future<ApiResponse> getExploreProfile(Map<String, dynamic> data);
+  Future<ApiResponse> updateProfilePicture(Map<String, dynamic> data);
 
 
 }

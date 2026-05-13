@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:ideal_marriage_bureau/application/core/extensions/extensions.dart';
 import 'package:ideal_marriage_bureau/presentation/views/auth/auth_view_model.dart';
 import 'package:ideal_marriage_bureau/presentation/views/block/block_profile_view_model.dart';
+import 'package:ideal_marriage_bureau/presentation/views/explore/explore_model_view_model.dart';
 import 'package:ideal_marriage_bureau/presentation/views/favourite/favourite_view_model.dart';
 import 'package:ideal_marriage_bureau/presentation/views/home/home_view_model.dart';
 
@@ -70,6 +71,7 @@ class _MyAppState extends State<MyApp> {
             ChangeNotifierProvider(create: (_) => GetPersonalProfileViewModel()),
             ChangeNotifierProvider(create: (_) => BlockViewModel()),
             ChangeNotifierProvider(create: (_) => FavouriteViewListModel()),
+            ChangeNotifierProvider(create: (_) => ExploreViewModel()),
           ],
           child: MaterialApp(
             title: StringManager.appName,

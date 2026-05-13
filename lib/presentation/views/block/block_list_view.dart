@@ -228,10 +228,10 @@ class _BlockListViewState extends State<BlockListView>
               };
 
               print("REQUEST BODY => $data");
-
               blockData.addToBlockUser(
                   data,this
               );
+
               // setState(() {
               //   // selectedTab = AuthTab.signup;
               //

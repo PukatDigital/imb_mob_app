@@ -1,7 +1,10 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:ideal_marriage_bureau/application/core/extensions/extensions.dart';
+import 'package:ideal_marriage_bureau/presentation/views/profile/profile_view_model.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import '../../../../application/app_theme/color_scheme.dart';
@@ -24,7 +27,7 @@ class ProfileDetailsView extends BaseStateFullWidget {
 
 class _ProfileDetailsViewState extends State<ProfileDetailsView>
     implements Result<String> {
-  late AuthViewModel authVM;
+  late GetPersonalProfileViewModel personalProfileData;
 
   bool isPersonalDetails = false;
   bool isFamilyDetails = false;
@@ -35,13 +38,31 @@ class _ProfileDetailsViewState extends State<ProfileDetailsView>
   File? _selectedImage;
   final ImagePicker _picker = ImagePicker();
 
-  Future<void> _pickImage() async {
-    final XFile? image =
-    await _picker.pickImage(source: ImageSource.gallery);
+
+  Future<void> _pickImage(ImageSource source) async {
+    final XFile? image = await _picker.pickImage(
+      source: source,
+      imageQuality: 70,
+    );
+
     if (image != null) {
       setState(() {
         _selectedImage = File(image.path);
       });
+
+      // ✅ Convert image to base64
+      List<int> imageBytes = await _selectedImage!.readAsBytes();
+      String base64Image = base64Encode(imageBytes);
+
+      // ✅ API Payload
+      Map<String, dynamic> map = {
+        "data": {
+          "user_id": widget.profileData?.userId,
+          "profile_picture": base64Image,
+        }
+      };
+
+      personalProfileData.updateProfileImages(map, this);
     }
   }
 
@@ -51,9 +72,9 @@ class _ProfileDetailsViewState extends State<ProfileDetailsView>
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<AuthViewModel>(
+    return Consumer<GetPersonalProfileViewModel>(
       builder: (_, provider, __) {
-        authVM = provider;
+        personalProfileData = provider;
         return Scaffold(
           backgroundColor: Colors.white,
           body: _mainContent(),
@@ -328,7 +349,7 @@ class _ProfileDetailsViewState extends State<ProfileDetailsView>
                             image: attachmentImages.isNotEmpty
                                 ? NetworkImage(attachmentImages[0])
                             as ImageProvider
-                                : AssetImage(Assets.home1),
+                                : AssetImage(Assets.user),
                             fit: BoxFit.cover,
                           ),
                         ),
@@ -379,7 +400,7 @@ class _ProfileDetailsViewState extends State<ProfileDetailsView>
         data!.profilePicture!.isNotEmpty) {
       profileImage = NetworkImage(data.profilePicture!);
     } else {
-      profileImage = AssetImage(Assets.home1);
+      profileImage = AssetImage(Assets.user);
     }
 
     final fullName =
@@ -399,7 +420,35 @@ class _ProfileDetailsViewState extends State<ProfileDetailsView>
               bottom: 2,
               right: 2,
               child: GestureDetector(
-                onTap: _pickImage,
+                onTap: () {
+                  showModalBottomSheet(
+                    context: context,
+                    builder: (_) {
+                      return SafeArea(
+                        child: Wrap(
+                          children: [
+                            ListTile(
+                              leading: const Icon(Icons.camera_alt),
+                              title: const Text("Camera"),
+                              onTap: () {
+                                Navigator.pop(context);
+                                _pickImage(ImageSource.camera);
+                              },
+                            ),
+                            ListTile(
+                              leading: const Icon(Icons.photo),
+                              title: const Text("Gallery"),
+                              onTap: () {
+                                Navigator.pop(context);
+                                _pickImage(ImageSource.gallery);
+                              },
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  );
+                },
                 child: CircleAvatar(
                   radius: widget.dimens.k18,
                   backgroundColor: ColorManager.white,
@@ -631,6 +680,10 @@ class _ProfileDetailsViewState extends State<ProfileDetailsView>
 
   @override
   void onSuccess(String result) {
-    MyToast.showToast(message: "OTP Verified Successfully!");
+    // MyToast.showToast(message: result);
+    context.read<GetPersonalProfileViewModel>().getAllPersonalProfileDetails(
+      this,
+      profileId: widget.profileData?.userId??"", // ✅ FIXED
+    );
   }
 }
