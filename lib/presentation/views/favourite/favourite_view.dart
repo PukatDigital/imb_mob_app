@@ -8,6 +8,7 @@ import '../../../../application/core/result.dart';
 import '../../../../base/base_widget.dart';
 import '../../../../widgets/toast.dart';
 import '../../../constants/asset_manager.dart';
+import '../home/user_profile/user_profile_details.dart';
 import 'favourite_view_model.dart';
 import '../../../../data/models/favourite_model/favourite_model.dart';
 
@@ -200,108 +201,119 @@ class _FavouriteViewState extends State<FavouriteView>
     final hasImage =
         item.profilePicture != null && item.profilePicture!.isNotEmpty;
 
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(widget.dimens.k15),
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          // Background: network image OR grey placeholder with sized icon
-          if (hasImage)
-            Image.network(
-              item.profilePicture!,
-              fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) => _greyPlaceholder(),
-            )
-          else
-            _greyPlaceholder(),
+    return GestureDetector(
+      onDoubleTap: (){
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) =>
+                UserProfileDetailsView(profileId: item.profileId.toString()),
+          ),
+        );
+      },
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(widget.dimens.k15),
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            // Background: network image OR grey placeholder with sized icon
+            if (hasImage)
+              Image.network(
+                item.profilePicture!,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => _greyPlaceholder(),
+              )
+            else
+              _greyPlaceholder(),
 
-          // Foreground content
-          Padding(
-            padding: EdgeInsets.all(widget.dimens.k10),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                GestureDetector(
-                  onTap: () {
-                    final data = {
-                      "added_by":favouriteData.favouriteProfileModel.data?.userId,
-                      "target_user_id":  item.userId,
-                      "type": "remove" ,
-                    };
+            // Foreground content
+            Padding(
+              padding: EdgeInsets.all(widget.dimens.k10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      final data = {
+                        "added_by":favouriteData.favouriteProfileModel.data?.userId,
+                        "target_user_id":  item.userId,
+                        "type": "remove" ,
+                      };
 
-                    favouriteData.addToFavouriteList(
-                      data,
-                      this,
-                    );
-                  },
-                  child: Align(
-                    alignment: Alignment.topRight,
-                    child: CircleAvatar(
-                      backgroundColor:
-                      ColorManager.loginContainer.withOpacity(.4),
-                      child: Image.asset(
-                        Assets.favoriteImage,
-                        height: widget.dimens.k22,
-                        color: ColorManager.primary,
+                      favouriteData.addToFavouriteList(
+                        data,
+                        this,
+                      );
+                    },
+                    child: Align(
+                      alignment: Alignment.topRight,
+                      child: CircleAvatar(
+                        backgroundColor:
+                        ColorManager.loginContainer.withOpacity(.4),
+                        child: Image.asset(
+                          Assets.favoriteImage,
+                          height: widget.dimens.k22,
+                          color: ColorManager.primary,
+                        ),
                       ),
                     ),
                   ),
-                ),
-                const Spacer(),
-                Container(
-                  width: MediaQuery.of(context).size.width,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(widget.dimens.k30),
-                    color: ColorManager.white.withOpacity(.3),
-                  ),
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: widget.dimens.k10,
-                      vertical: widget.dimens.k4,
+                  const Spacer(),
+                  Container(
+                    width: MediaQuery.of(context).size.width,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(widget.dimens.k30),
+                      color: ColorManager.white.withOpacity(.3),
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            CircleAvatar(
-                              radius: widget.dimens.k4,
-                              backgroundColor: Colors.green,
-                            ),
-                            SizedBox(width: widget.dimens.k6),
-                            Text(
-                              "Active",
-                              style: context.textTheme.titleMedium?.copyWith(
-                                fontSize: widget.dimens.k12,
-                                color: ColorManager.dropDownBroder,
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: widget.dimens.k10,
+                        vertical: widget.dimens.k4,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              CircleAvatar(
+                                radius: widget.dimens.k4,
+                                backgroundColor: Colors.green,
                               ),
-                            ),
-                          ],
-                        ),
-                        Text(
-                          item.profileName ?? "",
-                          style: context.textTheme.titleMedium?.copyWith(
-                            fontSize: widget.dimens.k14,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
+                              SizedBox(width: widget.dimens.k6),
+                              Text(
+                                "Active",
+                                style: context.textTheme.titleMedium?.copyWith(
+                                  fontSize: widget.dimens.k12,
+                                  color: ColorManager.dropDownBroder,
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
-                        // if (item.addedOn != null)
-                        //   Text(
-                        //     item.addedOn!,
-                        //     style: context.textTheme.bodySmall?.copyWith(
-                        //       fontSize: widget.dimens.k11,
-                        //       color: Colors.white70,
-                        //     ),
-                        //   ),
-                      ],
+                          Text(
+                            "${item.profileName ?? ""} -${item.age ?? ""}",
+                            style: context.textTheme.titleMedium?.copyWith(
+                              fontSize: widget.dimens.k14,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ),
+                          // if (item.addedOn != null)
+                          //   Text(
+                          //     item.addedOn!,
+                          //     style: context.textTheme.bodySmall?.copyWith(
+                          //       fontSize: widget.dimens.k11,
+                          //       color: Colors.white70,
+                          //     ),
+                          //   ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -319,12 +331,10 @@ class _FavouriteViewState extends State<FavouriteView>
       ),
     );
   }
-
   @override
   void onError(String error) {
     MyToast.showToast(message: error);
   }
-
   @override
   void onSuccess(String result) {
     context.read<FavouriteViewListModel>().getFavouriteProfile(

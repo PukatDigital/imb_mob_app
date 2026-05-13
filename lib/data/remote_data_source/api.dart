@@ -35,6 +35,7 @@ import '../../application/network/error-handler/error_handler.dart';
 import '../../application/network/result.dart';
 
 import '../models/block_model/block_model.dart';
+import '../models/explore_model/explore_model.dart';
 import '../models/favourite_model/favourite_model.dart';
 import '../models/login_model/Auth_login_model.dart';
 
@@ -776,6 +777,7 @@ class Apis implements IApi {
       return Error(e.toString());
     }
   }
+
   @override
   Future<ApiResponse> getBlockProfile(Map<String, dynamic> data) async {
     apiService.setIsTokenRequired(value: true);
@@ -808,7 +810,42 @@ class Apis implements IApi {
       return Error(e.toString());
     }
   }
+  @override
+  Future<ApiResponse> getExploreProfile(Map<String, dynamic> data) async {
+    apiService.setIsTokenRequired(value: true);
+    try {
+      final responseData = await dio.get(
+        "method/onebms.api.profile_api.get_matched_profile",
+        queryParameters: data,
+      );
+      return Success(ExploreDataModel.fromJson(responseData.data));
+    } on DioException catch (e) {
+      return Error(getErrorMessage(e));
+    } catch (e) {
+      return Error(e.toString());
+    }
+  }
+  @override
+  Future<ApiResponse> updateProfilePicture(Map<String, dynamic> data) async {
+    apiService.setIsTokenRequired(value: true);
 
+    d(data);
+    try {
+      final responseData = await dio.post(
+        "method/onebms.api.profile_api.update_profile_picture",
+        data: data,
+      );
+      d(responseData.data);
+      d(responseData.data["message"]);
+      return Success(responseData.data["message"]);
+    } on DioException catch (e) {
+      d(e);
+      return Error(getErrorMessage(e));
+    } catch (e) {
+      d(e);
+      return Error(e.toString());
+    }
+  }
 
   //
   // @override

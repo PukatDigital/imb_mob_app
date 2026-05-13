@@ -1,60 +1,70 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:ideal_marriage_bureau/application/core/extensions/extensions.dart';
+import 'package:ideal_marriage_bureau/presentation/views/explore/explore_model_view_model.dart';
 import 'package:provider/provider.dart';
 import '../../../../application/app_theme/color_scheme.dart';
 import '../../../../application/core/result.dart';
 import '../../../../base/base_widget.dart';
 import '../../../../widgets/toast.dart';
 import '../../../constants/asset_manager.dart';
-import '../auth/auth_view_model.dart';
+import '../home/user_profile/user_profile_details.dart';
 import 'filter_explore.dart';
+import '../../../data/models/explore_model/explore_model.dart';
+
 class ExploreView extends BaseStateFullWidget {
   ExploreView({super.key});
+
   @override
   State<ExploreView> createState() => _ExploreViewState();
 }
+
 class _ExploreViewState extends State<ExploreView>
     implements Result<String> {
-  late AuthViewModel authVM;
+  late ExploreViewModel exploreData;
+
   bool isSearchVisible = false;
   bool isFilterOpen = false;
+
   TextEditingController searchController = TextEditingController();
-  final List<Map<String, String>> profiles = List.generate(
-    8,
-        (index) => {
-      "name": "Maryam Baloch",
-      "age": "24",
-      "city": "Lahore",
-      "height": "5.6ft",
-      "status": "Active",
-      "image": Assets.home2,
-    },
-  );
-  List<Map<String, String>> filteredProfiles = [];
+
+  // Active filter params
+  Map<String, dynamic> _filterParams = {
+    "children": "",
+    "age_from": "",
+    "age_to": "",
+    "religion": "",
+    "education": "",
+    "location": "",
+    "marital_status": "",
+    "name": "",
+  };
+
   @override
   void initState() {
     super.initState();
-    filteredProfiles = profiles;
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      _loadProfiles();
+    });
+  }
+
+  void _loadProfiles() {
+    context.read<ExploreViewModel>().exploreList(this, filterParams: _filterParams);
   }
 
   void _onSearch(String value) {
     setState(() {
-      filteredProfiles = profiles.where((item) {
-        return item["name"]!
-            .toLowerCase()
-            .contains(value.toLowerCase()) ||
-            item["city"]!
-                .toLowerCase()
-                .contains(value.toLowerCase());
-      }).toList();
+      _filterParams["name"] = value;
     });
+    context.read<ExploreViewModel>().exploreList(this, filterParams: _filterParams);
   }
+
   @override
   Widget build(BuildContext context) {
-    return Consumer<AuthViewModel>(
+    return Consumer<ExploreViewModel>(
       builder: (_, provider, __) {
-        authVM = provider;
+        exploreData = provider;
         return Scaffold(
           backgroundColor: Colors.white,
           body: Stack(
@@ -62,16 +72,16 @@ class _ExploreViewState extends State<ExploreView>
               _mainContent(),
               if (isFilterOpen)
                 BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: -6, sigmaY: -6),
-                  child: Container(
-                    color: ColorManager.transparent),
-                  ),
+                  filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
+                  child: Container(color: ColorManager.transparent),
+                ),
             ],
           ),
         );
       },
     );
   }
+
   Widget _mainContent() {
     return Container(
       decoration: BoxDecoration(
@@ -101,6 +111,7 @@ class _ExploreViewState extends State<ExploreView>
       ),
     );
   }
+
   Widget _header() {
     return Row(
       children: [
@@ -120,11 +131,12 @@ class _ExploreViewState extends State<ExploreView>
             setState(() {
               isSearchVisible = !isSearchVisible;
               searchController.clear();
-              filteredProfiles = profiles;
+              _filterParams["name"] = "";
             });
+            if (!isSearchVisible) _loadProfiles();
           },
           child: SizedBox(
-            width: widget.dimens.k40, // Same width as back button for symmetry
+            width: widget.dimens.k40,
             child: Align(
               alignment: Alignment.centerRight,
               child: CircleAvatar(
@@ -141,6 +153,7 @@ class _ExploreViewState extends State<ExploreView>
       ],
     );
   }
+
   Widget _searchField() {
     return TextField(
       controller: searchController,
@@ -154,26 +167,22 @@ class _ExploreViewState extends State<ExploreView>
           vertical: widget.dimens.k15,
           horizontal: widget.dimens.k20,
         ),
-        // Fully circular & transparent border for all states
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(50), // Full circular
-          borderSide: BorderSide(color: Colors.transparent),
+          borderRadius: BorderRadius.circular(50),
+          borderSide: const BorderSide(color: Colors.transparent),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(50),
-          borderSide: BorderSide(color: Colors.transparent),
+          borderSide: const BorderSide(color: Colors.transparent),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(50),
-          borderSide: BorderSide(color: Colors.transparent),
-        ),
-        disabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(50),
-          borderSide: BorderSide(color: Colors.transparent),
+          borderSide: const BorderSide(color: Colors.transparent),
         ),
       ),
     );
   }
+
   Widget _matchingRow() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -190,17 +199,34 @@ class _ExploreViewState extends State<ExploreView>
           onTap: () async {
             setState(() => isFilterOpen = true);
 
-            await showModalBottomSheet(
+            final result = await showModalBottomSheet<Map<String, dynamic>>(
               context: context,
               isScrollControlled: true,
               isDismissible: true,
               enableDrag: true,
               backgroundColor: Colors.transparent,
-              builder: (_) =>  FilterExploreBottomView(),
+              builder: (_) => FilterExploreBottomView(
+                initialParams: _filterParams,
+              ),
             );
 
-
             setState(() => isFilterOpen = false);
+
+            if (result != null) {
+              setState(() {
+                _filterParams = {
+                  "children": result["children"] ?? "",
+                  "age_from": result["age_from"] ?? "",
+                  "age_to": result["age_to"] ?? "",
+                  "religion": result["religion"] ?? "",
+                  "education": result["education"] ?? "",
+                  "location": result["location"] ?? "",
+                  "marital_status": result["marital_status"] ?? "",
+                  "name": _filterParams["name"] ?? "",
+                };
+              });
+              _loadProfiles();
+            }
           },
           child: Row(
             children: [
@@ -225,89 +251,124 @@ class _ExploreViewState extends State<ExploreView>
       ],
     );
   }
+
   Widget _profileGrid() {
+    final profiles = exploreData.exploreDataModel.data?.profiles ?? [];
+
+    if (profiles.isEmpty) {
+      return const Center(child: Text("No profiles found"));
+    }
+
     return GridView.builder(
       padding: EdgeInsets.zero,
-      itemCount: filteredProfiles.length,
+      itemCount: profiles.length,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         mainAxisSpacing: widget.dimens.k12,
         crossAxisSpacing: widget.dimens.k12,
         childAspectRatio: .68,
       ),
-      itemBuilder: (_, index) {
-        return _profileCard(filteredProfiles[index]);
-      },
+      itemBuilder: (_, index) => _profileCard(profiles[index]),
     );
   }
-  Widget _profileCard(Map<String, String> item) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(widget.dimens.k15),
-        image: DecorationImage(
-          image: AssetImage(item["image"]!),
-          fit: BoxFit.cover,
-        ),
-      ),
-      child: Padding(
-        padding: EdgeInsets.all(widget.dimens.k10),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Align(
-              alignment: Alignment.topRight,
-              child: CircleAvatar(
-                backgroundColor:
-                ColorManager.loginContainer.withOpacity(.4),
-                child: Image.asset(
-                  Assets.favorite,
-                  height: widget.dimens.k22,
-                ),
-              ),
+
+  Widget _profileCard(Profiles item) {
+    final imageUrl = item.profilePicture ?? '';
+
+    return GestureDetector(
+      onDoubleTap: (){
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) =>
+                UserProfileDetailsView(profileId: item.profileId.toString()),
+          ),
+        );
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(widget.dimens.k15),
+          color: imageUrl.isEmpty
+              ? Colors.grey.shade400 // dark grey background
+              : null,
+          image: imageUrl.isNotEmpty
+              ? DecorationImage(
+            image: NetworkImage(imageUrl) as ImageProvider,
+            fit: BoxFit.cover,
+          )
+              :DecorationImage(
+            image: AssetImage(Assets.user),
+            fit: BoxFit.none, // keeps original smaller size
+            alignment: Alignment.center,
+            scale: 5.0, // increase value = smaller image
+            colorFilter: ColorFilter.mode(
+              Colors.grey.shade500,
+              BlendMode.srcIn,
             ),
-            const Spacer(),
-            Row(
-              children: [
-                CircleAvatar(
-                  radius: widget.dimens.k4,
-                  backgroundColor: Colors.green,
-                ),
-                SizedBox(width: widget.dimens.k6),
-                Text(
-                  item["status"]!,
-                  style: context.textTheme.titleMedium?.copyWith(
-                    fontSize: widget.dimens.k12,
-                    color: ColorManager.dropDownBroder,
+          ),
+            ),
+
+        child: Padding(
+          padding: EdgeInsets.all(widget.dimens.k10),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Align(
+                alignment: Alignment.topRight,
+                child: CircleAvatar(
+                  backgroundColor: ColorManager.loginContainer.withOpacity(.4),
+                  child: Image.asset(
+                    item.isFavourite == true
+                        ? Assets.favoriteImage // use filled icon if favourite
+                        : Assets.favorite,
+                    height: widget.dimens.k22,
                   ),
                 ),
-              ],
-            ),
-            Text(
-              "${item["name"]} - ${item["age"]}",
-              style: context.textTheme.titleMedium?.copyWith(
-                fontSize: widget.dimens.k14,
-                fontWeight: FontWeight.w600,
-                color: Colors.white,
               ),
-            ),
-            Text(
-              "${item["city"]} - ${item["height"]}",
-              style: context.textTheme.titleMedium?.copyWith(
-                fontSize: widget.dimens.k12,
-                color: ColorManager.dropDownBroder,
+              const Spacer(),
+              Row(
+                children: [
+                  CircleAvatar(
+                    radius: widget.dimens.k4,
+                    backgroundColor: Colors.green,
+                  ),
+                  SizedBox(width: widget.dimens.k6),
+                  Text(
+                    "Active",
+                    style: context.textTheme.titleMedium?.copyWith(
+                      fontSize: widget.dimens.k12,
+                      color: ColorManager.dropDownBroder,
+                    ),
+                  ),
+                ],
               ),
-            ),
-          ],
+              Text(
+                "${item.profileName ?? ''} - ${item.age ?? ''}",
+                style: context.textTheme.titleMedium?.copyWith(
+                  fontSize: widget.dimens.k14,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
+              ),
+              Text(
+                "${item.location ?? ''} - ${item.profession ?? ''}",
+                style: context.textTheme.titleMedium?.copyWith(
+                  fontSize: widget.dimens.k12,
+                  color: ColorManager.dropDownBroder,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
+
   @override
   void onError(String error) {
     MyToast.showToast(message: error);
   }
+
   @override
-  void onSuccess(String result) {
-    MyToast.showToast(message: "OTP Verified Successfully!");
-  }
+  void onSuccess(String result) {}
 }
