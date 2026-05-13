@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ideal_marriage_bureau/presentation/views/view_plan/payment_view.dart';
 import 'package:provider/provider.dart';
 import 'package:ideal_marriage_bureau/application/core/extensions/extensions.dart';
 
@@ -33,7 +34,7 @@ class _PlanViewState extends State<PlanView> implements Result<String> {
               _headerSection(),
               Expanded(                          // ✅ fixes scaffold body overflow
                 child: _plansSection(),
-              ),
+              ), 
             ],
           ),
         );
@@ -243,6 +244,13 @@ class _PlanViewState extends State<PlanView> implements Result<String> {
           PrimaryButton(
             height: widget.dimens.k40,
             onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) =>
+                      PaymentView(),
+                ),
+              );
               // TODO: Purchase logic
             },
             childText: "Get $credits Credits",

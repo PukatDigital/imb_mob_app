@@ -11,6 +11,12 @@ class Assets {
   // Images
   static const String onboardingImage = '${prefixImages}Onboarding  image.png';
   static const String arrowUp = '${prefixImages}arrow up.png';
+  static const String linked = '${prefixImages}linked.png';
+  static const String email = '${prefixImages}email.png';
+  static const String phone = '${prefixImages}phone.png';
+  static const String jazzCash = '${prefixImages}jazzcash.png';
+  static const String easypaisa = '${prefixImages}easypaisa.png';
+  static const String pVerfication = '${prefixImages}pVerfication.png';
   static const String imbIcon = '${prefixImages}imb icon.png';
   static const String loginWithGoogle = '${prefixImages}Google Logo.png';
   static const String male = '${prefixImages}male.png';

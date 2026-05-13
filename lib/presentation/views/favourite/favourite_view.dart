@@ -8,6 +8,7 @@ import '../../../../application/core/result.dart';
 import '../../../../base/base_widget.dart';
 import '../../../../widgets/toast.dart';
 import '../../../constants/asset_manager.dart';
+import '../home/user_profile/user_profile_details.dart';
 import 'favourite_view_model.dart';
 import '../../../../data/models/favourite_model/favourite_model.dart';
 
@@ -59,10 +60,7 @@ class _FavouriteViewState extends State<FavouriteView>
     return Consumer<FavouriteViewListModel>(
       builder: (_, provider, __) {
         favouriteData = provider;
-        return Scaffold(
-          backgroundColor: Colors.white,
-          body: _mainContent(),
-        );
+        return Scaffold(backgroundColor: Colors.white, body: _mainContent());
       },
     );
   }
@@ -182,7 +180,7 @@ class _FavouriteViewState extends State<FavouriteView>
     }
 
     return GridView.builder(
-      padding: EdgeInsets.zero,
+      padding: EdgeInsets.only(bottom: widget.dimens.k70),
       itemCount: profiles.length,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
@@ -191,7 +189,20 @@ class _FavouriteViewState extends State<FavouriteView>
         childAspectRatio: .85,
       ),
       itemBuilder: (_, index) {
-        return _profileCard(profiles[index]);
+        return GestureDetector(
+          behavior: HitTestBehavior.translucent, // ✅ fix tap conflict
+   onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => UserProfileDetailsView(
+                  profileId: profiles[index].profileId.toString(),
+                ),
+              ),
+            );
+          },
+          child: _profileCard(profiles[index]),
+        );
       },
     );
   }
@@ -224,21 +235,20 @@ class _FavouriteViewState extends State<FavouriteView>
                 GestureDetector(
                   onTap: () {
                     final data = {
-                      "added_by":favouriteData.favouriteProfileModel.data?.userId,
-                      "target_user_id":  item.userId,
-                      "type": "remove" ,
+                      "added_by":
+                          favouriteData.favouriteProfileModel.data?.userId,
+                      "target_user_id": item.userId,
+                      "type": "remove",
                     };
 
-                    favouriteData.addToFavouriteList(
-                      data,
-                      this,
-                    );
+                    favouriteData.addToFavouriteList(data, this);
                   },
                   child: Align(
                     alignment: Alignment.topRight,
                     child: CircleAvatar(
-                      backgroundColor:
-                      ColorManager.loginContainer.withOpacity(.4),
+                      backgroundColor: ColorManager.loginContainer.withOpacity(
+                        .4,
+                      ),
                       child: Image.asset(
                         Assets.favoriteImage,
                         height: widget.dimens.k22,

@@ -302,6 +302,14 @@ class _ProfileScreenState extends State<ProfileScreen> with AuthMixin
                   ),
                   widget.dimens.k20.verticalBoxPadding,
                   legalCard((){
+                    widget.navigator.pushNamed(RouteManager.rLinkedDeviceView,);
+                  },Assets.linked,"Accounts Linked"),
+                  widget.dimens.k20.verticalBoxPadding,
+                  legalCard((){
+                    widget.navigator.pushNamed(RouteManager.rPaymentHistoryView,);
+                  },Assets.linked,"Payment History"),
+                  widget.dimens.k20.verticalBoxPadding,
+                  legalCard((){
                     widget.navigator.pushNamed(RouteManager.rBlockListView,);
                   },Assets.blockIcon,"Blocked Account"),
                   widget.dimens.k20.verticalBoxPadding,

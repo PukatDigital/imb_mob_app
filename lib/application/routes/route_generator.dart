@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../data/models/get_profile_model/profile_details_model.dart';
 import '../../onboarding/onboarding.dart';
+import '../../presentation/linked_devices/linked_device_view.dart';
 import '../../presentation/views/auth/auth_view_model.dart';
 import '../../presentation/views/auth/sign-in/login_view.dart';
 import '../../presentation/views/auth/sign-in/sign_up_create_view.dart';
@@ -14,6 +15,8 @@ import '../../presentation/views/bottom_bar/bottom_bar_view.dart';
 import '../../presentation/views/notification/notification_list_view.dart';
 import '../../presentation/views/profile/profile_details_view.dart';
 import '../../presentation/views/set-up/sign_up_home_view.dart';
+import '../../presentation/views/view_plan/payment_history.dart';
+import '../../presentation/views/view_plan/payment_view.dart';
 import '../../presentation/views/view_plan/plan_view.dart';
 import '../../splash/splash_view.dart';
 import '../core/routes/routes.dart';
@@ -25,6 +28,7 @@ class RouteManager {
   static const rLoginView = '/rLoginView';
   static const rVerificationCodeView = '/rVerificationCodeView';
   static const rSignUpCreateView = '/rSignUpCreateView';
+
   static const rBottomBarView = '/rBottomBarView';
   static const rSignInView = '/rSignInView';
   static const rHomeView = '/rHomeView';
@@ -40,6 +44,9 @@ class RouteManager {
   static const rPlanView = '/rPlanView';
   static const rNotificationListView = '/rNotificationListView';
   static const rBlockListView = '/rBlockListView';
+  static const rLinkedDeviceView = '/rLinkedDeviceView';
+  static const rPaymentView = '/rPaymentView';
+  static const rPaymentHistoryView = '/rPaymentHistoryView';
 }
 
 class RouteGenerator {
@@ -121,6 +128,27 @@ class RouteGenerator {
                 () => ChangeNotifierProvider(
               create: (BuildContext context) => AuthViewModel(),
               child: PlanView(),
+            ));
+        case RouteManager.rLinkedDeviceView:
+        return PageRouter.fadeScale(
+            settings,
+                () => ChangeNotifierProvider(
+              create: (BuildContext context) => AuthViewModel(),
+              child: LinkedDeviceView(),
+            ));
+        case RouteManager.rPaymentHistoryView:
+        return PageRouter.fadeScale(
+            settings,
+                () => ChangeNotifierProvider(
+              create: (BuildContext context) => AuthViewModel(),
+              child: PaymentHistoryView(),
+            ));
+        case RouteManager.rPaymentView:
+        return PageRouter.fadeScale(
+            settings,
+                () => ChangeNotifierProvider(
+              create: (BuildContext context) => AuthViewModel(),
+              child: PaymentView(),
             ));
 
         case RouteManager.rNotificationListView:

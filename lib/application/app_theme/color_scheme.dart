@@ -25,6 +25,12 @@ class ColorManager {
   static const fieldHintColor = Color(0xff575757);
   static const addPicture = Color(0xffF5F5F5);
   static const onlineColor = Color(0xff57B72A);
+ static const approvedText = const Color(0xff34A853);
+ static const approveBg = const Color(0xffE6F9F0);
+ static const rejectedBg = const Color(0xffFDE8E8);
+ static const rejectedText = const Color(0xffB11E24);
+static const progressBg = const Color(0xffEAF0FB);
+static const  progressText = const Color(0xff3A72D1);
 
   static const white = Color(0xFFFFFFFF);
   static const halfWhite = Color(0xFFFAFAFA);

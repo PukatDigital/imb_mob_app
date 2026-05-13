@@ -64,7 +64,7 @@ class _LoginViewState extends State<LoginView> {
         return  Form(
           key: _formKey,
           child: SingleChildScrollView(
-            physics: const NeverScrollableScrollPhysics(),
+            physics: const AlwaysScrollableScrollPhysics(          ),
             child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
               children: [
