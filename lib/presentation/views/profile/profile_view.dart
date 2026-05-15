@@ -313,7 +313,50 @@ class _ProfileScreenState extends State<ProfileScreen> with AuthMixin
                     widget.navigator.pushNamed(RouteManager.rBlockListView,);
                   },Assets.blockIcon,"Blocked Account"),
                   widget.dimens.k20.verticalBoxPadding,
-                  legalCard((){},Assets.deleteIcon,"Delete Account"),
+                  legalCard(
+                        () {
+                      showDialog(
+                        context: context,
+                        barrierDismissible: false,
+                        builder: (context) {
+                          return AlertDialog(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            title: const Text("Delete Account"),
+                            content: const Text(
+                              "Are you sure you want to delete your account?",
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                child: const Text("Cancel"),
+                              ),
+                              ElevatedButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+
+                                  final data = {
+                                    "profile_id":
+                                    profileData.profileDetailsModel.data?.profileId,
+                                    "user_id":
+                                    profileData.profileDetailsModel.data?.userId,
+                                  };
+
+                                  profileData.addToDeleteAccount(data, this);
+                                },
+                                child: const Text("Delete"),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
+                    Assets.deleteIcon,
+                    "Delete Account",
+                  ),
                   widget.dimens.k20.verticalBoxPadding,
                   legalCard((){
 
@@ -354,6 +397,19 @@ class _ProfileScreenState extends State<ProfileScreen> with AuthMixin
   void onSuccess(String result) {
     MyToast.showToast(message: result,
     typeToast: TypeToast.success);
+
+    if (result.contains("Profile Deleted successfully")) {
+
+       widget.iPrefHelper.clear();
+
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        RouteManager.rLoginView,
+            (route) => false,
+      );
+    }
+
+
   }
 
   legalCard(onTap, image, text) {

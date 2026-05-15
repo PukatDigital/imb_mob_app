@@ -697,6 +697,31 @@ class Apis implements IApi {
       return Error(e.toString());
     }
   }
+  @override
+  Future<ApiResponse> updateProfile(Map<String, dynamic> data) async {
+    apiService.setIsTokenRequired(value: true);
+    try {
+      d("🚀 UPDATE DATA: ${jsonEncode(data)}"); // log actual JSON
+      final responseData = await dio.post(
+        "method/onebms.api.profile_api.update_profile",
+        data: jsonEncode(data), // always send JSON
+        options: Options(
+          headers: {
+            "Content-Type": "application/json",
+          },
+        ),
+      );
+      d("✅ STATUS: ${responseData.statusCode}");
+      d("📩 RESPONSE: ${responseData.data}");
+      return Success(responseData.data['message']);
+    } on DioException catch (e) {
+      d("❌ DIO ERROR: ${e.response?.data}");
+      return Error(getErrorMessage(e));
+    } catch (e) {
+      d("❌ UNKNOWN ERROR: $e");
+      return Error(e.toString());
+    }
+  }
 
   @override
   Future<ApiResponse> userSignUp(Map<String, dynamic> data) async {
@@ -764,6 +789,27 @@ class Apis implements IApi {
     try {
       final responseData = await dio.post(
         "method/onebms.api.profile_api.report_profile",
+        data: data,
+      );
+      d(responseData.data);
+      d(responseData.data["message"]);
+      return Success(responseData.data["message"]);
+    } on DioException catch (e) {
+      d(e);
+      return Error(getErrorMessage(e));
+    } catch (e) {
+      d(e);
+      return Error(e.toString());
+    }
+  }
+  @override
+  Future<ApiResponse> addToDeleteAccount(Map<String, dynamic> data) async {
+    apiService.setIsTokenRequired(value: true);
+
+    d(data);
+    try {
+      final responseData = await dio.post(
+        "method/onebms.api.profile_api.delete_profile",
         data: data,
       );
       d(responseData.data);

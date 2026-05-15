@@ -55,6 +55,7 @@ class BioAndOtherDetailsViewState extends State<BioAndOtherDetailsView>
       gender:            current.gender,
       dateOfBirth:       current.dateOfBirth,
       motherTongue:      current.motherTongue,
+      profileCompleted: current.profileCompleted,
       caste:             current.caste,
       height:            current.height,
       weight:            current.weight,

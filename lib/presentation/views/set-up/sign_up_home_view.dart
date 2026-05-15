@@ -41,6 +41,10 @@ class _SignUpCreationViewState extends State<SignUpCreationView>
   late SetUpProfileViewModel newDocVM;
   final PageController _pageController = PageController();
   int _currentStep = 0;
+  bool get _isEditMode {
+    final saved = context.read<IPrefHelper>().retrieveSetupProfile();
+    return (saved?.profileCompleted ?? 0) == 1;
+  }
   // ── Page Keys ────────────────────────────────────────────────────────────
   final GlobalKey<TellAboutYourSelfViewState>   _page1Key = GlobalKey();
   final GlobalKey<TellAboutYourFamilyViewState> _page2Key = GlobalKey();
@@ -171,12 +175,12 @@ class _SignUpCreationViewState extends State<SignUpCreationView>
   // }
   // ✅ Async banao — base64 conversion ke liye
   Future<Map<String, dynamic>> _buildSubmitPayload() async {
-    final pref  = context.read<IPrefHelper>();
-    final saved = pref.retrieveSetupProfile() ?? SetupProfilePrefModel();
-    final userId = pref.loginModel?.data?.user?.email ?? '';
+    final pref    = context.read<IPrefHelper>();
+    final saved   = pref.retrieveSetupProfile() ?? SetupProfilePrefModel();
+    final userId  = pref.loginModel?.data?.user?.email ?? '';
+    final isEdit  = (saved.profileCompleted ?? '') == '1';
 
-    // ✅ Local paths se base64 on-the-fly banao
-    final List<String> base64List = [];
+    // ── Resolve images ──────────────────────────────────────────────────────
     final paths = [
       saved.attach1 ?? '',
       saved.attach2 ?? '',
@@ -184,77 +188,169 @@ class _SignUpCreationViewState extends State<SignUpCreationView>
       saved.attach4 ?? '',
     ].where((p) => p.isNotEmpty).toList();
 
+    final List<String> resolvedImages = [];
     for (final path in paths) {
-      final file = File(path);
-      if (file.existsSync()) {
-        final b64 = await _fileToBase64(file);
-        base64List.add(b64);
-        print("✅ base64 generated, length: ${b64.length}");
+      if (path.startsWith('http://') || path.startsWith('https://')) {
+        resolvedImages.add(path);         // network URL → pass as-is
+      } else {
+        final file = File(path);
+        if (file.existsSync()) {
+          resolvedImages.add(await _fileToBase64(file)); // local → base64
+        }
       }
     }
 
-    print("📦 Total base64 images for payload: ${base64List.length}");
-
-    return {
-      "data": {
-        "user_id":          userId,
-        "profile_name":     saved.profileName ?? '',
-        "last_name":        saved.lastName ?? '',
-        "gender":           saved.gender ?? '',
-        "date_of_birth":    saved.dateOfBirth ?? '',
-        "mother_tongue":    saved.motherTongue ?? '',
-        "caste":            saved.caste ?? '',
-        "hight":            saved.height ?? '',
-        "weight":           saved.weight ?? '',
-        "material_status":  saved.materialStatus ?? '',
-        "country":          saved.country ?? '',
-        "ethnicity":        saved.ethnicity ?? '',
-        "nationality":      saved.nationality ?? '',
-        "religion":         saved.religion ?? '',
-        "belongs_to":       saved.belongsTo ?? '',
-        "religious_practice": saved.religiousPractice ?? '',
-        "zodiac_sign":      saved.zodiacSign ?? '',
-        "father_name":      saved.fatherName ?? '',
-        "father_occupation": saved.fatherOccupation ?? '',
-        "family_values":    saved.familyValues ?? '',
-        "living_arrangement": saved.livingArrangement ?? '',
-        "married":          saved.married ?? '',
-        "unmarried":        saved.unmarried ?? '',
-        "house_size":       saved.houseSize ?? '',
-        "area_society":     saved.areaSociety ?? '',
-        "can_move_abroad_for_marriage": saved.canMoveAbroadForMarriage ?? '',
-        "have_childern":    saved.haveChildren ?? '',
-        "other_family_details": saved.otherFamilyDetails ?? '',
-        "qualification":    saved.qualification ?? '',
-        "name_institution": saved.nameInstitution ?? '',
-        "profession":       saved.profession ?? '',
-        "employer":         saved.employer ?? '',
-        "employee_type":    saved.employeeType ?? '',
-        "job_title":        saved.jobTitle ?? '',
-        "income":           saved.income ?? '',
-        "business":         saved.business ?? '',
-        "business_text":    saved.businessText ?? '',
-        "life_style_and_interest": saved.lifeStyleAndInterest ?? [],
-        "future_plan":      saved.futurePlan ?? '',
-        "family_involvement": saved.familyInvolvement ?? '',
-        "marriage_period":  saved.marriagePeriod ?? '',
-        "smoke":            saved.smoke ?? '',
-        "halal_food":       saved.halalFood ?? '',
-        "for_girl":         saved.forGirl ?? '',
-        "for_boy":          saved.forBoy ?? '',
-        "life_partner":     saved.lifePartner ?? '',
-        // ✅ On-the-fly base64
-        "attach_1":   base64List.isNotEmpty ? base64List[0] : '',
-        "attached_2": base64List.length > 1 ? base64List[1] : '',
-        "attach_3":   base64List.length > 2 ? base64List[2] : '',
-        "attach_4":   base64List.length > 3 ? base64List[3] : '',
-        "bio":               saved.bio ?? '',
-        "marriage_intension": saved.marriageIntension ?? '',
-        "creater_profile":   saved.createrProfile ?? '',
-        "enable_notification": saved.enableNotification ?? '',
-      }
+    // ── Base payload (shared between create & update) ───────────────────────
+    final Map<String, dynamic> data = {
+      "user_id":          userId,
+      "last_name":        saved.lastName ?? '',
+      "gender":           saved.gender ?? '',
+      "date_of_birth":    saved.dateOfBirth ?? '',
+      "mother_tongue":    saved.motherTongue ?? '',
+      "caste":            saved.caste ?? '',
+      "hight":            saved.height ?? '',
+      "weight":           saved.weight ?? '',
+      "material_status":  saved.materialStatus ?? '',
+      "country":          saved.country ?? '',
+      "ethnicity":        saved.ethnicity ?? '',
+      "nationality":      saved.nationality ?? '',
+      "religion":         saved.religion ?? '',
+      "belongs_to":       saved.belongsTo ?? '',
+      "religious_practice": saved.religiousPractice ?? '',
+      "zodiac_sign":      saved.zodiacSign ?? '',
+      "father_name":      saved.fatherName ?? '',
+      "father_occupation": saved.fatherOccupation ?? '',
+      "family_values":    saved.familyValues ?? '',
+      "living_arrangement": saved.livingArrangement ?? '',
+      "married":          saved.married ?? '',
+      "unmarried":        saved.unmarried ?? '',
+      "house_size":       saved.houseSize ?? '',
+      "area_society":     saved.areaSociety ?? '',
+      "can_move_abroad_for_marriage": saved.canMoveAbroadForMarriage ?? '',
+      "have_childern":    saved.haveChildren ?? '',
+      "other_family_details": saved.otherFamilyDetails ?? '',
+      "qualification":    saved.qualification ?? '',
+      "name_institution": saved.nameInstitution ?? '',
+      "profession":       saved.profession ?? '',
+      "employer":         saved.employer ?? '',
+      "employee_type":    saved.employeeType ?? '',
+      "job_title":        saved.jobTitle ?? '',
+      "income":           saved.income ?? '',
+      "business":         saved.business ?? '',
+      "business_text":    saved.businessText ?? '',
+      "lift_style_and_interest": saved.lifeStyleAndInterest ?? [],
+      "future_plan":      saved.futurePlan ?? '',
+      "family_involvement": saved.familyInvolvement ?? '',
+      "marriage_period":  saved.marriagePeriod ?? '',
+      "smoke":            saved.smoke ?? '',
+      "halal_food":       saved.halalFood ?? '',
+      "for_girl":         saved.forGirl ?? '',
+      "for_boy":          saved.forBoy ?? '',
+      "life_partner":     saved.lifePartner ?? '',
+      "attach_1":   resolvedImages.isNotEmpty ? resolvedImages[0] : '',
+      "attach_2": resolvedImages.length > 1 ? resolvedImages[1] : '',
+      "attach_3":   resolvedImages.length > 2 ? resolvedImages[2] : '',
+      "attach_4":   resolvedImages.length > 3 ? resolvedImages[3] : '',
+      "bio":               saved.bio ?? '',
+      "marriage_intension": saved.marriageIntension ?? '',
+      "creater_profile":   saved.createrProfile ?? '',
+      "enable_notification": saved.enableNotification ?? '',
     };
+
+    // ── Edit mode: use name1 + profile_id; Create: use profile_name ─────────
+    if (isEdit) {
+      data["name1"]      = saved.profileName ?? '';   // update API key
+      data["profile_id"] = saved.profileId ?? '';     // required for update
+    } else {
+      data["profile_name"] = saved.profileName ?? ''; // create API key
+    }
+
+    return {"data": data};
   }
+  // Future<Map<String, dynamic>> _buildSubmitPayload() async {
+  //   final pref  = context.read<IPrefHelper>();
+  //   final saved = pref.retrieveSetupProfile() ?? SetupProfilePrefModel();
+  //   final userId = pref.loginModel?.data?.user?.email ?? '';
+  //
+  //   // ✅ Local paths se base64 on-the-fly banao
+  //   final List<String> base64List = [];
+  //   final paths = [
+  //     saved.attach1 ?? '',
+  //     saved.attach2 ?? '',
+  //     saved.attach3 ?? '',
+  //     saved.attach4 ?? '',
+  //   ].where((p) => p.isNotEmpty).toList();
+  //
+  //   for (final path in paths) {
+  //     final file = File(path);
+  //     if (file.existsSync()) {
+  //       final b64 = await _fileToBase64(file);
+  //       base64List.add(b64);
+  //       print("✅ base64 generated, length: ${b64.length}");
+  //     }
+  //   }
+  //
+  //   print("📦 Total base64 images for payload: ${base64List.length}");
+  //   return {
+  //     "data": {
+  //       "user_id":          userId,
+  //       "profile_name":     saved.profileName ?? '',
+  //       "last_name":        saved.lastName ?? '',
+  //       "gender":           saved.gender ?? '',
+  //       "date_of_birth":    saved.dateOfBirth ?? '',
+  //       "mother_tongue":    saved.motherTongue ?? '',
+  //       "caste":            saved.caste ?? '',
+  //       "hight":            saved.height ?? '',
+  //       "weight":           saved.weight ?? '',
+  //       "material_status":  saved.materialStatus ?? '',
+  //       "country":          saved.country ?? '',
+  //       "ethnicity":        saved.ethnicity ?? '',
+  //       "nationality":      saved.nationality ?? '',
+  //       "religion":         saved.religion ?? '',
+  //       "belongs_to":       saved.belongsTo ?? '',
+  //       "religious_practice": saved.religiousPractice ?? '',
+  //       "zodiac_sign":      saved.zodiacSign ?? '',
+  //       "father_name":      saved.fatherName ?? '',
+  //       "father_occupation": saved.fatherOccupation ?? '',
+  //       "family_values":    saved.familyValues ?? '',
+  //       "living_arrangement": saved.livingArrangement ?? '',
+  //       "married":          saved.married ?? '',
+  //       "unmarried":        saved.unmarried ?? '',
+  //       "house_size":       saved.houseSize ?? '',
+  //       "area_society":     saved.areaSociety ?? '',
+  //       "can_move_abroad_for_marriage": saved.canMoveAbroadForMarriage ?? '',
+  //       "have_childern":    saved.haveChildren ?? '',
+  //       "other_family_details": saved.otherFamilyDetails ?? '',
+  //       "qualification":    saved.qualification ?? '',
+  //       "name_institution": saved.nameInstitution ?? '',
+  //       "profession":       saved.profession ?? '',
+  //       "employer":         saved.employer ?? '',
+  //       "employee_type":    saved.employeeType ?? '',
+  //       "job_title":        saved.jobTitle ?? '',
+  //       "income":           saved.income ?? '',
+  //       "business":         saved.business ?? '',
+  //       "business_text":    saved.businessText ?? '',
+  //       "life_style_and_interest": saved.lifeStyleAndInterest ?? [],
+  //       "future_plan":      saved.futurePlan ?? '',
+  //       "family_involvement": saved.familyInvolvement ?? '',
+  //       "marriage_period":  saved.marriagePeriod ?? '',
+  //       "smoke":            saved.smoke ?? '',
+  //       "halal_food":       saved.halalFood ?? '',
+  //       "for_girl":         saved.forGirl ?? '',
+  //       "for_boy":          saved.forBoy ?? '',
+  //       "life_partner":     saved.lifePartner ?? '',
+  //       // ✅ On-the-fly base64
+  //       "attach_1":   base64List.isNotEmpty ? base64List[0] : '',
+  //       "attached_2": base64List.length > 1 ? base64List[1] : '',
+  //       "attach_3":   base64List.length > 2 ? base64List[2] : '',
+  //       "attach_4":   base64List.length > 3 ? base64List[3] : '',
+  //       "bio":               saved.bio ?? '',
+  //       "marriage_intension": saved.marriageIntension ?? '',
+  //       "creater_profile":   saved.createrProfile ?? '',
+  //       "enable_notification": saved.enableNotification ?? '',
+  //     }
+  //   };
+  // }
   Future<void> _nextStep() async {
     await _saveCurrentStep();
 
@@ -264,21 +360,32 @@ class _SignUpCreationViewState extends State<SignUpCreationView>
         curve: Curves.easeInOut,
       );
     } else {
-      // ✅ await karo — async ban gaya
       final payload = await _buildSubmitPayload();
-      newDocVM.submitSetUpProfileData(payload, this);
+      final saved   = context.read<IPrefHelper>().retrieveSetupProfile();
+      final isEdit  = (saved?.profileCompleted ?? 0) == 1;
+
+      if (isEdit) {
+        newDocVM.updateProfileData(payload, this);   // ← update API
+      } else {
+        newDocVM.submitSetUpProfileData(payload, this); // ← create API
+      }
     }
   }
-  // ── Previous button ──────────────────────────────────────────────────────
-  // void _previousStep() {
-  //   _saveCurrentStep();
-  //   if (_currentStep > 0) {
-  //     _pageController.previousPage(
+  // Future<void> _nextStep() async {
+  //   await _saveCurrentStep();
+  //
+  //   if (_currentStep < 6) {
+  //     _pageController.nextPage(
   //       duration: const Duration(milliseconds: 300),
   //       curve: Curves.easeInOut,
   //     );
+  //   } else {
+  //     // ✅ await karo — async ban gaya
+  //     final payload = await _buildSubmitPayload();
+  //     newDocVM.submitSetUpProfileData(payload, this);
   //   }
   // }
+
   Future<void> _previousStep() async {
     await _saveCurrentStep();
     if (_currentStep > 0) {
@@ -530,8 +637,9 @@ class _SignUpCreationViewState extends State<SignUpCreationView>
                             : PrimaryButton(
                           width: size.width / 2.3,
                           onPressed: _nextStep,
+
                           childText: _currentStep == 6
-                              ? "Submit"
+                              ? (_isEditMode ? "Update" : "Submit")
                               : "Next",
                           issquare: false,
                           color: ColorManager.primary,

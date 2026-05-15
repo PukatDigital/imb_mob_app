@@ -310,11 +310,31 @@ class SetUpProfileViewModel extends BaseViewModel {
 
 
   void submitSetUpProfileData(
-      Map<String, dynamic> data, Result result) async {
+      Map<String, dynamic> data, Result result) async
+  {
     apiResponse = Loading();
     notifyListeners();
 
     apiResponse = await api.submitSetUpProfile(data);
+
+    apiResponse.fold<String>(
+      onSuccess: (message) {
+        notifyListeners();
+        result.onSuccess(message);
+      },
+      onError: (error) {
+        notifyListeners();
+        result.onError(error);
+      },
+    );
+  }
+  void updateProfileData(
+      Map<String, dynamic> data, Result result) async
+  {
+    apiResponse = Loading();
+    notifyListeners();
+
+    apiResponse = await api.updateProfile(data);
 
     apiResponse.fold<String>(
       onSuccess: (message) {

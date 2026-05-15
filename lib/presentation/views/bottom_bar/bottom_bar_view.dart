@@ -66,30 +66,20 @@ class _BottomBarViewState extends State<BottomBarView> {
     return Scaffold(
       extendBody: true,
       backgroundColor: Colors.grey,
-      body:
-      Container(
-          color: Colors.transparent,
+      body: Container(
+        color: Colors.transparent,
         height: MediaQuery.of(context).size.height,
-        // decoration: BoxDecoration(
-        //   gradient: LinearGradient(
-        //     begin: Alignment.topCenter,
-        //     end: Alignment.bottomCenter,
-        //     colors: [
-        //       const Color(0xFF224966).withOpacity(0.2),
-        //       ColorManager.white,
-        //       ColorManager.white,
-        //       ColorManager.white,
-        //     ],
-        //   ),
-        // ),
-        child: _screens[_selectedIndex]
+        child: _screens[_selectedIndex],
       ),
       bottomNavigationBar: Container(
-        // margin: const EdgeInsets.only(bottom: 20, left: 15, right: 15),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 20),
+        padding: EdgeInsets.only(
+          left: 12,
+          right: 12,
+          top: 20,
+          bottom: 20 + MediaQuery.of(context).padding.bottom, // ✅ Add system nav bar height
+        ),
         decoration: BoxDecoration(
           color: ColorManager.white,
-          // borderRadius: BorderRadius.circular(50),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,

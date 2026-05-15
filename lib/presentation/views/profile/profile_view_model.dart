@@ -42,6 +42,19 @@ class GetPersonalProfileViewModel extends BaseViewModel {
       onError: result.onError,
     );
   }
+  void addToDeleteAccount(Map<String, dynamic> data, Result result) async {
+    d(data);
+
+    apiResponse = Loading();
+    notifyListeners(); // important if using Provider
+
+    apiResponse = await api.addToDeleteAccount(data);
+
+    apiResponse.fold(
+      onSuccess: result.onSuccess,
+      onError: result.onError,
+    );
+  }
 // Future<void> getAllProfileDetails(Result result)
 // async {
 //   apiResponse = Loading();

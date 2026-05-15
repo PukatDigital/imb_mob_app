@@ -111,6 +111,7 @@ class TellAboutYourSelfViewState extends State<TellAboutYourSelfView>
       belongsTo:         belong,
       religiousPractice: religious,
       zodiacSign:        zodiac,
+      profileCompleted: current.profileCompleted,
       // ── Page 2 — keep previous ────────────────────────────────────────
       fatherName:               current.fatherName,
       fatherOccupation:         current.fatherOccupation,

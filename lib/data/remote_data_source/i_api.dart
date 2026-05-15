@@ -35,9 +35,11 @@ abstract class IApi {
   Future<ApiResponse> getAllProfileDetails(Map<String, dynamic> data);
 
   Future<ApiResponse> submitSetUpProfile(Map<String, dynamic> data);
+  Future<ApiResponse> updateProfile(Map<String, dynamic> data);
   Future<ApiResponse> addToFavourite(Map<String, dynamic> data);
   Future<ApiResponse> addToBlock(Map<String, dynamic> data);
   Future<ApiResponse> addToReport(Map<String, dynamic> data);
+  Future<ApiResponse> addToDeleteAccount(Map<String, dynamic> data);
 
   Future<ApiResponse> getBlockProfile(Map<String, dynamic> data);
   Future<ApiResponse> getFavouriteProfile(Map<String, dynamic> data);

@@ -12,8 +12,11 @@ import '../../../../application/core/result.dart';
 import '../../../../base/base_widget.dart';
 import '../../../../widgets/toast.dart';
 import '../../../constants/asset_manager.dart';
+import '../../../data/local_data_source/preference/i_pref_helper.dart';
 import '../../../data/models/get_profile_model/profile_details_model.dart';
 import '../auth/auth_view_model.dart';
+import '../set-up/edit_profile/edit_profile_mapping.dart';
+import '../set-up/sign_up_home_view.dart';
 
 
 class ProfileDetailsView extends BaseStateFullWidget {
@@ -627,7 +630,6 @@ class _ProfileDetailsViewState extends State<ProfileDetailsView>
       ),
     );
   }
-
   Widget _header() {
     return Row(
       children: [
@@ -640,9 +642,10 @@ class _ProfileDetailsViewState extends State<ProfileDetailsView>
               Text(
                 "Back",
                 style: context.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w400,
-                    fontSize: widget.dimens.k17,
-                    color: ColorManager.primary),
+                  fontWeight: FontWeight.w400,
+                  fontSize: widget.dimens.k17,
+                  color: ColorManager.primary,
+                ),
               ),
             ],
           ),
@@ -659,19 +662,78 @@ class _ProfileDetailsViewState extends State<ProfileDetailsView>
           ),
         ),
         GestureDetector(
-          onTap: () {},
+          onTap: _onEditTapped,          // ← changed
           child: CircleAvatar(
             backgroundColor: ColorManager.primary.withOpacity(.2),
             radius: widget.dimens.k20,
-            child: Icon(
-              Icons.edit,
-              color: ColorManager.primary,
-            ),
+            child: Icon(Icons.edit, color: ColorManager.primary),
           ),
         ),
       ],
     );
   }
+
+  /// Maps ProfileData → pref → navigate to edit flow
+  void _onEditTapped() {
+    final data = widget.profileData;
+    if (data == null) return;
+
+    // 1. Convert ProfileData → SetupProfilePrefModel
+    final prefModel = ProfileEditMapper.fromProfileData(data);
+
+    // 2. Save to SharedPreferences
+    context.read<IPrefHelper>().saveSetupProfile(prefModel);
+
+    // 3. Navigate to the 7-step sign-up creation view (edit mode)
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => SignUpCreationView()),
+    );
+  }
+  // Widget _header() {
+  //   return Row(
+  //     children: [
+  //       GestureDetector(
+  //         onTap: () => Navigator.pop(context),
+  //         child: Row(
+  //           children: [
+  //             Icon(Icons.arrow_back_ios,
+  //                 size: widget.dimens.k20, color: ColorManager.primary),
+  //             Text(
+  //               "Back",
+  //               style: context.textTheme.titleMedium?.copyWith(
+  //                   fontWeight: FontWeight.w400,
+  //                   fontSize: widget.dimens.k17,
+  //                   color: ColorManager.primary),
+  //             ),
+  //           ],
+  //         ),
+  //       ),
+  //       Expanded(
+  //         child: Center(
+  //           child: Text(
+  //             "Profile",
+  //             style: TextStyle(
+  //               fontSize: widget.dimens.k18,
+  //               fontWeight: FontWeight.w600,
+  //             ),
+  //           ),
+  //         ),
+  //       ),
+  //       GestureDetector(
+  //         onTap: () {},
+  //         child: CircleAvatar(
+  //           backgroundColor: ColorManager.primary.withOpacity(.2),
+  //           radius: widget.dimens.k20,
+  //           child: Icon(
+  //             Icons.edit,
+  //             color: ColorManager.primary,
+  //           ),
+  //         ),
+  //       ),
+  //     ],
+  //   );
+  // }
 
   @override
   void onError(String error) {

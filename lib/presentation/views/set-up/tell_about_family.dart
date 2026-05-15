@@ -82,6 +82,7 @@ class TellAboutYourFamilyViewState extends State<TellAboutYourFamilyView>
       lastName:          current.lastName,
       gender:            current.gender,
       dateOfBirth:       current.dateOfBirth,
+      profileCompleted: current.profileCompleted,
       motherTongue:      current.motherTongue,
       caste:             current.caste,
       height:            current.height,

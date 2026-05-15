@@ -4,6 +4,8 @@ class SetupProfilePrefModel {
   String? lastName;
   String? gender;
   String? dateOfBirth;
+  String? profileId;
+  int? profileCompleted;
   String? motherTongue;
   String? caste;
   String? height;
@@ -74,6 +76,8 @@ class SetupProfilePrefModel {
     this.lastName,
     this.gender,
     this.dateOfBirth,
+    this.profileId,
+    this.profileCompleted,
     this.motherTongue,
     this.caste,
     this.height,
@@ -136,6 +140,8 @@ class SetupProfilePrefModel {
       lastName:          json['last_name'],
       gender:            json['gender'],
       dateOfBirth:       json['date_of_birth'],
+      profileId:        json['profile_id'],
+      profileCompleted: json['profile_completed'],
       motherTongue:      json['mother_tongue'],
       caste:             json['caste'],
       height:            json['hight'],
@@ -209,6 +215,8 @@ class SetupProfilePrefModel {
       'last_name':         lastName,
       'gender':            gender,
       'date_of_birth':     dateOfBirth,
+      'profile_id':        profileId,
+      'profile_completed':profileCompleted,
       'mother_tongue':     motherTongue,
       'caste':             caste,
       'hight':             height,
