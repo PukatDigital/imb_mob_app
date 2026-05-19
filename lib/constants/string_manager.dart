@@ -31,6 +31,11 @@ class StringManager {
   static const String successfullyVerified = "You have successfully verified your Number";
   static const String continueText = "Continue";
   static const String verify = "Verify";
+  static const String forgotpassword1 = "Forgot your password?";
+  static const String continueWithPhone = "Continue with phone number?";
+  static const String continueWithemail = "Continue with email?";
+  static const String forgotSub = "No worries! Enter your email or phone number and we’ll send you a reset link";
+
   static const String coachDetails = "Coach Details";
   static const String enterDetails = "Please enter your details";
   static const String updateDetails = "Update your details";

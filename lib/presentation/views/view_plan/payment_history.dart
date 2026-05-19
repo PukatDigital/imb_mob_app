@@ -99,7 +99,7 @@ class _HistoryViewState extends State<PaymentHistoryView> implements Result<Stri
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            const Color(0xFFB11E24).withOpacity(.18),
+             Color(0xFFB11E24).withOpacity(.18),
             Colors.transparent,
           ],
         ),
@@ -119,12 +119,12 @@ class _HistoryViewState extends State<PaymentHistoryView> implements Result<Stri
                 Icon(
                   Icons.arrow_back_ios,
                   size: widget.dimens.k16,
-                  color: const Color(0xffB32025),
+                  color: ColorManager.rejectedText,
                 ),
                 Text(
                   "Back",
                   style: TextStyle(
-                    color: const Color(0xffB32025),
+                    color:  ColorManager.rejectedText,
                     fontSize: widget.dimens.k16,
                     fontWeight: FontWeight.w500,
                   ),

@@ -13,6 +13,9 @@ class Assets {
   static const String arrowUp = '${prefixImages}arrow up.png';
   static const String linked = '${prefixImages}linked.png';
   static const String email = '${prefixImages}email.png';
+  static const String error = '${prefixImages}error.png';
+  static const String deactivate = '${prefixImages}deactivate.png';
+  static const String image = '${prefixImages}image.png';
   static const String phone = '${prefixImages}phone.png';
   static const String jazzCash = '${prefixImages}jazzcash.png';
   static const String easypaisa = '${prefixImages}easypaisa.png';

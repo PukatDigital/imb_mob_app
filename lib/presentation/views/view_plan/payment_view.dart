@@ -1,6 +1,7 @@
 
 
 import 'package:flutter/material.dart';
+import 'package:ideal_marriage_bureau/application/app_theme/color_scheme.dart';
 import 'package:ideal_marriage_bureau/application/core/extensions/extensions.dart';
 import 'package:ideal_marriage_bureau/base/base_widget.dart';
 
@@ -156,12 +157,12 @@ class _PaymentViewState extends State<PaymentView> {
                 Icon(
                   Icons.arrow_back_ios,
                   size: widget.dimens.k16,
-                  color: const Color(0xffB32025),
+                  color: ColorManager.rejectedText,
                 ),
                 Text(
                   "Back",
                   style: TextStyle(
-                    color: const Color(0xffB32025),
+                    color:  ColorManager.rejectedText,
                     fontSize: widget.dimens.k16,
                     fontWeight: FontWeight.w500,
                   ),

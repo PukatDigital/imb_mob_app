@@ -80,6 +80,8 @@ class Px {
   final k100 = 100.0;
   final k110 = 110.0;
   final k150 = 150.0;
+  final k180 = 180.0;
+  final k200 = 200.0;
   final k130 = 130.0;
   final k250 = 250.0;
   final k300 = 300.0;
