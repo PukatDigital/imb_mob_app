@@ -16,17 +16,19 @@ import '../../../constants/asset_manager.dart';
 import '../auth/auth_mixin.dart';
 import '../auth/auth_view_model.dart';
 import 'covered_profile.dart';
+
 class ProfileScreen extends BaseStateFullWidget {
-   ProfileScreen({super.key});
+  ProfileScreen({super.key});
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
-class _ProfileScreenState extends State<ProfileScreen> with AuthMixin
+
+class _ProfileScreenState extends State<ProfileScreen>
+    with AuthMixin
     implements Result<String> {
   late GetPersonalProfileViewModel profileData;
   bool _pushNotificationEnabled = true;
   late final loginModel;
-
 
   @override
   void initState() {
@@ -42,7 +44,6 @@ class _ProfileScreenState extends State<ProfileScreen> with AuthMixin
     });
   }
 
-
   final int _currentIndex = 0;
   // final List<String> coverImages = [
   //   Assets.home1,
@@ -52,10 +53,8 @@ class _ProfileScreenState extends State<ProfileScreen> with AuthMixin
   // ];
   @override
   Widget build(BuildContext context) {
-
     return Consumer<GetPersonalProfileViewModel>(
       builder: (_, provider, __) {
-
         profileData = provider;
         return Scaffold(
           backgroundColor: ColorManager.liteWhite,
@@ -64,6 +63,7 @@ class _ProfileScreenState extends State<ProfileScreen> with AuthMixin
       },
     );
   }
+
   Widget _mainContent() {
     final size = MediaQuery.of(context).size;
     List<String> getProfileImages() {
@@ -82,6 +82,7 @@ class _ProfileScreenState extends State<ProfileScreen> with AuthMixin
       // 👉 return API images OR empty list
       return apiImages;
     }
+
     final images = getProfileImages();
     return Padding(
       padding: EdgeInsets.all(widget.dimens.k15),
@@ -93,18 +94,32 @@ class _ProfileScreenState extends State<ProfileScreen> with AuthMixin
             widget.dimens.k15.verticalBoxPadding,
 
             ProfileCoverCard(
-              image: profileData.profileDetailsModel.data?.profilePicture??"",
+              image: profileData.profileDetailsModel.data?.profilePicture ?? "",
               coverImages: getProfileImages(),
               name: profileData.profileDetailsModel.data?.profileName ?? "",
               email: profileData.profileDetailsModel.data?.email ?? "",
-              reach: "${profileData.profileDetailsModel.data?.profileCompleted ?? 0}%",
-              impressions: profileData.profileDetailsModel.data?.totalFavouriteProfiles?.toString() ?? "0",
-              credit: profileData.profileDetailsModel.data?.noOfTimesAddedAsFavourite?.toString() ?? "0",
+              reach:
+                  "${profileData.profileDetailsModel.data?.profileCompleted ?? 0}%",
+              impressions:
+                  profileData.profileDetailsModel.data?.totalFavouriteProfiles
+                      ?.toString() ??
+                  "0",
+              credit:
+                  profileData
+                      .profileDetailsModel
+                      .data
+                      ?.noOfTimesAddedAsFavourite
+                      ?.toString() ??
+                  "0",
               onProfileTap: () {
                 widget.navigator.pushNamed(
                   RouteManager.rProfileDetailsView,
-                      object: profileData.profileDetailsModel.data, // ✅ data pass karo
+                  object:
+                      profileData.profileDetailsModel.data, // ✅ data pass karo
                 );
+              },
+              onImpressionsTap: (){
+                widget.navigator.pushNamed(RouteManager.rImpressionView);
               },
             ),
             // ProfileCoverCard(
@@ -128,11 +143,14 @@ class _ProfileScreenState extends State<ProfileScreen> with AuthMixin
             widget.dimens.k15.verticalBoxPadding,
             Container(
               width: size.width,
-             padding: EdgeInsets.symmetric(vertical:  widget.dimens.k20,horizontal:  widget.dimens.k15),
-             decoration: BoxDecoration(
-               borderRadius: BorderRadius.circular(widget.dimens.k25),
-               color: ColorManager.containerColor,
-             ),
+              padding: EdgeInsets.symmetric(
+                vertical: widget.dimens.k20,
+                horizontal: widget.dimens.k15,
+              ),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(widget.dimens.k25),
+                color: ColorManager.containerColor,
+              ),
               child: Row(
                 children: [
                   Expanded(
@@ -140,7 +158,7 @@ class _ProfileScreenState extends State<ProfileScreen> with AuthMixin
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                         "Upgrade to Premium ",
+                          "Upgrade to Premium ",
                           style: context.textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.w600,
                             color: ColorManager.white,
@@ -159,13 +177,12 @@ class _ProfileScreenState extends State<ProfileScreen> with AuthMixin
                     ),
                   ),
                   GestureDetector(
-                    onTap: (){
+                    onTap: () {
                       widget.navigator.pushNamed(RouteManager.rPlanView);
-
                     },
                     child: Container(
                       height: 40,
-                      width:  widget.dimens.k100,
+                      width: widget.dimens.k100,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(20),
                         gradient: const LinearGradient(
@@ -183,9 +200,9 @@ class _ProfileScreenState extends State<ProfileScreen> with AuthMixin
                         child: Text(
                           "View Plans",
                           style: TextStyle(
-                            color:ColorManager.textColor,
+                            color: ColorManager.textColor,
                             fontWeight: FontWeight.w500,
-                            fontSize:  widget.dimens.k14,
+                            fontSize: widget.dimens.k14,
                           ),
                         ),
                       ),
@@ -197,7 +214,10 @@ class _ProfileScreenState extends State<ProfileScreen> with AuthMixin
             widget.dimens.k15.verticalBoxPadding,
             Container(
               width: size.width,
-              padding: EdgeInsets.symmetric(vertical:  widget.dimens.k20,horizontal:  widget.dimens.k15),
+              padding: EdgeInsets.symmetric(
+                vertical: widget.dimens.k20,
+                horizontal: widget.dimens.k15,
+              ),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(widget.dimens.k25),
                 color: ColorManager.white,
@@ -210,50 +230,54 @@ class _ProfileScreenState extends State<ProfileScreen> with AuthMixin
                     style: context.textTheme.bodySmall?.copyWith(
                       fontWeight: FontWeight.w600,
                       color: ColorManager.fieldTextColor,
-        
                     ),
                   ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Image.asset(
-                        Assets.notification,
-                        height: widget.dimens.k20,
-                        width: widget.dimens.k20,
+                      Row(
+                        children: [
+                          Image.asset(
+                            Assets.notification,
+                            height: widget.dimens.k20,
+                            width: widget.dimens.k20,
+                          ),
+                          widget.dimens.k5.horizontalBoxPadding,
+                          Text(
+                            "Push Notifications",
+                            style: context.textTheme.bodyMedium?.copyWith(
+                              fontWeight: FontWeight.w500,
+                              color: ColorManager.textColor,
+                              fontSize: widget.dimens.k15,
+                            ),
+                          ),
+                        ],
                       ),
-                      widget.dimens.k5.horizontalBoxPadding,
-                      Text(
-                        "Push Notifications",
-                        style: context.textTheme.bodyMedium?.copyWith(
-                          fontWeight: FontWeight.w500,
-                          color: ColorManager.textColor,
-                          fontSize: widget.dimens.k15,
-                        ),
+                      CupertinoSwitch(
+                        value: _pushNotificationEnabled,
+                        activeTrackColor:
+                            ColorManager.primary, // ON track + thumb
+                        inactiveTrackColor:
+                            ColorManager.dropDownBroder, // OFF track
+                        onChanged: (value) {
+                          setState(() {
+                            _pushNotificationEnabled = value;
+                          });
+                          d(value ? "Push Notifications ON" : "OFF");
+                        },
                       ),
                     ],
                   ),
-                  CupertinoSwitch(
-                    value: _pushNotificationEnabled,
-                    activeTrackColor: ColorManager.primary,          // ON track + thumb
-                    inactiveTrackColor: ColorManager.dropDownBroder,    // OFF track
-                    onChanged: (value) {
-                      setState(() {
-                        _pushNotificationEnabled = value;
-                      });
-                      d(value ? "Push Notifications ON" : "OFF");
-                    },
-                  )
                 ],
-              ),
-              ],
               ),
             ),
             widget.dimens.k15.verticalBoxPadding,
             Container(
               width: size.width,
-              padding: EdgeInsets.symmetric(vertical:  widget.dimens.k20,horizontal:  widget.dimens.k15),
+              padding: EdgeInsets.symmetric(
+                vertical: widget.dimens.k20,
+                horizontal: widget.dimens.k15,
+              ),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(widget.dimens.k25),
                 color: ColorManager.white,
@@ -266,25 +290,28 @@ class _ProfileScreenState extends State<ProfileScreen> with AuthMixin
                     style: context.textTheme.bodySmall?.copyWith(
                       fontWeight: FontWeight.w600,
                       color: ColorManager.fieldTextColor,
-        
                     ),
                   ),
                   widget.dimens.k20.verticalBoxPadding,
-                  legalCard((){},Assets.getHelp,"Get help"),
+                  legalCard(() {}, Assets.getHelp, "Get help"),
                   widget.dimens.k20.verticalBoxPadding,
-                  legalCard((){},Assets.report,"Report a Problem"),
+                  legalCard(() {widget.navigator.pushNamed(
+                    RouteManager.rReportProblem,
+                  );}, Assets.report, "Report a Problem"),
                   widget.dimens.k20.verticalBoxPadding,
-                  legalCard((){},Assets.privacyPolicy,"Privacy Policy"),
+                  legalCard(() {}, Assets.privacyPolicy, "Privacy Policy"),
                   widget.dimens.k20.verticalBoxPadding,
-                  legalCard((){},Assets.termsCondition,"Terms & Conditions"),
-        
+                  legalCard(() {}, Assets.termsCondition, "Terms & Conditions"),
                 ],
               ),
             ),
             widget.dimens.k15.verticalBoxPadding,
             Container(
               width: size.width,
-              padding: EdgeInsets.symmetric(vertical:  widget.dimens.k20,horizontal:  widget.dimens.k15),
+              padding: EdgeInsets.symmetric(
+                vertical: widget.dimens.k20,
+                horizontal: widget.dimens.k15,
+              ),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(widget.dimens.k25),
                 color: ColorManager.white,
@@ -297,24 +324,40 @@ class _ProfileScreenState extends State<ProfileScreen> with AuthMixin
                     style: context.textTheme.bodySmall?.copyWith(
                       fontWeight: FontWeight.w600,
                       color: ColorManager.fieldTextColor,
-        
                     ),
                   ),
                   widget.dimens.k20.verticalBoxPadding,
-                  legalCard((){
-                    widget.navigator.pushNamed(RouteManager.rLinkedDeviceView,);
-                  },Assets.linked,"Accounts Linked"),
-                  widget.dimens.k20.verticalBoxPadding,
-                  // legalCard((){
-                  //   widget.navigator.pushNamed(RouteManager.rPaymentHistoryView,);
-                  // },Assets.linked,"Payment History"),
-                  // widget.dimens.k20.verticalBoxPadding,
-                  legalCard((){
-                    widget.navigator.pushNamed(RouteManager.rBlockListView,);
-                  },Assets.blockIcon,"Blocked Account"),
+                  legalCard(
+                    () {
+                      widget.navigator.pushNamed(
+                        RouteManager.rLinkedDeviceView,
+                      );
+                    },
+                    Assets.linked,
+                    "Accounts Linked",
+                  ),
                   widget.dimens.k20.verticalBoxPadding,
                   legalCard(
-                        () {
+                    () {
+                      showDeactivateDialouge(context, widget.dimens);
+                    },
+                    Assets.deactivate,
+                    "Accounts Deactivate",
+                  ),
+
+
+                  widget.dimens.k20.verticalBoxPadding,
+
+                  legalCard(
+                    () {
+                      widget.navigator.pushNamed(RouteManager.rBlockListView);
+                    },
+                    Assets.blockIcon,
+                    "Blocked Account",
+                  ),
+                  widget.dimens.k20.verticalBoxPadding,
+                  legalCard(
+                    () {
                       showDialog(
                         context: context,
                         barrierDismissible: false,
@@ -340,9 +383,15 @@ class _ProfileScreenState extends State<ProfileScreen> with AuthMixin
 
                                   final data = {
                                     "profile_id":
-                                    profileData.profileDetailsModel.data?.profileId,
+                                        profileData
+                                            .profileDetailsModel
+                                            .data
+                                            ?.profileId,
                                     "user_id":
-                                    profileData.profileDetailsModel.data?.userId,
+                                        profileData
+                                            .profileDetailsModel
+                                            .data
+                                            ?.userId,
                                   };
 
                                   profileData.addToDeleteAccount(data, this);
@@ -358,17 +407,18 @@ class _ProfileScreenState extends State<ProfileScreen> with AuthMixin
                     "Delete Account",
                   ),
                   widget.dimens.k20.verticalBoxPadding,
-                  legalCard((){
-
-                    widget.iPrefHelper.clear();
-                    Navigator.pushNamedAndRemoveUntil(
-                      context,
-                      RouteManager.rLoginView,
-                          (route) => false,
-                    );
-                  },Assets.logOut,"Log Out"),
-               
-        
+                  legalCard(
+                    () {
+                      widget.iPrefHelper.clear();
+                      Navigator.pushNamedAndRemoveUntil(
+                        context,
+                        RouteManager.rLoginView,
+                        (route) => false,
+                      );
+                    },
+                    Assets.logOut,
+                    "Log Out",
+                  ),
                 ],
               ),
             ),
@@ -378,6 +428,206 @@ class _ProfileScreenState extends State<ProfileScreen> with AuthMixin
       ),
     );
   }
+
+  void showDeactivateDialouge(BuildContext context, dynamic dimens) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(dimens.k24),
+          ),
+          insetPadding: EdgeInsets.symmetric(horizontal: dimens.k20),
+          child: Padding(
+            padding: EdgeInsets.all(dimens.k24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+
+
+                // closes Container (green circle)
+
+                SizedBox(height: dimens.k5), // ✅
+
+                Text(
+                  'Deactivate your account?', // ✅ fixed \n too
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: dimens.k24,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.black87,
+                  ),
+                ),
+
+                SizedBox(height: dimens.k12), // ✅
+
+                Text(
+                  'Your profile will be hidden and other \n users wont be able to see or contact'
+                      ' \n you. \n  You can reactivate your account anytime\nby logging back in. ', // ✅ fixed \n
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: dimens.k15,
+                    color: Colors.grey.shade600,
+                    height: 1.4,
+                  ),
+                ),
+
+                SizedBox(height: dimens.k30), // ✅
+
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(  // ← also add Expanded, otherwise SizedBox(width: double.infinity) inside a Row will overflow
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          elevation: 0,
+                          backgroundColor: const Color(0xFFB11E24).withOpacity(.18),
+                          padding: EdgeInsets.symmetric(vertical: dimens.k16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(dimens.k40),
+                          ),
+                        ),
+                        onPressed: () => Navigator.pop(context),
+                        child: Text(
+                          'Cancel',
+                          style: TextStyle(
+                            fontSize: dimens.k16,
+                            fontWeight: FontWeight.w600,
+                            color:ColorManager.rejectedText,
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    SizedBox(width: dimens.k12), // ✅ fixed
+
+                    Expanded(  // ← Expanded here too
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          elevation: 0,
+                          backgroundColor: ColorManager.rejectedText,
+                          padding: EdgeInsets.symmetric(vertical: dimens.k16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(dimens.k40),
+                          ),
+                        ),
+                        onPressed: () {
+                          Navigator.pushReplacementNamed(context, RouteManager.rLoginView);
+                        },
+                        child: Text(
+                          'Deactivate',
+                          style: TextStyle(
+                            fontSize: dimens.k16,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+  void showDeactivateSuccess(BuildContext context, dynamic dimens) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(dimens.k24),
+          ),
+          insetPadding: EdgeInsets.symmetric(
+            horizontal: dimens.k20,
+          ),
+          child: Padding(
+            padding: EdgeInsets.all(dimens.k24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+
+
+                Container(
+                  padding: EdgeInsets.all(dimens.k5),
+                  decoration: const BoxDecoration(
+
+                    shape: BoxShape.circle,
+                  ),
+                  child: Image.asset(
+                    Assets.error, // ✅ already correct
+                    height: dimens.k50,
+                    width: dimens.k50,
+                    fit: BoxFit.contain,
+                  ),
+                ),  // closes Container (green circle)
+
+                SizedBox(height: dimens.k10),  // ✅
+
+                Text(
+                  'Account deactivated\n successfully ',  // ✅ fixed \n too
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: dimens.k24,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.black87,
+                  ),
+                ),
+
+                SizedBox(height: dimens.k12),  // ✅
+
+                Text(
+                  'We’ll miss you 💔 \n \n Your account has been temporarily \n hidden.',  // ✅ fixed \n
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: dimens.k15,
+                    color: Colors.grey.shade600,
+                    height: 1.4,
+                  ),
+                ),
+
+                SizedBox(height: dimens.k28),  // ✅
+
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      elevation: 0,
+                      backgroundColor: ColorManager.rejectedText,
+                      padding: EdgeInsets.symmetric(
+                        vertical: dimens.k16,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius:
+                        BorderRadius.circular(dimens.k40),
+                      ),
+                    ),
+                    onPressed: () {
+                      Navigator.pushReplacementNamed(context, RouteManager.rLoginView);
+                    },
+                    child: Text(
+                      'Go to Login',
+                      style: TextStyle(
+                        fontSize: dimens.k16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   Widget _header() {
     return Center(
       child: Text(
@@ -389,31 +639,29 @@ class _ProfileScreenState extends State<ProfileScreen> with AuthMixin
       ),
     );
   }
+
   @override
   void onError(String error) {
     MyToast.showToast(message: error);
   }
+
   @override
   void onSuccess(String result) {
-    MyToast.showToast(message: result,
-    typeToast: TypeToast.success);
+    MyToast.showToast(message: result, typeToast: TypeToast.success);
 
     if (result.contains("Profile Deleted successfully")) {
-
-       widget.iPrefHelper.clear();
+      widget.iPrefHelper.clear();
 
       Navigator.pushNamedAndRemoveUntil(
         context,
         RouteManager.rLoginView,
-            (route) => false,
+        (route) => false,
       );
     }
-
-
   }
 
   legalCard(onTap, image, text) {
-    return  GestureDetector(
+    return GestureDetector(
       onTap: onTap,
       child: Row(
         children: [

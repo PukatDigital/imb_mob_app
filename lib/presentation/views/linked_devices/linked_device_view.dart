@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:ideal_marriage_bureau/application/core/extensions/extensions.dart';
 import '../../../../base/base_widget.dart';
-import '../../constants/asset_manager.dart';
+import '../../../constants/asset_manager.dart';
+
 
 class LinkedDeviceView extends BaseStateFullWidget {
    LinkedDeviceView({super.key});

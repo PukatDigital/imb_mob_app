@@ -13,6 +13,7 @@ class ProfileCoverCard extends StatefulWidget {
   final String impressions;
   final String credit;
   final VoidCallback onProfileTap;
+  final VoidCallback? onImpressionsTap;
 
   const ProfileCoverCard({
     super.key,
@@ -24,6 +25,7 @@ class ProfileCoverCard extends StatefulWidget {
     required this.impressions,
     required this.credit,
     required this.onProfileTap,
+    required this.onImpressionsTap,
   });
 
   @override
@@ -182,7 +184,7 @@ class _ProfileCoverCardState extends State<ProfileCoverCard> {
         children: [
           _statItem(widget.reach, "Reach", context),
           _divider(),
-          _statItem(widget.impressions, "Impressions", context),
+          GestureDetector( onTap: widget.onImpressionsTap,child: _statItem(widget.impressions, "Impressions", context)),
           _divider(),
           _statItem(widget.credit, "Credit", context),
         ],

@@ -101,7 +101,7 @@ class _LoginFormViewState extends State<LoginFormView>
                   widget.dimens.k15.verticalBoxPadding,
                   GestureDetector(
                     onTap: () {
-                      // widget.navigator.pushNamed(RouteManager.rForgetView);
+                      widget.navigator.pushNamed(RouteManager.rForgotPassword);
                     },
                     child: Text(
                       StringManager.forgetPassword,

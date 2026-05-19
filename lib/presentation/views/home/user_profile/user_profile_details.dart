@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:ideal_marriage_bureau/application/core/extensions/extensions.dart';
+import 'package:ideal_marriage_bureau/application/routes/route_generator.dart';
 import 'package:ideal_marriage_bureau/data/models/get_profile_model/get_all_profile_list_model.dart';
 import 'package:ideal_marriage_bureau/data/models/get_profile_model/profile_details_model.dart';
 import 'package:ideal_marriage_bureau/presentation/views/home/home_view_model.dart';
@@ -35,7 +36,7 @@ class _UserProfileDetailsViewState extends State<UserProfileDetailsView>
   bool isEducationProfession = false;
   bool isLifeStyleInterest = false;
   bool isPartnerPreferences = false;
-
+  bool hasSaidHi = false;
   // ✅ ProfileData — no conflict with Data from get_all_profile_list_model
   ProfileData? get _d => detailsVM.profileDetailsModel?.data;
 
@@ -220,45 +221,111 @@ class _UserProfileDetailsViewState extends State<UserProfileDetailsView>
   }
 
   Widget _profileSection() {
-    final pictureUrl = _d?.profilePicture?.isNotEmpty == true
+    final pictureUrl =
+    _d?.profilePicture?.isNotEmpty == true
         ? _d!.profilePicture!
         : _d?.profilePicture ?? "";
 
+    final userName =
+    "${_d?.profileName ?? ''} ${_d?.lastName ?? ''}"
+        .trim();
+
     return Column(
       children: [
+
+        /// Profile Image
         CircleAvatar(
           radius: widget.dimens.k60,
           backgroundColor: ColorManager.halfWhite,
           backgroundImage:
-          pictureUrl.isNotEmpty ? NetworkImage(pictureUrl) : null,
+          pictureUrl.isNotEmpty
+              ? NetworkImage(pictureUrl)
+              : null,
           child: pictureUrl.isEmpty
-              ? Icon(Icons.person,
-              size: widget.dimens.k50, color: ColorManager.fieldTextColor)
+              ? Icon(
+            Icons.person,
+            size: widget.dimens.k50,
+            color:
+            ColorManager.fieldTextColor,
+          )
               : null,
         ),
+
         widget.dimens.k10.verticalBoxPadding,
+
+        /// Name
         Text(
-          "${_d?.profileName ?? _d?.profileName ?? ''} "
-              "${_d?.lastName ?? ''}".trim(),
+          userName,
           style: TextStyle(
-              fontSize: widget.dimens.k18, fontWeight: FontWeight.w600),
+            fontSize: widget.dimens.k18,
+            fontWeight: FontWeight.w600,
+          ),
         ),
+
         widget.dimens.k5.verticalBoxPadding,
+
+        /// Location
         Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment:
+          MainAxisAlignment.center,
           children: [
-            Icon(Icons.location_on_outlined,
-                size: widget.dimens.k20, color: ColorManager.fieldTextColor),
-            widget.dimens.k5.horizontalBoxPadding,
+            Icon(
+              Icons.location_on_outlined,
+              size: widget.dimens.k20,
+              color:
+              ColorManager.fieldTextColor,
+            ),
+
+            widget.dimens.k5
+                .horizontalBoxPadding,
+
             Text(
               _d?.country ?? "—",
               style: TextStyle(
                 fontSize: widget.dimens.k13,
                 fontWeight: FontWeight.w400,
-                color: ColorManager.fieldTextColor,
+                color:
+                ColorManager.fieldTextColor,
               ),
             ),
           ],
+        ),
+
+        widget.dimens.k10.verticalBoxPadding,
+
+        /// Say Hi Button / Text
+        GestureDetector(
+          onTap: () {
+            if (!hasSaidHi) {
+              setState(() {
+                hasSaidHi = true;
+              });
+             // widget.navigator.pushNamed(RouteManager)
+     }
+          },
+          child: Container(
+            padding:  EdgeInsets.symmetric(
+              horizontal: widget.dimens.k22,
+              vertical: widget.dimens.k10,
+            ),
+            decoration: BoxDecoration(
+              color: ColorManager.loginContainer,
+              borderRadius: BorderRadius.circular(widget.dimens.k30),
+            ),
+            child: Text(
+              hasSaidHi
+                  ? "You said hi to $userName 👋"
+                  : "👋 Say Hi",
+              style: TextStyle(
+                fontSize: widget.dimens.k13,
+                fontWeight: FontWeight.w500,
+                color:
+                ColorManager.textColor,
+
+
+              ),
+            ),
+          ),
         ),
       ],
     );

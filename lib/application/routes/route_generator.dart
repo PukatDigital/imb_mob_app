@@ -1,11 +1,21 @@
 
 import 'package:flutter/material.dart';
+import 'package:ideal_marriage_bureau/presentation/views/auth/sign-in/forget_password/forgetPassword_phone_view.dart';
+import 'package:ideal_marriage_bureau/presentation/views/home/user_profile/impression_view.dart';
+import 'package:ideal_marriage_bureau/presentation/views/linked_devices/linked_device_view.dart';
+import 'package:ideal_marriage_bureau/presentation/views/profile/profile_view.dart';
+import 'package:ideal_marriage_bureau/presentation/views/report_problem/report_problem_view.dart';
+
 
 import 'package:provider/provider.dart';
 import '../../data/models/get_profile_model/profile_details_model.dart';
 import '../../onboarding/onboarding.dart';
-import '../../presentation/linked_devices/linked_device_view.dart';
+
 import '../../presentation/views/auth/auth_view_model.dart';
+
+import '../../presentation/views/auth/sign-in/forget_password/create_new_password_view.dart';
+import '../../presentation/views/auth/sign-in/forget_password/forgetPassword_email_View.dart';
+import '../../presentation/views/auth/sign-in/forget_password/verfication_code_view.dart';
 import '../../presentation/views/auth/sign-in/login_view.dart';
 import '../../presentation/views/auth/sign-in/sign_up_create_view.dart';
 import '../../presentation/views/auth/sign-in/verification_code_view.dart';
@@ -26,8 +36,12 @@ class RouteManager {
   static const rSplashView = '/rSplashView';
   static const rOnboardingView = '/rOnboardingView';
   static const rLoginView = '/rLoginView';
+  static const rForgotPassword = '/rForgotPassword';
+  static const rContinueWithPhone = '/rContinueWithPhone';
   static const rVerificationCodeView = '/rVerificationCodeView';
   static const rSignUpCreateView = '/rSignUpCreateView';
+  static const rForgetPasswordOTPView = '/rForgetPasswordOTPView';
+  static const rCreateNewPasswordView = '/rCreateNewPasswordView';
 
   static const rBottomBarView = '/rBottomBarView';
   static const rSignInView = '/rSignInView';
@@ -41,12 +55,15 @@ class RouteManager {
   static const rOrderHistory = '/rOrderHistory';
   static const rTSignUpCreationView = '/rSignUpCreationView';
   static const rProfileDetailsView = '/rProfileDetailsView';
+  static const rProfileScreen = '/rProfileScreen';
   static const rPlanView = '/rPlanView';
   static const rNotificationListView = '/rNotificationListView';
   static const rBlockListView = '/rBlockListView';
   static const rLinkedDeviceView = '/rLinkedDeviceView';
   static const rPaymentView = '/rPaymentView';
   static const rPaymentHistoryView = '/rPaymentHistoryView';
+  static const rReportProblem = '/rReportProblem';
+  static const rImpressionView = '/rImpressionView';
 }
 
 class RouteGenerator {
@@ -79,12 +96,45 @@ class RouteGenerator {
             child:  LoginView(),
           ),
         );
+        case RouteManager.rForgotPassword:
+        return PageRouter.fadeScale(
+          settings,
+              () => ChangeNotifierProvider(
+            create: (_) => AuthViewModel(),
+            child:  ForgetView(),
+          ),
+        ); case RouteManager.rContinueWithPhone:
+        return PageRouter.fadeScale(
+          settings,
+              () => ChangeNotifierProvider(
+            create: (_) => AuthViewModel(),
+            child:  ContinueWithPhoneNumber(),
+          ),
+        );
+        case RouteManager.rCreateNewPasswordView:
+        return PageRouter.fadeScale(
+          settings,
+              () => ChangeNotifierProvider(
+            create: (_) => AuthViewModel(),
+            child:  CreateNewPasswordView(),
+          ),
+        );
+
       case RouteManager.rVerificationCodeView:
         return PageRouter.fadeScale(
           settings,
               () => ChangeNotifierProvider(
             create: (_) => AuthViewModel(),
             child: VerificationCodeView(
+              email: settings.arguments as String?, // ✅ FIX
+            ),
+          ),
+        ); case RouteManager.rForgetPasswordOTPView:
+        return PageRouter.fadeScale(
+          settings,
+              () => ChangeNotifierProvider(
+            create: (_) => AuthViewModel(),
+            child: ForgetPasswordOTPView(
               email: settings.arguments as String?, // ✅ FIX
             ),
           ),
@@ -164,6 +214,27 @@ class RouteGenerator {
                 () => ChangeNotifierProvider(
               create: (BuildContext context) => AuthViewModel(),
               child: BlockListView(),
+            ));
+        case RouteManager.rProfileScreen:
+        return PageRouter.fadeScale(
+            settings,
+                () => ChangeNotifierProvider(
+              create: (BuildContext context) => AuthViewModel(),
+              child: ProfileScreen(),
+            ));
+        case RouteManager.rReportProblem:
+        return PageRouter.fadeScale(
+            settings,
+                () => ChangeNotifierProvider(
+              create: (BuildContext context) => AuthViewModel(),
+              child: ReportProblemView(),
+            ));
+        case RouteManager.rImpressionView:
+        return PageRouter.fadeScale(
+            settings,
+                () => ChangeNotifierProvider(
+              create: (BuildContext context) => AuthViewModel(),
+              child: ImpressionsView(),
             ));
 
 
