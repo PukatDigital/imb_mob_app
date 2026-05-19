@@ -10,7 +10,7 @@ import '../favourite/favourite_view.dart';
 import '../home/home_view.dart';
 import '../profile/profile_view.dart';
 class BottomBarView extends BaseStateFullWidget {
-  BottomBarView({super.key}); // ✅ Accept external key, don't force globalKey
+  BottomBarView({super.key});
 
   static final GlobalKey<_BottomBarViewState> globalKey =
   GlobalKey<_BottomBarViewState>();
