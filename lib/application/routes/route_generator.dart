@@ -111,12 +111,17 @@ class RouteGenerator {
             child:  ContinueWithPhoneNumber(),
           ),
         );
-        case RouteManager.rCreateNewPasswordView:
+      case RouteManager.rCreateNewPasswordView:
+
+        final String? email = settings.arguments as String?;
+
         return PageRouter.fadeScale(
           settings,
               () => ChangeNotifierProvider(
             create: (_) => AuthViewModel(),
-            child:  CreateNewPasswordView(),
+            child: CreateNewPasswordView(
+              email: email,
+            ),
           ),
         );
 
@@ -169,7 +174,7 @@ class RouteGenerator {
           settings,
               () => ChangeNotifierProvider(
             create: (context) => AuthViewModel(),
-            child: ProfileDetailsView(profileData: data), // ✅
+            child: ProfileDetailsView(profileData: data),
           ),
         );
         case RouteManager.rPlanView:

@@ -4,34 +4,46 @@ import 'package:ideal_marriage_bureau/application/routes/route_generator.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../../application/app_theme/color_scheme.dart';
-import '../../../../../application/app_theme/text_themes.dart';
 import '../../../../../application/common/enum.dart';
 import '../../../../../application/core/result.dart';
+import '../../../../../application/network/result.dart';
 import '../../../../../base/base_widget.dart';
 import '../../../../../constants/asset_manager.dart';
 import '../../../../../widgets/custom_field.dart';
+import '../../../../../widgets/loader.dart';
 import '../../../../../widgets/primary_button.dart';
 import '../../../../../widgets/toast.dart';
 import '../../auth_view_model.dart';
 
 class CreateNewPasswordView extends BaseStateFullWidget {
-  CreateNewPasswordView({super.key});
+  final String? email;
+  CreateNewPasswordView({super.key,this.email});
 
   @override
-  State<CreateNewPasswordView> createState() => _CreateNewPasswordViewState();
+  State<CreateNewPasswordView> createState() =>
+      _CreateNewPasswordViewState();
 }
 
-class _CreateNewPasswordViewState extends State<CreateNewPasswordView>
+class _CreateNewPasswordViewState
+    extends State<CreateNewPasswordView>
     implements Result {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
-  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController passwordController =
+  TextEditingController();
 
   final TextEditingController confirmPasswordController =
-      TextEditingController();
-
+  TextEditingController();
+  String? _resolvedEmail;
   bool obscurePassword = true;
   bool obscureConfirmPassword = true;
+  late AuthViewModel authVM;
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final routeEmail = ModalRoute.of(context)?.settings.arguments as String?;
+    _resolvedEmail = routeEmail ?? widget.email;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +54,6 @@ class _CreateNewPasswordViewState extends State<CreateNewPasswordView>
         builder: (context, provider, child) {
           return Stack(
             children: [
-              /// Background
               _background(),
 
               SafeArea(
@@ -54,6 +65,7 @@ class _CreateNewPasswordViewState extends State<CreateNewPasswordView>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+
                       /// Back Button
                       GestureDetector(
                         onTap: () {
@@ -82,7 +94,7 @@ class _CreateNewPasswordViewState extends State<CreateNewPasswordView>
 
                       widget.dimens.k50.verticalBoxPadding,
 
-                      /// Main Card
+                      /// Main Content
                       Expanded(
                         child: SingleChildScrollView(
                           child: Container(
@@ -91,28 +103,28 @@ class _CreateNewPasswordViewState extends State<CreateNewPasswordView>
                               horizontal: widget.dimens.k2,
                               vertical: widget.dimens.k15,
                             ),
-
                             child: ConstrainedBox(
                               constraints: BoxConstraints(
                                 minHeight:
-                                    MediaQuery.of(context).size.height * 0.75,
+                                MediaQuery.of(context).size.height * 0.75,
                               ),
                               child: IntrinsicHeight(
                                 child: Form(
                                   key: formKey,
                                   child: Column(
                                     crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    CrossAxisAlignment.start,
                                     children: [
+
                                       /// Title
                                       Text(
                                         "Create new password",
                                         style: context.textTheme.titleLarge
                                             ?.copyWith(
-                                              fontWeight: FontWeight.w700,
-                                              fontSize: widget.dimens.k32,
-                                              color: ColorManager.textColor,
-                                            ),
+                                          fontWeight: FontWeight.w700,
+                                          fontSize: widget.dimens.k32,
+                                          color: ColorManager.textColor,
+                                        ),
                                       ),
 
                                       widget.dimens.k10.verticalBoxPadding,
@@ -122,11 +134,11 @@ class _CreateNewPasswordViewState extends State<CreateNewPasswordView>
                                         "Set a new password for your account.",
                                         style: context.textTheme.bodyMedium
                                             ?.copyWith(
-                                              fontWeight: FontWeight.w400,
-                                              fontSize: widget.dimens.k15,
-                                              color:
-                                                  ColorManager.textColorSubTitle,
-                                            ),
+                                          fontWeight: FontWeight.w400,
+                                          fontSize: widget.dimens.k15,
+                                          color: ColorManager
+                                              .textColorSubTitle,
+                                        ),
                                       ),
 
                                       widget.dimens.k30.verticalBoxPadding,
@@ -136,8 +148,8 @@ class _CreateNewPasswordViewState extends State<CreateNewPasswordView>
                                         "Password",
                                         style: context.textTheme.bodyMedium
                                             ?.copyWith(
-                                              fontWeight: FontWeight.w500,
-                                            ),
+                                          fontWeight: FontWeight.w500,
+                                        ),
                                       ),
 
                                       widget.dimens.k8.verticalBoxPadding,
@@ -151,18 +163,20 @@ class _CreateNewPasswordViewState extends State<CreateNewPasswordView>
                                           onTap: () {
                                             setState(() {
                                               obscurePassword =
-                                                  !obscurePassword;
+                                              !obscurePassword;
                                             });
                                           },
                                           child: Icon(
                                             obscurePassword
-                                                ? Icons.visibility_off_outlined
+                                                ? Icons
+                                                .visibility_off_outlined
                                                 : Icons.visibility_outlined,
                                             color: Colors.grey,
                                           ),
                                         ),
                                         validator: (value) {
-                                          if (value == null || value.isEmpty) {
+                                          if (value == null ||
+                                              value.isEmpty) {
                                             return "Password is required";
                                           }
 
@@ -181,8 +195,8 @@ class _CreateNewPasswordViewState extends State<CreateNewPasswordView>
                                         "Confirm Password",
                                         style: context.textTheme.bodyMedium
                                             ?.copyWith(
-                                              fontWeight: FontWeight.w500,
-                                            ),
+                                          fontWeight: FontWeight.w500,
+                                        ),
                                       ),
 
                                       widget.dimens.k8.verticalBoxPadding,
@@ -190,29 +204,34 @@ class _CreateNewPasswordViewState extends State<CreateNewPasswordView>
                                       /// Confirm Password Field
                                       CustomField(
                                         hintText: "Confirm Password",
-                                        controller: confirmPasswordController,
-                                        obscureText: obscureConfirmPassword,
+                                        controller:
+                                        confirmPasswordController,
+                                        obscureText:
+                                        obscureConfirmPassword,
                                         suffixIcon: GestureDetector(
                                           onTap: () {
                                             setState(() {
                                               obscureConfirmPassword =
-                                                  !obscureConfirmPassword;
+                                              !obscureConfirmPassword;
                                             });
                                           },
                                           child: Icon(
                                             obscureConfirmPassword
-                                                ? Icons.visibility_off_outlined
+                                                ? Icons
+                                                .visibility_off_outlined
                                                 : Icons.visibility_outlined,
                                             color: Colors.grey,
                                           ),
                                         ),
                                         validator: (value) {
-                                          if (value == null || value.isEmpty) {
+                                          if (value == null ||
+                                              value.isEmpty) {
                                             return "Confirm password is required";
                                           }
 
                                           if (value !=
-                                              passwordController.text.trim()) {
+                                              passwordController.text
+                                                  .trim()) {
                                             return "Passwords do not match";
                                           }
 
@@ -222,22 +241,33 @@ class _CreateNewPasswordViewState extends State<CreateNewPasswordView>
 
                                       const Spacer(),
 
-                                      /// Button
-                                      PrimaryButton(
+                                      /// Update Button
+                                      provider.apiResponse is Loading
+                                          ?  Loader()
+                                          :PrimaryButton(
                                         childText: "Update Password",
                                         isSafeArea: false,
+
                                         onPressed: () {
 
-                                          // if (formKey.currentState
-                                          //         ?.validate() ??
-                                          //     false) {
-                                          //   /// Dummy Success
-                                          //   onSuccess(
-                                          //     "Password updated successfully",
-                                          //   );
-                                          }
-                                        ),
+                                          if (formKey.currentState
+                                              ?.validate() ??
+                                              false) {
 
+                                            provider.updatePassword(
+                                              {
+                                                "email":
+                                                _resolvedEmail,
+                                                "new_password":
+                                                passwordController
+                                                    .text
+                                                    .trim(),
+                                              },
+                                              this,
+                                            );
+                                          }
+                                        },
+                                      ),
                                     ],
                                   ),
                                 ),
@@ -271,14 +301,19 @@ class _CreateNewPasswordViewState extends State<CreateNewPasswordView>
       ),
     );
   }
-  void showPasswordResetDailogue(BuildContext context, dynamic? dimens) {
+
+  void showPasswordResetDailogue(
+      BuildContext context,
+      dynamic? dimens,
+      ) {
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (_) {
         return Dialog(
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(dimens.k24),
+            borderRadius:
+            BorderRadius.circular(dimens.k24),
           ),
           insetPadding: EdgeInsets.symmetric(
             horizontal: dimens.k20,
@@ -288,6 +323,8 @@ class _CreateNewPasswordViewState extends State<CreateNewPasswordView>
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+
+                /// Close
                 Align(
                   alignment: Alignment.topRight,
                   child: GestureDetector(
@@ -300,24 +337,22 @@ class _CreateNewPasswordViewState extends State<CreateNewPasswordView>
                   ),
                 ),
 
+                /// Success Image
                 Container(
                   padding: EdgeInsets.all(dimens.k10),
-                  decoration: const BoxDecoration(
-
-                    shape: BoxShape.circle,
-                  ),
                   child: Image.asset(
-                    Assets.success, // ✅ already correct
+                    Assets.success,
                     height: dimens.k40,
                     width: dimens.k40,
                     fit: BoxFit.contain,
                   ),
-                ),  // closes Container (green circle)
+                ),
 
-                SizedBox(height: dimens.k20),  // ✅
+                SizedBox(height: dimens.k20),
 
+                /// Title
                 Text(
-                  'Password updated\n successfully 🎉',  // ✅ fixed \n too
+                  'Password updated\nsuccessfully 🎉',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: dimens.k24,
@@ -326,10 +361,11 @@ class _CreateNewPasswordViewState extends State<CreateNewPasswordView>
                   ),
                 ),
 
-                SizedBox(height: dimens.k12),  // ✅
+                SizedBox(height: dimens.k12),
 
+                /// Subtitle
                 Text(
-                  'You can now log in with your new \n password.',  // ✅ fixed \n
+                  'You can now log in with your new\npassword.',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: dimens.k15,
@@ -338,24 +374,31 @@ class _CreateNewPasswordViewState extends State<CreateNewPasswordView>
                   ),
                 ),
 
-                SizedBox(height: dimens.k28),  // ✅
+                SizedBox(height: dimens.k28),
 
+                /// Login Button
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       elevation: 0,
-                      backgroundColor: ColorManager.rejectedText,
+                      backgroundColor:
+                      ColorManager.rejectedText,
                       padding: EdgeInsets.symmetric(
                         vertical: dimens.k16,
                       ),
                       shape: RoundedRectangleBorder(
                         borderRadius:
-                        BorderRadius.circular(dimens.k40),
+                        BorderRadius.circular(
+                          dimens.k40,
+                        ),
                       ),
                     ),
                     onPressed: () {
-                     Navigator.pushReplacementNamed(context, RouteManager.rLoginView);
+                      Navigator.pushReplacementNamed(
+                        context,
+                        RouteManager.rLoginView,
+                      );
                     },
                     child: Text(
                       'Go to Login',
@@ -377,13 +420,22 @@ class _CreateNewPasswordViewState extends State<CreateNewPasswordView>
 
   @override
   onError(String error) {
-    MyToast.showToast(message: error, typeToast: TypeToast.error);
+    MyToast.showToast(
+      message: error,
+      typeToast: TypeToast.error,
+    );
   }
 
   @override
   onSuccess(result) {
-    MyToast.showToast(message: result.toString(), typeToast: TypeToast.success);
-    showPasswordResetDailogue(context, widget.dimens);
-    Navigator.pop(context);
+    MyToast.showToast(
+      message: result.toString(),
+      typeToast: TypeToast.success,
+    );
+
+    showPasswordResetDailogue(
+      context,
+      widget.dimens,
+    );
   }
 }

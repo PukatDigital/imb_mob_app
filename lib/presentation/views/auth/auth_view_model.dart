@@ -21,6 +21,7 @@ class AuthViewModel extends BaseViewModel {
       onError: result.onError,
     );
   }
+
   void emailVerificationCode(Map<String, dynamic> data, Result result) async {
     d(data);
     apiResponse = Loading();
@@ -30,6 +31,16 @@ class AuthViewModel extends BaseViewModel {
       onError: result.onError,
     );
   }
+  void forgetEmailVerificationCode(Map<String, dynamic> data, Result result) async {
+    d(data);
+    apiResponse = Loading();
+    apiResponse = await api.forgetEmailVerification(data);
+    apiResponse.fold<String>(
+      onSuccess: result.onSuccess,
+      onError: result.onError,
+    );
+  }
+
   void otpVerificationCode(Map<String, dynamic> data, Result result) async {
     d(data);
     apiResponse = Loading();
@@ -39,10 +50,28 @@ class AuthViewModel extends BaseViewModel {
       onError: result.onError,
     );
   }
+  void updateOtpVerificationCode(Map<String, dynamic> data, Result result) async {
+    d(data);
+    apiResponse = Loading();
+    apiResponse = await api.updateOtpVerification(data);
+    apiResponse.fold<String>(
+      onSuccess: result.onSuccess,
+      onError: result.onError,
+    );
+  }
   void signUpUser(Map<String, dynamic> data, Result result) async {
     d(data);
     apiResponse = Loading();
     apiResponse = await api.signUp(data);
+    apiResponse.fold<String>(
+      onSuccess: result.onSuccess,
+      onError: result.onError,
+    );
+  }
+  void updatePassword(Map<String, dynamic> data, Result result) async {
+    d(data);
+    apiResponse = Loading();
+    apiResponse = await api.resetPassword(data);
     apiResponse.fold<String>(
       onSuccess: result.onSuccess,
       onError: result.onError,

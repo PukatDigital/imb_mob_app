@@ -5,8 +5,11 @@ abstract class IApi {
   Future<ApiResponse> signInByEmail(Map<String, dynamic> data);
   Future<ApiResponse> userSignUp(Map<String, dynamic> data);
   Future<ApiResponse> emailVerification(Map<String, dynamic> data);
+  Future<ApiResponse> forgetEmailVerification(Map<String, dynamic> data);
   Future<ApiResponse> otpVerification(Map<String, dynamic> data);
+  Future<ApiResponse> updateOtpVerification(Map<String, dynamic> data);
   Future<ApiResponse> signUp(Map<String, dynamic> data);
+  Future<ApiResponse> resetPassword(Map<String, dynamic> data);
   Future<ApiResponse> getMotherTongues();
   Future<ApiResponse> getAllCastes();
   Future<ApiResponse> getAllHeights();
