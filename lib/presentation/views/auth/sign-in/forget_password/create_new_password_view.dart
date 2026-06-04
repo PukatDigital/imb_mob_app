@@ -274,7 +274,7 @@ class _CreateNewPasswordViewState extends State<CreateNewPasswordView>
   void showPasswordResetDailogue(BuildContext context, dynamic? dimens) {
     showDialog(
       context: context,
-      barrierDismissible: false,
+      barrierDismissible: true,
       builder: (_) {
         return Dialog(
           shape: RoundedRectangleBorder(

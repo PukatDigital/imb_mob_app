@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ideal_marriage_bureau/application/app_theme/color_scheme.dart';
 import 'package:ideal_marriage_bureau/application/core/extensions/extensions.dart';
 import '../../../../base/base_widget.dart';
 import '../../../constants/asset_manager.dart';
@@ -21,7 +22,7 @@ class _LinkedDeviceViewState extends State<LinkedDeviceView> {
     },
     {
       "title": "Phone Number",
-      "value": "not linked",
+      "value": "+923013455623",
       "isLinked": false,
       "icon": Assets.phone,
     },
@@ -127,8 +128,8 @@ class _LinkedDeviceViewState extends State<LinkedDeviceView> {
       children: [
     /// Icon Container
     Container(
-    width: widget.dimens.k48,
-      height: widget.dimens.k48,
+    width: widget.dimens.k40,
+      height: widget.dimens.k40,
       decoration: BoxDecoration(
         color: Colors.white,
         shape: BoxShape.circle,
@@ -150,7 +151,7 @@ class _LinkedDeviceViewState extends State<LinkedDeviceView> {
         ),
       ),
     ),
-        widget.dimens.k14.horizontalBoxPadding,
+        widget.dimens.k8.horizontalBoxPadding,
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -158,7 +159,8 @@ class _LinkedDeviceViewState extends State<LinkedDeviceView> {
               Text(
                 item['title'],
                 style: TextStyle(
-                  fontSize: widget.dimens.k17,
+                  fontSize: widget.dimens.k13
+                  ,
                   fontWeight: FontWeight.w600,
                   color: Colors.black87,
                 ),
@@ -168,7 +170,7 @@ class _LinkedDeviceViewState extends State<LinkedDeviceView> {
                 item['value'],
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  fontSize: widget.dimens.k14,
+                  fontSize: widget.dimens.k12,
                   color: Colors.grey.shade600,
                 ),
               ),
@@ -177,6 +179,32 @@ class _LinkedDeviceViewState extends State<LinkedDeviceView> {
         ),
         widget.dimens.k12.horizontalBoxPadding,
 
+       if(isLinked) GestureDetector(
+          onTap: () {
+            /// Future integration
+            /// Link / unlink logic here
+
+            setState(() {
+              item['isLinked'] = !item['isLinked'];
+              item['value'] = item['isLinked']
+                  ? 'dummydata@gmail.com'
+                  : 'not linked';
+            });
+          },
+          child: CircleAvatar(
+            radius: 15,
+            backgroundColor:  const Color(0xFFB11E24).withOpacity(.18),
+
+            child: Image.asset(
+
+              Assets.linkedevice,
+              width: widget.dimens.k15,
+              height: widget.dimens.k15,
+
+            ),
+          ),
+        ),
+        widget.dimens.k5.horizontalBoxPadding,
         GestureDetector(
           onTap: () {
             /// Future integration
@@ -201,7 +229,7 @@ class _LinkedDeviceViewState extends State<LinkedDeviceView> {
               borderRadius: BorderRadius.circular(widget.dimens.k30),
             ),
             child: Text(
-              isLinked ? 'Linked' : 'Link',
+              isLinked ? 'Change' : 'Link',
               style:  TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.w600,

@@ -32,9 +32,15 @@ abstract class IApi {
   Future<ApiResponse> getAllEthnicities();
   Future<ApiResponse> getAllLifeStyleAndInterest();
   Future<ApiResponse> getAllProfiles();
+  Future<ApiResponse> getProblemType();
+  Future<ApiResponse> getProblemList(Map<String, dynamic> data);
   Future<ApiResponse> getAllProfileDetails(Map<String, dynamic> data);
+  Future<ApiResponse> getProblemDetails(Map<String, dynamic> data);
 
   Future<ApiResponse> submitSetUpProfile(Map<String, dynamic> data);
+  Future<ApiResponse> sendIntrest(Map<String, dynamic> data);
+  Future<ApiResponse> createReportProblem(Map<String, dynamic> data);
+  Future<ApiResponse> deactivateAccount(Map<String, dynamic> data);
   Future<ApiResponse> updateProfile(Map<String, dynamic> data);
   Future<ApiResponse> addToFavourite(Map<String, dynamic> data);
   Future<ApiResponse> addToBlock(Map<String, dynamic> data);
@@ -42,6 +48,8 @@ abstract class IApi {
   Future<ApiResponse> addToDeleteAccount(Map<String, dynamic> data);
 
   Future<ApiResponse> getBlockProfile(Map<String, dynamic> data);
+  Future<ApiResponse> getDeactivateProfile(Map<String, dynamic> data);
+  Future<ApiResponse> getImpressionList();
   Future<ApiResponse> getFavouriteProfile(Map<String, dynamic> data);
   Future<ApiResponse> getExploreProfile(Map<String, dynamic> data);
   Future<ApiResponse> updateProfilePicture(Map<String, dynamic> data);

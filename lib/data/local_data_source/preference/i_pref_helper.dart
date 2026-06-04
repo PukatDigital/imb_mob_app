@@ -47,4 +47,10 @@ abstract class IPrefHelper {
   SetupProfilePrefModel? retrieveSetupProfile();
   void saveSetupProfile(SetupProfilePrefModel model);
   void clearSetupProfile();
+  // Credentials
+  void saveLoginCredentials(String email, String password);
+  void clearLoginCredentials();
+  String getSavedEmail();
+  String getSavedPassword();
+  bool getRememberMe();
 }

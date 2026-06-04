@@ -45,29 +45,34 @@ class MatchCard extends BaseStateLessWidget {
   Widget build(BuildContext context) {
     final login = iPrefHelper.loginModel;
     final viewModel = context.read<GetProfileViewModel>();
+    final screenHeight = MediaQuery.of(context).size.height;
+    final bottomPadding = MediaQuery.of(context).padding.bottom; // ✅ accounts for gesture/button nav
+    final bottomNavHeight =  bottomPadding; // ✅ your actual bottom nav bar height
 
     return Stack(
       children: [
         /// IMAGE VIEW
-        PageView.builder(
-          controller: PageController(),
-          itemCount: _images.isNotEmpty ? _images.length : 1,
-          itemBuilder: (_, index) {
-            return _images.isNotEmpty
-                ? Image.network(
-              _images[index],
-              fit: BoxFit.cover,
-              width: MediaQuery.of(context).size.width,
-              errorBuilder: (_, __, ___) => _placeholder(),
-            )
-                : _placeholder();
-          },
+        Positioned.fill(
+          child: PageView.builder(
+            controller: PageController(),
+            itemCount: _images.isNotEmpty ? _images.length : 1,
+            itemBuilder: (_, index) {
+              return _images.isNotEmpty
+                  ? Image.network(
+                _images[index],
+                fit: BoxFit.cover,
+                width: MediaQuery.of(context).size.width,
+                errorBuilder: (_, __, ___) => _placeholder(),
+              )
+                  : _placeholder();
+            },
+          ),
         ),
 
         /// RIGHT ACTION BUTTONS
         Positioned(
           right: dimens.k16,
-          bottom: kBottomNavigationBarHeight + dimens.k30,
+          bottom: bottomNavHeight + dimens.k16, // ✅ dynamic bottom
           child: Column(
             children: [
               /// PROFILE BUTTON
@@ -76,8 +81,8 @@ class MatchCard extends BaseStateLessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) =>
-                          UserProfileDetailsView(profileId: profile.profileId.toString()),
+                      builder: (_) => UserProfileDetailsView(
+                          profileId: profile.profileId.toString()),
                     ),
                   );
                 },
@@ -114,9 +119,7 @@ class MatchCard extends BaseStateLessWidget {
 
               /// FAVORITE BUTTON (TOGGLE)
               ActionButton(
-                icon: profile.isFavourite == true
-                    ? Assets.fav
-                    : Assets.favorite,
+                icon: profile.isFavourite == true ? Assets.fav : Assets.favorite,
                 imagesColor: profile.isFavourite == true
                     ? ColorManager.primary
                     : ColorManager.white,
@@ -125,13 +128,11 @@ class MatchCard extends BaseStateLessWidget {
                     : ColorManager.white.withOpacity(.3),
                 onTap: () {
                   final isFav = profile.isFavourite ?? false;
-
                   final data = {
                     "added_by": login?.data?.user?.name?.trim(),
                     "target_user_id": profile.userId?.trim(),
                     "type": isFav ? "remove" : "add",
                   };
-
                   viewModel.addToFavouriteList(
                     data,
                     _FavouriteResultHandler(context, profile),
@@ -141,16 +142,12 @@ class MatchCard extends BaseStateLessWidget {
 
               ActionButton(
                 icon: Assets.chat,
-                onTap: () {
-                  print("Chat tapped");
-                },
+                onTap: () => print("Chat tapped"),
               ),
 
               ActionButton(
                 icon: Assets.cancel,
-                onTap: () {
-                  print("Cancel tapped");
-                },
+                onTap: () => print("Cancel tapped"),
               ),
             ],
           ),
@@ -160,7 +157,7 @@ class MatchCard extends BaseStateLessWidget {
         Positioned(
           left: 0,
           right: 0,
-          bottom: kBottomNavigationBarHeight + dimens.k20,
+          bottom: bottomNavHeight, // ✅ dynamic bottom
           child: Container(
             padding: EdgeInsets.all(dimens.k20),
             decoration: BoxDecoration(

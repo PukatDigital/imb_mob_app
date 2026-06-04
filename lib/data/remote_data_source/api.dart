@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:ideal_marriage_bureau/data/models/get_profile_model/get_all_profile_list_model.dart';
 import 'package:ideal_marriage_bureau/data/models/get_profile_model/profile_details_model.dart';
+import 'package:ideal_marriage_bureau/data/models/report_problem_model/problem_detail_model.dart';
 import 'package:ideal_marriage_bureau/data/models/set_up_profile_model/belongs_to_model.dart';
 import 'package:ideal_marriage_bureau/data/models/set_up_profile_model/castes_model.dart';
 import 'package:ideal_marriage_bureau/data/models/set_up_profile_model/cities_model.dart';
@@ -37,8 +38,12 @@ import '../../application/network/result.dart';
 import '../models/block_model/block_model.dart';
 import '../models/explore_model/explore_model.dart';
 import '../models/favourite_model/favourite_model.dart';
+import '../models/get_profile_model/deactivate_profile_model.dart';
+import '../models/impression_model/impression_list_model.dart';
 import '../models/login_model/Auth_login_model.dart';
 
+import '../models/report_problem_model/problem_list_model.dart';
+import '../models/report_problem_model/problem_type_model.dart';
 import 'i_api.dart';
 
 class Apis implements IApi {
@@ -242,7 +247,7 @@ class Apis implements IApi {
       );
       d("RAW Response: ${responseData.data}");
       return Success(MaterialStatusModel.fromJson(responseData.data));
-    } on DioException catch (e) {
+  } on DioException catch (e) {
       d("DioException Type: ${e.type}");
       d("Status Code: ${e.response?.statusCode}");
       d("Response Data: ${e.response?.data}");
@@ -282,6 +287,46 @@ class Apis implements IApi {
       );
       d("RAW Response: ${responseData.data}");
       return Success(CitiesModel.fromJson(responseData.data));
+    } on DioException catch (e) {
+      d("DioException Type: ${e.type}");
+      d("Status Code: ${e.response?.statusCode}");
+      d("Response Data: ${e.response?.data}");
+      d("Request URL: ${e.requestOptions.uri}");
+      return Error(getErrorMessage(e));
+    } catch (e) {
+      d("Unknown Error: $e");
+      return Error(e.toString());
+    }
+  }
+  @override
+  Future<ApiResponse> getProblemType() async {
+    apiService.setIsTokenRequired(value: true);
+    try {
+      final responseData = await dio.get(
+        "method/onebms.api.base_api_latest.get_problem_category_list",
+      );
+      d("RAW Response: ${responseData.data}");
+      return Success(ProblemType.fromJson(responseData.data));
+    } on DioException catch (e) {
+      d("DioException Type: ${e.type}");
+      d("Status Code: ${e.response?.statusCode}");
+      d("Response Data: ${e.response?.data}");
+      d("Request URL: ${e.requestOptions.uri}");
+      return Error(getErrorMessage(e));
+    } catch (e) {
+      d("Unknown Error: $e");
+      return Error(e.toString());
+    }
+  }
+  @override
+  Future<ApiResponse> getProblemList(Map<String, dynamic> data) async {
+    apiService.setIsTokenRequired(value: true);
+    try {
+      final responseData = await dio.get(
+        "method/onebms.api.profile_api.get_problem_list",
+      );
+      d("RAW Response: ${responseData.data}");
+      return Success(ProblemList.fromJson(responseData.data));
     } on DioException catch (e) {
       d("DioException Type: ${e.type}");
       d("Status Code: ${e.response?.statusCode}");
@@ -653,6 +698,7 @@ class Apis implements IApi {
       return Error(e.toString());
     }
   }
+
   @override
   Future<ApiResponse> getAllProfileDetails(Map<String, dynamic> data) async {
     apiService.setIsTokenRequired(value: true);
@@ -671,6 +717,41 @@ class Apis implements IApi {
       return Error(e.toString());
     }
   }
+  @override
+  Future<ApiResponse> getProblemDetails(Map<String, dynamic> data) async {
+    apiService.setIsTokenRequired(value: true);
+    try {
+      final responseData = await dio.get(
+        "method/onebms.api.profile_api.get_problem_detail",
+        queryParameters: data, // sends profile_id as query param
+      );
+      d("✅ API Response: ${responseData.data}");
+      return Success(ProblemDetailModel.fromJson(responseData.data));
+    } on DioException catch (e) {
+      d("❌ DioException: $e");
+      return Error(getErrorMessage(e));
+    } catch (e) {
+      d("❌ Exception: $e");
+      return Error(e.toString());
+    }
+  }
+  Future<ApiResponse> getDeactivateProfile(Map<String, dynamic> data) async {
+    apiService.setIsTokenRequired(value: true);
+    try {
+      final responseData = await dio.get(
+        "method/onebms.api.profile_api.get_profile_deactivation_status",
+        queryParameters: data, // sends profile_id as query param
+      );
+      d("✅ API Response: ${responseData.data}");
+      return Success(DeactivateProfileModel.fromJson(responseData.data));
+    } on DioException catch (e) {
+      d("❌ DioException: $e");
+      return Error(getErrorMessage(e));
+    } catch (e) {
+      d("❌ Exception: $e");
+      return Error(e.toString());
+    }
+  }
 
   @override
   Future<ApiResponse> submitSetUpProfile(Map<String, dynamic> data) async {
@@ -679,6 +760,81 @@ class Apis implements IApi {
       d("🚀 SUBMIT DATA: ${jsonEncode(data)}"); // log actual JSON
       final responseData = await dio.post(
         "method/onebms.api.profile_api.create_profile",
+        data: jsonEncode(data), // always send JSON
+        options: Options(
+          headers: {
+            "Content-Type": "application/json",
+          },
+        ),
+      );
+      d("✅ STATUS: ${responseData.statusCode}");
+      d("📩 RESPONSE: ${responseData.data}");
+      return Success(responseData.data['message']);
+    } on DioException catch (e) {
+      d("❌ DIO ERROR: ${e.response?.data}");
+      return Error(getErrorMessage(e));
+    } catch (e) {
+      d("❌ UNKNOWN ERROR: $e");
+      return Error(e.toString());
+    }
+  }
+  @override
+  Future<ApiResponse> createReportProblem(Map<String, dynamic> data) async {
+    apiService.setIsTokenRequired(value: true);
+    try {
+      d("🚀 SUBMIT DATA: ${jsonEncode(data)}"); // log actual JSON
+      final responseData = await dio.post(
+        "method/onebms.api.profile_api.create_problem_report",
+        data: jsonEncode(data), // always send JSON
+        options: Options(
+          headers: {
+            "Content-Type": "application/json",
+          },
+        ),
+      );
+      d("✅ STATUS: ${responseData.statusCode}");
+      d("📩 RESPONSE: ${responseData.data}");
+      return Success(responseData.data['message']);
+    } on DioException catch (e) {
+      d("❌ DIO ERROR: ${e.response?.data}");
+      return Error(getErrorMessage(e));
+    } catch (e) {
+      d("❌ UNKNOWN ERROR: $e");
+      return Error(e.toString());
+    }
+  }
+  @override
+  Future<ApiResponse> deactivateAccount(Map<String, dynamic> data) async {
+    apiService.setIsTokenRequired(value: true);
+    try {
+      d("🚀 SUBMIT DATA: ${jsonEncode(data)}"); // log actual JSON
+      final responseData = await dio.post(
+        "method/onebms.api.profile_api.deactivate_profile",
+        data: jsonEncode(data), // always send JSON
+        options: Options(
+          headers: {
+            "Content-Type": "application/json",
+          },
+        ),
+      );
+      d("✅ STATUS: ${responseData.statusCode}");
+      d("📩 RESPONSE: ${responseData.data}");
+      return Success(responseData.data['message']);
+    } on DioException catch (e) {
+      d("❌ DIO ERROR: ${e.response?.data}");
+      return Error(getErrorMessage(e));
+    } catch (e) {
+      d("❌ UNKNOWN ERROR: $e");
+      return Error(e.toString());
+    }
+  }
+  @override
+  Future<ApiResponse> sendIntrest(Map<String, dynamic> data) async {
+    apiService.setIsTokenRequired(value: true);
+    try {
+      d("🚀 SUBMIT DATA: ${jsonEncode(data)}"); // log actual JSON
+      final responseData = await dio.post(
+        "method/onebms.api.profile_api.send_interest",
         data: jsonEncode(data), // always send JSON
         options: Options(
           headers: {
@@ -834,6 +990,24 @@ class Apis implements IApi {
       );
 
       return Success(BlockedProfileModel.fromJson(responseData.data));
+    } on DioException catch (e) {
+      return Error(getErrorMessage(e));
+    } catch (e) {
+      return Error(e.toString());
+    }
+  }
+
+
+  @override
+  Future<ApiResponse> getImpressionList() async {
+    apiService.setIsTokenRequired(value: true);
+    try {
+      final responseData = await dio.get(
+        "method/onebms.api.profile_api.get_interests",
+
+      );
+
+      return Success(ImpressionListModel.fromJson(responseData.data));
     } on DioException catch (e) {
       return Error(getErrorMessage(e));
     } catch (e) {

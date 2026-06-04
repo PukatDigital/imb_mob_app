@@ -11,6 +11,7 @@ import 'package:ideal_marriage_bureau/presentation/views/home/home_view_model.da
 
 import 'package:ideal_marriage_bureau/presentation/views/home/view_model.dart';
 import 'package:ideal_marriage_bureau/presentation/views/profile/profile_view_model.dart';
+import 'package:ideal_marriage_bureau/presentation/views/report_problem/report_problem_view_model.dart';
 import 'package:ideal_marriage_bureau/presentation/views/set-up/set_up_profile_view_model.dart';
 import 'package:ideal_marriage_bureau/presentation/views/set-up/sign_up_view_model.dart';
 
@@ -72,6 +73,7 @@ class _MyAppState extends State<MyApp> {
             ChangeNotifierProvider(create: (_) => BlockViewModel()),
             ChangeNotifierProvider(create: (_) => FavouriteViewListModel()),
             ChangeNotifierProvider(create: (_) => ExploreViewModel()),
+            ChangeNotifierProvider(create: (_) => GetReportProblem()),
           ],
           child: MaterialApp(
             title: StringManager.appName,

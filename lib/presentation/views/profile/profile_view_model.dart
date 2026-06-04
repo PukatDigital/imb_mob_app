@@ -6,9 +6,11 @@ import 'package:ideal_marriage_bureau/data/models/get_profile_model/get_all_prof
 import 'package:ideal_marriage_bureau/data/models/get_profile_model/profile_details_model.dart';
 
 import '../../../application/common/log.dart';
+import '../../../data/models/get_profile_model/deactivate_profile_model.dart';
 
 class GetPersonalProfileViewModel extends BaseViewModel {
   ProfileDetailsModel profileDetailsModel = ProfileDetailsModel();
+  DeactivateProfileModel deactivateProfileModel = DeactivateProfileModel();
 
   Future<void> getAllPersonalProfileDetails(Result result, {required String profileId}) async {
     apiResponse = Loading();
@@ -29,6 +31,45 @@ class GetPersonalProfileViewModel extends BaseViewModel {
       },
     );
   }
+  Future<void> getDeactivateProfile(Map<String, dynamic> data,Result result) async {
+    apiResponse = Loading();
+    notifyListeners();
+
+    apiResponse = await api.getDeactivateProfile(data);
+
+    apiResponse.fold<DeactivateProfileModel>(
+      onSuccess: (res) {
+        deactivateProfileModel = res;
+        d("✅ Activation Details: ${res.toJson()}");
+        notifyListeners();
+        result.onSuccess("success");
+      },
+      onError: (err) {
+        d("❌ Profile Details error: $err");
+        result.onError(err);
+      },
+    );
+  }
+  void deactivateAccount(
+      Map<String, dynamic> data, Result result) async
+  {
+    apiResponse = Loading();
+    notifyListeners();
+
+    apiResponse = await api.deactivateAccount(data);
+
+    apiResponse.fold<String>(
+      onSuccess: (message) {
+        notifyListeners();
+        result.onSuccess(message);
+      },
+      onError: (error) {
+        notifyListeners();
+        result.onError(error);
+      },
+    );
+  }
+
   void updateProfileImages(Map<String, dynamic> data, Result result) async {
     d(data);
 

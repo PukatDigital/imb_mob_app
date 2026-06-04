@@ -56,11 +56,11 @@ class CustomDropDown<T> extends BaseStateLessWidget {
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
-            borderSide: BorderSide(color: ColorManager.dropDownBroder),
+            borderSide: BorderSide(color: ColorManager.fieldTextColor),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
-            borderSide: BorderSide(color: ColorManager.dropDownBroder, width: 2),
+            borderSide: BorderSide(color: ColorManager.fieldTextColor, width: 2),
           ),
           errorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),

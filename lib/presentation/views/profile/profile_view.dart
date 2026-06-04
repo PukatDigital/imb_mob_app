@@ -286,6 +286,60 @@ class _ProfileScreenState extends State<ProfileScreen>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
+                    "History",
+                    style: context.textTheme.bodySmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: ColorManager.fieldTextColor,
+                    ),
+                  ),
+                  widget.dimens.k20.verticalBoxPadding,
+                  legalCard(() {}, Assets.subscription, "Subscription"),
+                  widget.dimens.k20.verticalBoxPadding,
+                  legalCard(() {
+                    widget.navigator.pushNamed(
+                      RouteManager.rLinkedDeviceVerificationView,
+                    );
+                  }, Assets.subscription, "Verification View"),
+                  widget.dimens.k20.verticalBoxPadding,
+                  legalCard(() {
+                    widget.navigator.pushNamed(
+                      RouteManager.rPrivacyView,
+                    );
+                  }, Assets.subscription, "Privacy View"),
+                  widget.dimens.k20.verticalBoxPadding, legalCard(() {
+                    widget.navigator.pushNamed(
+                      RouteManager.rTermsAndCondtionsView,
+                    );
+                  }, Assets.subscription, "Terms and Conditions"),
+                  widget.dimens.k20.verticalBoxPadding,
+
+                  legalCard(() {
+                    widget.navigator.pushNamed(
+                    RouteManager.rReportProblemList,
+                  );
+                    }, Assets.myproblem, "My Reports "),
+
+
+                  // widget.dimens.k20.verticalBoxPadding,
+                  // legalCard(() {}, Assets.termsCondition, "Terms & Conditions"),
+                ],
+              ),
+            ),
+            widget.dimens.k15.verticalBoxPadding,
+            Container(
+              width: size.width,
+              padding: EdgeInsets.symmetric(
+                vertical: widget.dimens.k20,
+                horizontal: widget.dimens.k15,
+              ),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(widget.dimens.k25),
+                color: ColorManager.white,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
                     "Legal",
                     style: context.textTheme.bodySmall?.copyWith(
                       fontWeight: FontWeight.w600,
@@ -408,12 +462,23 @@ class _ProfileScreenState extends State<ProfileScreen>
                   ),
                   widget.dimens.k20.verticalBoxPadding,
                   legalCard(
-                    () {
+                        () {
+                      // ✅ Preserve credentials if remember_me is true
+                      final rememberMe = widget.iPrefHelper.getRememberMe();
+                      final savedEmail = widget.iPrefHelper.getSavedEmail();
+                      final savedPassword = widget.iPrefHelper.getSavedPassword();
+
                       widget.iPrefHelper.clear();
+
+                      // ✅ Restore credentials after clear
+                      if (rememberMe) {
+                        widget.iPrefHelper.saveLoginCredentials(savedEmail, savedPassword);
+                      }
+
                       Navigator.pushNamedAndRemoveUntil(
                         context,
                         RouteManager.rLoginView,
-                        (route) => false,
+                            (route) => false,
                       );
                     },
                     Assets.logOut,
@@ -432,7 +497,7 @@ class _ProfileScreenState extends State<ProfileScreen>
   void showDeactivateDialouge(BuildContext context, dynamic dimens) {
     showDialog(
       context: context,
-      barrierDismissible: false,
+      barrierDismissible: true,
       builder: (_) {
         return Dialog(
           shape: RoundedRectangleBorder(
@@ -513,7 +578,8 @@ class _ProfileScreenState extends State<ProfileScreen>
                           ),
                         ),
                         onPressed: () {
-                          Navigator.pushReplacementNamed(context, RouteManager.rLoginView);
+                          final data = {"profile_deactive": 1};
+                          context.read<GetPersonalProfileViewModel>().deactivateAccount(data, this);
                         },
                         child: Text(
                           'Deactivate',
@@ -537,7 +603,7 @@ class _ProfileScreenState extends State<ProfileScreen>
   void showDeactivateSuccess(BuildContext context, dynamic dimens) {
     showDialog(
       context: context,
-      barrierDismissible: false,
+      barrierDismissible: true,
       builder: (_) {
         return Dialog(
           shape: RoundedRectangleBorder(
@@ -650,6 +716,16 @@ class _ProfileScreenState extends State<ProfileScreen>
     MyToast.showToast(message: result, typeToast: TypeToast.success);
 
     if (result.contains("Profile Deleted successfully")) {
+      widget.iPrefHelper.clear();
+
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        RouteManager.rLoginView,
+        (route) => false,
+      );
+    }
+
+    if (result.contains("Profile deactivated successfully.")) {
       widget.iPrefHelper.clear();
 
       Navigator.pushNamedAndRemoveUntil(

@@ -82,6 +82,28 @@ class PrefHelper implements IPrefHelper {
       saveToken(model.data?.sessionId); // fallback
     }
   }
+  @override
+  void saveLoginCredentials(String email, String password) {
+    _pref.setString('saved_email', email);
+    _pref.setString('saved_password', password);
+    _pref.setBool('remember_me', true);
+  }
+
+  @override
+  void clearLoginCredentials() {
+    _pref.remove('saved_email');
+    _pref.remove('saved_password');
+    _pref.setBool('remember_me', false);
+  }
+
+  @override
+  String getSavedEmail() => _pref.getString('saved_email') ?? '';
+
+  @override
+  String getSavedPassword() => _pref.getString('saved_password') ?? '';
+
+  @override
+  bool getRememberMe() => _pref.getBool('remember_me') ?? false;
   // @override
   // void saveLoginModel(LoginModel model) {
   //   _pref.setString('user_data', jsonEncode(model.toJson()));

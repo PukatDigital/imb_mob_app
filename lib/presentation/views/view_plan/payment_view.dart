@@ -371,7 +371,7 @@ class _PaymentViewState extends State<PaymentView> {
   void showPaymentSuccessDialog(BuildContext context, dynamic dimens) {
     showDialog(
       context: context,
-      barrierDismissible: false,
+      barrierDismissible: true,
       builder: (_) {
         return Dialog(
           shape: RoundedRectangleBorder(

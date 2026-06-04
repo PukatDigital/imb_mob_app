@@ -31,6 +31,7 @@ class ColorManager {
  static const rejectedText = const Color(0xffB11E24);
 static const progressBg = const Color(0xffEAF0FB);
 static const  progressText = const Color(0xff3A72D1);
+static const  inReview = const Color(0xffE3B23C);
 
   static const white = Color(0xFFFFFFFF);
   static const halfWhite = Color(0xFFFAFAFA);

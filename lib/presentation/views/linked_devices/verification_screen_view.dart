@@ -1,0 +1,256 @@
+import 'dart:async';
+
+import 'package:flutter/material.dart';
+import 'package:ideal_marriage_bureau/base/base_widget.dart';
+import 'package:provider/provider.dart';
+
+import '../../../application/app_theme/color_scheme.dart';
+import '../../../application/common/enum.dart';
+import '../../../application/core/result.dart';
+import '../../../application/network/result.dart';
+import '../../../application/routes/route_generator.dart';
+import '../../../constants/string_manager.dart';
+import '../../../widgets/loader.dart';
+import '../../../widgets/otp_verification.dart';
+import '../../../widgets/primary_button.dart';
+import '../../../widgets/toast.dart';
+import '../auth/auth_view_model.dart';
+class LinkedDeviceVerificationView extends BaseStateFullWidget {
+  final String? email;
+   LinkedDeviceVerificationView({super.key, this.email});
+
+  @override
+  State<LinkedDeviceVerificationView> createState() => _LinkedDeviceVerificationViewState();
+}
+
+class _LinkedDeviceVerificationViewState extends State<LinkedDeviceVerificationView> implements Result<String>, ErrorResult {
+late AuthViewModel authVM;
+
+String? _resolvedEmail;
+String _otpValue = '';
+bool _hasOtpError = false;
+
+Timer? _timer;
+int _secondsRemaining = 120;
+bool _isResendEnabled = false;
+
+@override
+void didChangeDependencies() {
+  super.didChangeDependencies();
+  // Prefer route argument, fallback to constructor param
+  final routeEmail = ModalRoute.of(context)?.settings.arguments as String?;
+  _resolvedEmail = routeEmail ?? widget.email;
+}
+
+@override
+void initState() {
+  super.initState();
+  _startTimer();
+}
+
+void _startTimer() {
+  _secondsRemaining = 120;
+  _isResendEnabled = false;
+
+  _timer?.cancel();
+  _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+    if (_secondsRemaining == 0) {
+      timer.cancel();
+      setState(() {
+        _isResendEnabled = true;
+      });
+    } else {
+      setState(() {
+        _secondsRemaining--;
+      });
+    }
+  });
+}
+
+@override
+void dispose() {
+  _timer?.cancel();
+  super.dispose();
+}
+
+@override
+Widget build(BuildContext context) {
+  return Scaffold(
+    backgroundColor: Colors.white,
+    resizeToAvoidBottomInset: true,
+    body: Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            const Color(0xFFB11E24).withOpacity(0.18),
+            const Color(0xFFB11E24).withOpacity(0.0),
+          ],
+        ),
+      ),
+      child: _body(),
+    ),
+  );
+}
+
+Widget _body() {
+  return Consumer<AuthViewModel>(
+    builder: (context, provider, child) {
+      authVM = provider;
+
+      return Column(
+        children: [
+          SizedBox(height: widget.dimens.k60),
+
+          /// BACK BUTTON
+          GestureDetector(
+            onTap: () => Navigator.pop(context),
+            child: Padding(
+              padding: const EdgeInsets.only(left: 10),
+              child: Row(
+                children: [
+                  Icon(Icons.arrow_back_ios, color: ColorManager.primary),
+                  Text(
+                    "Back",
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      color: ColorManager.primary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          Expanded(
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: widget.dimens.k18),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(height: widget.dimens.k50),
+
+                  Text(
+                    StringManager.verificationCode,
+                    style:  Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      fontSize: widget.dimens.k25,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+
+                  SizedBox(height: widget.dimens.k5),
+
+                  Text(
+                    "Enter your verification code send. We sent a code to $_resolvedEmail",
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      fontSize: widget.dimens.k14,
+                      color: ColorManager.textColorSubTitle,
+                    ),
+                  ),
+
+                  SizedBox(height: widget.dimens.k20),
+
+                  /// OTP FIELD
+                  OTPCodeField(
+                    hasError: _hasOtpError,
+                    onCompleted: (value) {
+                      setState(() {
+                        _otpValue = value;
+                        _hasOtpError = value.length != 6;
+                      });
+                    },
+                  ),
+
+                  SizedBox(height: widget.dimens.k10),
+
+                  /// TIMER + RESEND
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        _isResendEnabled
+                            ? "You can resend code now"
+                            : "Resend in ${_secondsRemaining ~/ 60}:${(_secondsRemaining % 60).toString().padLeft(2, '0')}",
+                        style:  Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: ColorManager.textColorSubTitle,
+                        ),
+                      ),
+
+                      TextButton(
+                        onPressed: _isResendEnabled
+                            ? () {
+                          // ✅ Uses _resolvedEmail consistently
+                          authVM.emailVerificationCode(
+                            {"email": _resolvedEmail?.trim()},
+                            this,
+                          );
+                          _startTimer();
+                        }
+                            : null,
+                        child: Text(
+                          "Resend",
+                          style: TextStyle(
+                            color: _isResendEnabled
+                                ? ColorManager.primary
+                                : Colors.grey,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const Spacer(),
+
+                  /// VERIFY BUTTON
+                  authVM.apiResponse is Loading
+                      ?  Loader()
+                      : PrimaryButton(
+                    onPressed: () {
+                      if (_otpValue.length != 6) {
+                        setState(() => _hasOtpError = true);
+                        return;
+                      }
+
+                      // ✅ Uses _resolvedEmail consistently
+                      authVM.otpVerificationCode(
+                        {
+                          "email": _resolvedEmail?.trim(),
+                          "otp": _otpValue.trim(),
+                        },
+                        this,
+                      );
+                    },
+                    childText: StringManager.verify,
+                    color: ColorManager.primary,
+                    textStyle:  Theme.of(context).textTheme.titleMedium?.copyWith(
+                      color: Colors.white,
+                    ),
+                  ),
+
+                  SizedBox(height: widget.dimens.k40),
+                ],
+              ),
+            ),
+          ),
+        ],
+      );
+    },
+  );
+}
+
+@override
+void onError(String error) {
+  MyToast.showToast(message: error);
+}
+
+@override
+void onSuccess(String result) {
+  MyToast.showToast(message: result,
+      typeToast: TypeToast.success);
+  // ✅ Pass resolved email as route argument
+  widget.navigator.pushNamed(
+    RouteManager.rSignUpCreateView,
+    object: _resolvedEmail,
+  );
+}
+}

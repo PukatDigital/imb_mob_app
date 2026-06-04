@@ -25,6 +25,19 @@ class LoginFormView extends BaseStateFullWidget {
 class _LoginFormViewState extends State<LoginFormView>
     with AuthMixin<LoginFormView>  implements Result<LoginModel>{
   @override
+  @override
+  void initState() {
+    super.initState();
+    _loadSavedCredentials();
+  }
+
+  void _loadSavedCredentials() {
+    if (widget.iPrefHelper.getRememberMe()) {
+      email.text = widget.iPrefHelper.getSavedEmail();
+      password.text = widget.iPrefHelper.getSavedPassword();
+      setState(() => remember = true);
+    }
+  }
   Widget build(BuildContext context) {
     var size = MediaQuery.sizeOf(context);
      return Consumer <AuthViewModel> (
@@ -219,7 +232,16 @@ class _LoginFormViewState extends State<LoginFormView>
     final userData = result.data;
 
     if (userData?.success == true && userData?.user != null) {
+
       widget.iPrefHelper.saveLoginModel(result);
+      if (remember) {
+        widget.iPrefHelper.saveLoginCredentials(
+          email.text.trim(),
+          password.text.trim(),
+        );
+      } else {
+        widget.iPrefHelper.clearLoginCredentials();
+      }
 
       MyToast.showToast(
         message: result.data?.message ?? "" ,

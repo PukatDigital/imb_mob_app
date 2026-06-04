@@ -266,7 +266,7 @@ class _SignUpCreateViewState extends State<SignUpCreateView>
   void _showVerificationDialog() {
     showDialog(
       context: context,
-      barrierDismissible: false,
+      barrierDismissible: true,
       builder: (context) => VerificationDialog(),
     );
   }

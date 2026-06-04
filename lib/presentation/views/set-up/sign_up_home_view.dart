@@ -402,7 +402,7 @@ class _SignUpCreationViewState extends State<SignUpCreationView>
   void _showBackDialog() {
     showDialog(
       context: context,
-      barrierDismissible: false,
+      barrierDismissible: true,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16)),

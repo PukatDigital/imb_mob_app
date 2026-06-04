@@ -5,6 +5,7 @@ import 'package:ideal_marriage_bureau/presentation/views/home/user_profile/impre
 import 'package:ideal_marriage_bureau/presentation/views/linked_devices/linked_device_view.dart';
 import 'package:ideal_marriage_bureau/presentation/views/profile/profile_view.dart';
 import 'package:ideal_marriage_bureau/presentation/views/report_problem/report_problem_view.dart';
+import 'package:ideal_marriage_bureau/presentation/views/terms_and_conditions/terms_and_condition_view.dart';
 
 
 import 'package:provider/provider.dart';
@@ -22,8 +23,13 @@ import '../../presentation/views/auth/sign-in/verification_code_view.dart';
 
 import '../../presentation/views/block/block_list_view.dart';
 import '../../presentation/views/bottom_bar/bottom_bar_view.dart';
+import '../../presentation/views/linked_devices/verification_screen_view.dart';
 import '../../presentation/views/notification/notification_list_view.dart';
+import '../../presentation/views/privacy/privacy_screen_view.dart';
 import '../../presentation/views/profile/profile_details_view.dart';
+import '../../presentation/views/report_problem/problem_detail_view.dart';
+import '../../presentation/views/report_problem/problem_list_view.dart';
+import '../../presentation/views/report_problem/report_problem_view_model.dart';
 import '../../presentation/views/set-up/sign_up_home_view.dart';
 import '../../presentation/views/view_plan/payment_history.dart';
 import '../../presentation/views/view_plan/payment_view.dart';
@@ -60,10 +66,15 @@ class RouteManager {
   static const rNotificationListView = '/rNotificationListView';
   static const rBlockListView = '/rBlockListView';
   static const rLinkedDeviceView = '/rLinkedDeviceView';
+  static const rLinkedDeviceVerificationView = '/rLinkedDeviceVerificationView';
   static const rPaymentView = '/rPaymentView';
   static const rPaymentHistoryView = '/rPaymentHistoryView';
   static const rReportProblem = '/rReportProblem';
   static const rImpressionView = '/rImpressionView';
+  static const rReportProblemList = '/rReportProblemList';
+  static const rProblemDetails = '/rProblemDetails';
+  static const rPrivacyView = '/rPrivacyView';
+  static const rTermsAndCondtionsView = '/rTermsAndCondtionsView';
 }
 
 class RouteGenerator {
@@ -103,7 +114,17 @@ class RouteGenerator {
             create: (_) => AuthViewModel(),
             child:  ForgetView(),
           ),
-        ); case RouteManager.rContinueWithPhone:
+        );
+      case RouteManager.rProblemDetails:
+        final problemId = settings.arguments as String? ?? '';
+        return PageRouter.fadeScale(
+          settings,
+              () => ChangeNotifierProvider(
+            create: (_) => GetReportProblem(),   // ← use correct provider
+            child: ProblemDetailView(problemId: problemId),
+          ),
+        );
+        case RouteManager.rContinueWithPhone:
         return PageRouter.fadeScale(
           settings,
               () => ChangeNotifierProvider(
@@ -117,6 +138,21 @@ class RouteGenerator {
               () => ChangeNotifierProvider(
             create: (_) => AuthViewModel(),
             child:  CreateNewPasswordView(),
+          ),
+        );case RouteManager.rTermsAndCondtionsView:
+        return PageRouter.fadeScale(
+          settings,
+              () => ChangeNotifierProvider(
+            create: (_) => AuthViewModel(),
+            child:  TermsAndConditionsView(),
+          ),
+        );
+        case RouteManager.rReportProblemList:
+        return PageRouter.fadeScale(
+          settings,
+              () => ChangeNotifierProvider(
+            create: (_) => GetReportProblem(),
+            child:  ProblemListView(),
           ),
         );
 
@@ -156,6 +192,13 @@ class RouteGenerator {
               create: (BuildContext context) => AuthViewModel(),
               child: BottomBarView(),
             ));
+        case RouteManager.rPrivacyView:
+        return PageRouter.fadeScale(
+            settings,
+                () => ChangeNotifierProvider(
+              create: (BuildContext context) => AuthViewModel(),
+              child: PrivacyView(),
+            ));
         case RouteManager.rTSignUpCreationView:
         return PageRouter.fadeScale(
             settings,
@@ -185,6 +228,13 @@ class RouteGenerator {
                 () => ChangeNotifierProvider(
               create: (BuildContext context) => AuthViewModel(),
               child: LinkedDeviceView(),
+            ));
+        case RouteManager.rLinkedDeviceVerificationView:
+        return PageRouter.fadeScale(
+            settings,
+                () => ChangeNotifierProvider(
+              create: (BuildContext context) => AuthViewModel(),
+              child: LinkedDeviceVerificationView(),
             ));
         case RouteManager.rPaymentHistoryView:
         return PageRouter.fadeScale(

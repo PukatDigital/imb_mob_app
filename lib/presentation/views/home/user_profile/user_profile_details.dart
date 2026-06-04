@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:ideal_marriage_bureau/application/common/enum.dart';
 import 'package:ideal_marriage_bureau/application/core/extensions/extensions.dart';
 import 'package:ideal_marriage_bureau/application/routes/route_generator.dart';
 import 'package:ideal_marriage_bureau/data/models/get_profile_model/get_all_profile_list_model.dart';
@@ -103,13 +104,13 @@ class _UserProfileDetailsViewState extends State<UserProfileDetailsView>
           ),
         ),
         child: Padding(
-          padding: EdgeInsets.all(widget.dimens.k15),
+          padding: EdgeInsets.all(widget.dimens.k20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              widget.dimens.k50.verticalBoxPadding,
+              widget.dimens.k30.verticalBoxPadding,
               _header(),
-              widget.dimens.k40.verticalBoxPadding,
+              widget.dimens.k20.verticalBoxPadding,
               _profileSection(),
               widget.dimens.k10.verticalBoxPadding,
               _bioCard("Bio", _d?.bio ?? "—"),
@@ -159,6 +160,7 @@ class _UserProfileDetailsViewState extends State<UserProfileDetailsView>
               _picturesSection(),
               widget.dimens.k20.verticalBoxPadding,
               _chatButton(),
+              widget.dimens.k20.verticalBoxPadding,
             ],
           ),
         ),
@@ -297,14 +299,14 @@ class _UserProfileDetailsViewState extends State<UserProfileDetailsView>
         GestureDetector(
           onTap: () {
             if (!hasSaidHi) {
-              setState(() {
-                hasSaidHi = true;
-              });
-             // widget.navigator.pushNamed(RouteManager)
-     }
+              final data = {
+                "target_profile": widget.profileId, // ← pass the profile id
+              };
+              context.read<GetProfileViewModel>().sendIntrest(data, this);
+            }
           },
           child: Container(
-            padding:  EdgeInsets.symmetric(
+            padding: EdgeInsets.symmetric(
               horizontal: widget.dimens.k22,
               vertical: widget.dimens.k10,
             ),
@@ -319,10 +321,7 @@ class _UserProfileDetailsViewState extends State<UserProfileDetailsView>
               style: TextStyle(
                 fontSize: widget.dimens.k13,
                 fontWeight: FontWeight.w500,
-                color:
-                ColorManager.textColor,
-
-
+                color: ColorManager.textColor,
               ),
             ),
           ),
@@ -672,8 +671,14 @@ class _UserProfileDetailsViewState extends State<UserProfileDetailsView>
   }
 
   @override
-  void onError(String error) => MyToast.showToast(message: error);
+  void onError(String error) => MyToast.showToast(message: error, typeToast: TypeToast.error);
 
   @override
-  void onSuccess(String result) {}
+  void onSuccess(String result) {
+    setState(() {
+      hasSaidHi = true;  // ← only set true on API success
+    });
+    MyToast.showToast(message: result, typeToast: TypeToast.success);
+
+  }
 }

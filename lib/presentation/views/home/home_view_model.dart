@@ -6,11 +6,13 @@ import 'package:ideal_marriage_bureau/data/models/get_profile_model/get_all_prof
 import 'package:ideal_marriage_bureau/data/models/get_profile_model/profile_details_model.dart';
 
 import '../../../application/common/log.dart';
+import '../../../data/models/impression_model/impression_list_model.dart';
 
 class GetProfileViewModel extends BaseViewModel {
 
   GetProfileModel getProfileModel = GetProfileModel();
   ProfileDetailsModel profileDetailsModel = ProfileDetailsModel();
+  ImpressionListModel impressionListModel = ImpressionListModel();
 
   List<Profiles> get profiles => getProfileModel.data?.profiles ?? [];
 
@@ -22,6 +24,20 @@ class GetProfileViewModel extends BaseViewModel {
     apiResponse.fold<GetProfileModel>(
       onSuccess: (success) {
         getProfileModel = success;
+        notifyListeners();
+      },
+      onError: result.onError,
+    );
+  }
+  void getImpressionList(ErrorResult result, {required String profileId}) async {
+    apiResponse = Loading();
+    notifyListeners();
+
+    apiResponse = await api.getImpressionList();
+    apiResponse.fold<ImpressionListModel>(
+      onSuccess: (success) {
+        impressionListModel = success;
+        d("✅ Impression List: ${success.toJson()}");
         notifyListeners();
       },
       onError: result.onError,
@@ -43,6 +59,26 @@ class GetProfileViewModel extends BaseViewModel {
       onError: (err) {
         d("❌ Profile Details error: $err");
         result.onError(err);
+      },
+    );
+  }
+
+  void sendIntrest(
+      Map<String, dynamic> data, Result result) async
+  {
+    apiResponse = Loading();
+    notifyListeners();
+
+    apiResponse = await api.sendIntrest(data);
+
+    apiResponse.fold<String>(
+      onSuccess: (message) {
+        notifyListeners();
+        result.onSuccess(message);
+      },
+      onError: (error) {
+        notifyListeners();
+        result.onError(error);
       },
     );
   }

@@ -24,11 +24,14 @@ class Assets {
   static const String loginWithGoogle = '${prefixImages}Google Logo.png';
   static const String male = '${prefixImages}male.png';
   static const String feMale = '${prefixImages}female.png';
+  static const String myproblem = '${prefixImages}myproblem.png';
+  static const String subscription = '${prefixImages}subscription.png';
   static const String success = '${prefixImages}sucess.png';
   static const String home = '${prefixImages}home.png';
   static const String explore = '${prefixImages}exlpore.png';
   static const String favorite = '${prefixImages}favorite.png';
   static const String fav = '${prefixImages}fav.png';
+  static const String linkedevice = '${prefixImages}linkedevice.png';
   static const String favoriteImage = '${prefixImages}favourite_image.png';
   static const String chat = '${prefixImages}chat.png';
   static const String profile = '${prefixImages}profile.png';
