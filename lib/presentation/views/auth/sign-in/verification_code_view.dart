@@ -215,7 +215,7 @@ class _VerificationCodeViewState extends State<VerificationCodeView>
                         }
 
                         // ✅ Uses _resolvedEmail consistently
-                        authVM.otpVerificationCode(
+                        authVM.updateOtpVerificationCode(
                           {
                             "email": _resolvedEmail?.trim(),
                             "otp": _otpValue.trim(),

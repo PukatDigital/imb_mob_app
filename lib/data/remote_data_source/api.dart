@@ -118,6 +118,28 @@ class Apis implements IApi {
     }
   }
   @override
+  Future<ApiResponse> forgetEmailVerification(Map<String, dynamic> data) async {
+    apiService.setIsTokenRequired(value: false);
+
+    d(data);
+    try {
+      final responseData = await dio.post(
+        "method/onebms.api.auth.send_reset_password_otp",
+        data: data,
+      );
+      d(responseData.data);
+      d(responseData.data["message"]);
+      return Success(responseData.data["message"]);
+    } on DioException catch (e) {
+      d(e);
+      return Error(getErrorMessage(e));
+    } catch (e) {
+      d(e);
+      return Error(e.toString());
+    }
+  }
+
+  @override
   Future<ApiResponse> otpVerification(Map<String, dynamic> data) async {
     apiService.setIsTokenRequired(value: false);
     d(data);
@@ -138,12 +160,52 @@ class Apis implements IApi {
     }
   }
   @override
+  Future<ApiResponse> updateOtpVerification(Map<String, dynamic> data) async {
+    apiService.setIsTokenRequired(value: false);
+    d(data);
+    try {
+      final responseData = await dio.post(
+        "method/onebms.api.auth.verify_reset_password_otp",
+        data: data,
+      );
+      d(responseData.data);
+      d(responseData.data["message"]);
+      return Success(responseData.data["message"]);
+    } on DioException catch (e) {
+      d(e);
+      return Error(getErrorMessage(e));
+    } catch (e) {
+      d(e);
+      return Error(e.toString());
+    }
+  }
+  @override
   Future<ApiResponse> signUp(Map<String, dynamic> data) async {
     apiService.setIsTokenRequired(value: false);
     d(data);
     try {
       final responseData = await dio.post(
         "method/onebms.api.auth.create_user_profile",
+        data: data,
+      );
+      d(responseData.data);
+      d(responseData.data["message"]);
+      return Success(responseData.data["message"]);
+    } on DioException catch (e) {
+      d(e);
+      return Error(getErrorMessage(e));
+    } catch (e) {
+      d(e);
+      return Error(e.toString());
+    }
+  }
+  @override
+  Future<ApiResponse> resetPassword(Map<String, dynamic> data) async {
+    apiService.setIsTokenRequired(value: false);
+    d(data);
+    try {
+      final responseData = await dio.post(
+        "method/onebms.api.auth.reset_password",
         data: data,
       );
       d(responseData.data);

@@ -16,9 +16,6 @@ import '../../../../../widgets/otp_verification.dart';
 import '../../../../../widgets/primary_button.dart';
 import '../../../../../widgets/toast.dart';
 import '../../auth_view_model.dart';
-
-
-
 class ForgetPasswordOTPView extends BaseStateFullWidget {
   final String? email;
 
@@ -218,7 +215,7 @@ class _VerificationCodeViewState extends State<ForgetPasswordOTPView>
                         }
 
                         // ✅ Uses _resolvedEmail consistently
-                        authVM.otpVerificationCode(
+                        authVM.updateOtpVerificationCode(
                           {
                             "email": _resolvedEmail?.trim(),
                             "otp": _otpValue.trim(),
@@ -255,7 +252,7 @@ class _VerificationCodeViewState extends State<ForgetPasswordOTPView>
         typeToast: TypeToast.success);
     // ✅ Pass resolved email as route argument
     widget.navigator.pushNamed(
-      RouteManager.rSignUpCreateView,
+      RouteManager.rCreateNewPasswordView,
       object: _resolvedEmail,
     );
   }
