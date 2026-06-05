@@ -54,6 +54,7 @@ dependencies:
   flutter_sound:
   permission_handler:
   cached_network_image: ^3.4.1
+  flutter_html: ^3.0.0
 
   stack_trace: any
 dev_dependencies:

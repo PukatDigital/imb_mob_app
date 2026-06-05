@@ -75,6 +75,7 @@ class RouteManager {
   static const rProblemDetails = '/rProblemDetails';
   static const rPrivacyView = '/rPrivacyView';
   static const rTermsAndCondtionsView = '/rTermsAndCondtionsView';
+  static const rSubscription = '/rSubscription';
 }
 
 class RouteGenerator {
@@ -284,6 +285,7 @@ class RouteGenerator {
               create: (BuildContext context) => AuthViewModel(),
               child: ReportProblemView(),
             ));
+
         case RouteManager.rImpressionView:
         return PageRouter.fadeScale(
             settings,
@@ -291,6 +293,14 @@ class RouteGenerator {
               create: (BuildContext context) => AuthViewModel(),
               child: ImpressionsView(),
             ));
+        case RouteManager.rSubscription:
+        return PageRouter.fadeScale(
+            settings,
+                () => ChangeNotifierProvider(
+              create: (BuildContext context) => AuthViewModel(),
+              child: PaymentHistoryView(),
+            ));
+
 
 
 

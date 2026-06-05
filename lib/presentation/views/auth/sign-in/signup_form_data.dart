@@ -11,7 +11,7 @@ class SignUpFormData {
   final TextEditingController firstNameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController = TextEditingController();
-
+  int termsAccepted = 1;
   Gender? selectedGender;
   String? selectedQualification;
   String? selectedCountry;
@@ -43,5 +43,6 @@ class SignUpFormData {
     "country": selectedCountry ?? "",
     "city": selectedCity ?? "",
     "password": passwordController.text.trim(),
+    "terms_conditions": termsAccepted,
   };
 }

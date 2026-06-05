@@ -56,6 +56,9 @@ abstract class IApi {
   Future<ApiResponse> getFavouriteProfile(Map<String, dynamic> data);
   Future<ApiResponse> getExploreProfile(Map<String, dynamic> data);
   Future<ApiResponse> updateProfilePicture(Map<String, dynamic> data);
+  Future<ApiResponse> getTermsAndConditions();
+  Future<ApiResponse> getAllPlans();
+  Future<ApiResponse> getAllPaymentList();
 
 
 }

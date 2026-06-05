@@ -1,6 +1,7 @@
 
 import 'package:ideal_marriage_bureau/application/core/extensions/extensions.dart';
 import 'package:ideal_marriage_bureau/data/models/set_up_profile_model/cities_model.dart';
+import 'package:ideal_marriage_bureau/data/models/term_and_condition_model/term_and_condition.dart';
 import '../../../../application/common/log.dart';
 import '../../../../application/core/result.dart';
 import '../../../../application/network/result.dart';
@@ -12,6 +13,7 @@ class AuthViewModel extends BaseViewModel {
   EducationModel educationModel=EducationModel();
   CountriesModel countriesModel=CountriesModel();
   CitiesModel citiesModel=CitiesModel();
+  TermsAndConditions termsAndConditions=TermsAndConditions();
   void signInByEmail(Map<String, dynamic> data, Result result) async {
     apiResponse = Loading();
     apiResponse = await api.signInByEmail(data);
@@ -105,6 +107,17 @@ class AuthViewModel extends BaseViewModel {
     apiResponse.fold<CitiesModel>(  // ← generic type matches
       onSuccess: (success) {
         citiesModel = success;
+        notifyListeners();
+      },
+      onError: result.onError,
+    );
+  }
+  void getTermsAndConditions(ErrorResult result) async {
+    apiResponse = Loading();
+    apiResponse = await api.getTermsAndConditions();
+    apiResponse.fold<TermsAndConditions>(
+      onSuccess: (success) {
+        termsAndConditions = success;
         notifyListeners();
       },
       onError: result.onError,

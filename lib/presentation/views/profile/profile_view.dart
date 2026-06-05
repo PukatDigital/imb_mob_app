@@ -293,7 +293,11 @@ class _ProfileScreenState extends State<ProfileScreen>
                     ),
                   ),
                   widget.dimens.k20.verticalBoxPadding,
-                  legalCard(() {}, Assets.subscription, "Subscription"),
+                  legalCard(() {
+                    widget.navigator.pushNamed(
+                      RouteManager.rSubscription,
+                    );
+                  }, Assets.subscription, "Subscription"),
                   widget.dimens.k20.verticalBoxPadding,
                   legalCard(() {
                     widget.navigator.pushNamed(

@@ -28,6 +28,7 @@ import 'package:ideal_marriage_bureau/data/models/set_up_profile_model/religions
 import 'package:ideal_marriage_bureau/data/models/set_up_profile_model/religious_practices_model.dart';
 import 'package:ideal_marriage_bureau/data/models/set_up_profile_model/weights_model.dart';
 import 'package:ideal_marriage_bureau/data/models/set_up_profile_model/zodiac_signs_model.dart';
+import 'package:ideal_marriage_bureau/data/models/term_and_condition_model/term_and_condition.dart';
 
 
 import '../../application/common/log.dart';
@@ -42,6 +43,8 @@ import '../models/get_profile_model/deactivate_profile_model.dart';
 import '../models/impression_model/impression_list_model.dart';
 import '../models/login_model/Auth_login_model.dart';
 
+import '../models/plans_model/paln_details_model.dart';
+import '../models/plans_model/payment_list_model.dart';
 import '../models/report_problem_model/problem_list_model.dart';
 import '../models/report_problem_model/problem_type_model.dart';
 import 'i_api.dart';
@@ -1125,6 +1128,67 @@ class Apis implements IApi {
       return Error(getErrorMessage(e));
     } catch (e) {
       d(e);
+      return Error(e.toString());
+    }
+  }
+  @override
+  Future<ApiResponse> getTermsAndConditions() async {
+    apiService.setIsTokenRequired(value: true);
+    try {
+      final responseData = await dio.get(
+        "method/onebms.api.profile_api.get_terms_and_conditions",
+      );
+      d("RAW Response: ${responseData.data}");
+      return Success(TermsAndConditions.fromJson(responseData.data));
+    } on DioException catch (e) {
+      d("DioException Type: ${e.type}");
+      d("Status Code: ${e.response?.statusCode}");
+      d("Response Data: ${e.response?.data}");
+      d("Request URL: ${e.requestOptions.uri}");
+      return Error(getErrorMessage(e));
+    } catch (e) {
+      d("Unknown Error: $e");
+      return Error(e.toString());
+    }
+  }
+  @override
+  Future<ApiResponse> getAllPlans() async {
+    apiService.setIsTokenRequired(value: true);
+    try {
+      final responseData = await dio.get(
+        "method/onebms.api.profile_api.get_active_plans",
+      );
+      d("RAW Response: ${responseData.data}");
+      return Success(ActivePlans.fromJson(responseData.data));
+    } on DioException catch (e) {
+      d("DioException Type: ${e.type}");
+      d("Status Code: ${e.response?.statusCode}");
+      d("Response Data: ${e.response?.data}");
+      d("Request URL: ${e.requestOptions.uri}");
+      return Error(getErrorMessage(e));
+    } catch (e) {
+      d("Unknown Error: $e");
+      return Error(e.toString());
+    }
+  }
+
+  @override
+  Future<ApiResponse> getAllPaymentList() async {
+    apiService.setIsTokenRequired(value: true);
+    try {
+      final responseData = await dio.get(
+        "method/onebms.api.profile_api.get_payment_list",
+      );
+      d("RAW Response: ${responseData.data}");
+      return Success(PaymentListModel.fromJson(responseData.data));
+    } on DioException catch (e) {
+      d("DioException Type: ${e.type}");
+      d("Status Code: ${e.response?.statusCode}");
+      d("Response Data: ${e.response?.data}");
+      d("Request URL: ${e.requestOptions.uri}");
+      return Error(getErrorMessage(e));
+    } catch (e) {
+      d("Unknown Error: $e");
       return Error(e.toString());
     }
   }
