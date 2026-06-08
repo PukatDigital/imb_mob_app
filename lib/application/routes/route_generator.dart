@@ -33,6 +33,8 @@ import '../../presentation/views/report_problem/report_problem_view_model.dart';
 import '../../presentation/views/set-up/sign_up_home_view.dart';
 import '../../presentation/views/view_plan/payment_history.dart';
 import '../../presentation/views/view_plan/payment_view.dart';
+import '../../presentation/views/view_plan/plan_details_view_model.dart' show PlansViewModel;
+import '../../presentation/views/view_plan/plan_history_details_view.dart';
 import '../../presentation/views/view_plan/plan_view.dart';
 import '../../splash/splash_view.dart';
 import '../core/routes/routes.dart';
@@ -73,6 +75,7 @@ class RouteManager {
   static const rImpressionView = '/rImpressionView';
   static const rReportProblemList = '/rReportProblemList';
   static const rProblemDetails = '/rProblemDetails';
+  static const rPlanListDetails = '/rPlanListDetails';
   static const rPrivacyView = '/rPrivacyView';
   static const rTermsAndCondtionsView = '/rTermsAndCondtionsView';
   static const rSubscription = '/rSubscription';
@@ -123,6 +126,15 @@ class RouteGenerator {
               () => ChangeNotifierProvider(
             create: (_) => GetReportProblem(),   // ← use correct provider
             child: ProblemDetailView(problemId: problemId),
+          ),
+        );
+        case RouteManager.rPlanListDetails:
+        final planId = settings.arguments as String? ?? '';
+        return PageRouter.fadeScale(
+          settings,
+              () => ChangeNotifierProvider(
+            create: (_) => PlansViewModel(),   // ← use correct provider
+            child: PaymentHistoryDetailView(planId: planId),
           ),
         );
         case RouteManager.rContinueWithPhone:

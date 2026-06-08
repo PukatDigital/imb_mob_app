@@ -45,6 +45,7 @@ import '../models/login_model/Auth_login_model.dart';
 
 import '../models/plans_model/paln_details_model.dart';
 import '../models/plans_model/payment_list_model.dart';
+import '../models/plans_model/plans_list_detail_model.dart';
 import '../models/report_problem_model/problem_list_model.dart';
 import '../models/report_problem_model/problem_type_model.dart';
 import 'i_api.dart';
@@ -402,6 +403,28 @@ class Apis implements IApi {
       d("Unknown Error: $e");
       return Error(e.toString());
     }
+  }@override
+  Future<ApiResponse> getPlanListDetails(Map<String, dynamic> data) async {
+    apiService.setIsTokenRequired(value: true);
+    try {
+      final responseData = await dio.get(
+        "method/onebms.api.profile_api.get_plan_detail",
+        queryParameters: data,
+      );
+      d("RAW Response: ${responseData.data}");
+      d("RAW Response: ${responseData.data}");
+      d("  ${responseData.statusCode}");
+      return Success(PlansListDetailsModel.fromJson(responseData.data));
+    } on DioException catch (e) {
+      d("DioException Type: ${e.type}");
+      d("Status Code: ${e.response?.statusCode}");
+      d("Response Data: ${e.response?.data}");
+      d("Request URL: ${e.requestOptions.uri}");
+      return Error(getErrorMessage(e));
+    } catch (e) {
+      d("Unknown Error: $e");
+      return Error(e.toString());
+    }
   }
   @override
   Future<ApiResponse> getAllNationalities() async {
@@ -411,11 +434,13 @@ class Apis implements IApi {
         "method/onebms.api.base_api.get_all_nationalities",
       );
       d("RAW Response: ${responseData.data}");
+
       return Success(NationalitiesModel.fromJson(responseData.data));
     } on DioException catch (e) {
       d("DioException Type: ${e.type}");
       d("Status Code: ${e.response?.statusCode}");
       d("Response Data: ${e.response?.data}");
+
       d("Request URL: ${e.requestOptions.uri}");
       return Error(getErrorMessage(e));
     } catch (e) {

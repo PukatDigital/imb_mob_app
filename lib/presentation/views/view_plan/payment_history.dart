@@ -3,13 +3,16 @@ import 'package:ideal_marriage_bureau/application/app_theme/color_scheme.dart';
 import 'package:ideal_marriage_bureau/application/core/extensions/extensions.dart';
 import 'package:ideal_marriage_bureau/base/base_widget.dart';
 import 'package:ideal_marriage_bureau/presentation/views/view_plan/plan_details_view_model.dart';
+
 import 'package:provider/provider.dart';
 
 import '../../../application/common/enum.dart';
 import '../../../application/core/result.dart';
 import '../../../application/network/result.dart';
+import '../../../application/routes/route_generator.dart';
 import '../../../data/models/plans_model/payment_list_model.dart';
 import '../../../widgets/toast.dart';
+import 'plan_history_details_view.dart';
 
 
 class PaymentHistoryView extends BaseStateFullWidget {
@@ -81,20 +84,31 @@ class _HistoryViewState extends State<PaymentHistoryView> implements ErrorResult
           padding: EdgeInsets.symmetric(horizontal: widget.dimens.k18),
           child: Column(
             children: list.map((item) {
+              // In _buildBody(), replace the existing Container with this:
+
               return Padding(
                 padding: EdgeInsets.only(bottom: widget.dimens.k12),
-                child: Container(
-                  width: double.infinity,
-                  padding: EdgeInsets.all(widget.dimens.k16),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(widget.dimens.k15),
-                    border: Border.all(
-                      color: Colors.grey.shade200,
-                      width: 1,
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.pushNamed(
+                      context,
+                      RouteManager.rPlanListDetails,
+                      arguments: item.name,
+                    );
+                  },
+                  child: Container(
+                    width: double.infinity,
+                    padding: EdgeInsets.all(widget.dimens.k16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(widget.dimens.k15),
+                      border: Border.all(
+                        color: Colors.grey.shade200,
+                        width: 1,
+                      ),
                     ),
+                    child: _historyTile(item),
                   ),
-                  child: _historyTile(item),
                 ),
               );
             }).toList(),
@@ -294,4 +308,5 @@ class _HistoryViewState extends State<PaymentHistoryView> implements ErrorResult
   void onError(String error) {
     MyToast.showToast(message: error);
   }
+
 }

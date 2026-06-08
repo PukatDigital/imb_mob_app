@@ -39,6 +39,7 @@ abstract class IApi {
   Future<ApiResponse> getProblemList(Map<String, dynamic> data);
   Future<ApiResponse> getAllProfileDetails(Map<String, dynamic> data);
   Future<ApiResponse> getProblemDetails(Map<String, dynamic> data);
+  Future<ApiResponse> getPlanListDetails(Map<String, dynamic> data);
 
   Future<ApiResponse> submitSetUpProfile(Map<String, dynamic> data);
   Future<ApiResponse> sendIntrest(Map<String, dynamic> data);
