@@ -121,7 +121,7 @@ class _LoginViewState extends State<LoginView> {
 
 
                             },
-                            childText: 'Login',
+                            childText: 'Log In',
                             issquare: true,
                             color: selectedTab == AuthTab.login
                                 ? ColorManager.white
@@ -148,7 +148,7 @@ class _LoginViewState extends State<LoginView> {
 
                               });
                             },
-                            childText: 'Sign up',
+                            childText: 'Sign Up',
                             issquare: true,
                             color: selectedTab == AuthTab.signup
                                 ? ColorManager.white

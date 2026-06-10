@@ -15,8 +15,9 @@ class PrimaryButton extends BaseStateLessWidget {
   final double? elevation;
   final bool isSafeArea;
   final bool issquare;
-  final double? height; // 👈 optional height
-  final double? radius; // 👈 optional radius
+  final double? height;
+  final double? radius;
+  final bool isDisabled; // ✅ ADD THIS
 
   PrimaryButton({
     super.key,
@@ -32,12 +33,16 @@ class PrimaryButton extends BaseStateLessWidget {
     this.issquare = false,
     this.height,
     this.radius,
+    this.isDisabled = false, // ✅ default false (optional)
   });
 
   @override
   Widget build(BuildContext context) {
-    final double buttonHeight = height ?? dimens.k55; // default height
-    final double borderRadius = radius ?? (issquare ? dimens.k25 : dimens.k25); // default radius
+    final double buttonHeight = height ?? dimens.k55;
+    final double borderRadius = radius ?? dimens.k25;
+
+    // ✅ isDisabled true ho to null, warna normal onPressed
+    final VoidCallback? effectiveOnPressed = isDisabled ? null : onPressed;
 
     return SafeArea(
       top: false,
@@ -45,11 +50,14 @@ class PrimaryButton extends BaseStateLessWidget {
       right: false,
       bottom: isSafeArea && Platform.isIOS,
       child: ElevatedButton(
-        onPressed: onPressed ?? () {},
-
+        onPressed: effectiveOnPressed,
         style: ElevatedButton.styleFrom(
-
-          backgroundColor: color ?? ColorManager.primary,
+          // ✅ isDisabled ho to opacity 0.5
+          backgroundColor: isDisabled
+              ? (color ?? ColorManager.primary).withOpacity(0.5)
+              : (color ?? ColorManager.primary),
+          disabledBackgroundColor: (color ?? ColorManager.primary).withOpacity(0.5), // ✅ jab onPressed null ho
+          disabledForegroundColor: ColorManager.white,
           elevation: elevation ?? 0,
           fixedSize: Size(width ?? context.width, buttonHeight),
           shape: RoundedRectangleBorder(

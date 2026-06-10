@@ -16,7 +16,7 @@ import '../auth_mixin.dart';
 import '../auth_view_model.dart';
 
 class SignUpFormView extends BaseStateFullWidget {
-   SignUpFormView({super.key});
+  SignUpFormView({super.key});
 
   @override
   State<SignUpFormView> createState() => _SignUpFormViewState();
@@ -26,17 +26,19 @@ class _SignUpFormViewState extends State<SignUpFormView>
     with AuthMixin<SignUpFormView>
     implements Result {
 
+  bool isLoading = false; // ✅ ADD THIS
+
   @override
   void initState() {
     super.initState();
-    authVM = AuthViewModel(); // ✅ make sure VM initialized
+    authVM = AuthViewModel();
   }
 
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.sizeOf(context);
     return Form(
-      key: formKey, // ✅ FIXED (using mixin formKey)
+      key: formKey,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -48,23 +50,24 @@ class _SignUpFormViewState extends State<SignUpFormView>
             hintText: StringManager.username,
             keyboardType: TextInputType.emailAddress,
             controller: email,
-            validator: (input) => AppValidators.fieldValidator(input),
+            validator: (input) => AppValidators.mailValidator(input),
           ),
-         //const Spacer(),
 
-         SizedBox(height: size.height * .20),
+          SizedBox(height: size.height * .20),
 
           /// 🔹 SIGN UP BUTTON
           PrimaryButton(
-            childText: 'Sign Up',
+            childText: isLoading ? 'Please Wait...' : 'Sign Up',
             textStyle: context.textTheme.bodyMedium?.copyWith(
               fontSize: widget.dimens.k16,
               fontWeight: FontWeight.w500,
               color: ColorManager.white,
             ),
             issquare: true,
+            isDisabled: isLoading, // ✅ bas yeh ek line add karein
             onPressed: () {
               if (validate) {
+                setState(() => isLoading = true);
                 authVM.emailVerificationCode(
                   {"email": email.text.trim()},
                   this,
@@ -72,7 +75,9 @@ class _SignUpFormViewState extends State<SignUpFormView>
               }
             },
           ),
+
           widget.dimens.k15.verticalBoxPadding,
+
           Row(
             children: [
               Expanded(
@@ -82,8 +87,7 @@ class _SignUpFormViewState extends State<SignUpFormView>
                 ),
               ),
               Padding(
-                padding:
-                EdgeInsets.symmetric(horizontal: widget.dimens.k8),
+                padding: EdgeInsets.symmetric(horizontal: widget.dimens.k8),
                 child: Text(
                   'or',
                   style: context.textTheme.titleMedium?.copyWith(
@@ -104,7 +108,7 @@ class _SignUpFormViewState extends State<SignUpFormView>
 
           widget.dimens.k15.verticalBoxPadding,
 
-          /// 🔹 GOOGLE LOGIN BUTTON (UI ONLY)
+          /// 🔹 GOOGLE LOGIN BUTTON
           Container(
             height: widget.dimens.k50,
             width: MediaQuery.of(context).size.width,
@@ -138,15 +142,25 @@ class _SignUpFormViewState extends State<SignUpFormView>
       ),
     );
   }
+
   @override
   void onError(String error) {
+    setState(() {
+      isLoading = false; // ✅ error par loading stop
+    });
     MyToast.showToast(message: error);
   }
+
   @override
   void onSuccess(result) {
+    setState(() {
+      isLoading = false; // ✅ success par loading stop
+    });
+
     MyToast.showToast(
       message: result,
       typeToast: TypeToast.success,
+
     );
 
     if (email.text.trim().isEmpty) {
@@ -156,7 +170,7 @@ class _SignUpFormViewState extends State<SignUpFormView>
 
     widget.navigator.pushNamed(
       RouteManager.rVerificationCodeView,
-      object: email.text.trim(), // or arguments depending on your nav system
+      object: email.text.trim(),
     );
   }
 }

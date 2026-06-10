@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:ideal_marriage_bureau/data/models/get_profile_model/get_all_profile_list_model.dart';
 import 'package:ideal_marriage_bureau/data/models/get_profile_model/profile_details_model.dart';
+import 'package:ideal_marriage_bureau/data/models/plans_model/bank_details.dart';
 import 'package:ideal_marriage_bureau/data/models/report_problem_model/problem_detail_model.dart';
 import 'package:ideal_marriage_bureau/data/models/set_up_profile_model/belongs_to_model.dart';
 import 'package:ideal_marriage_bureau/data/models/set_up_profile_model/castes_model.dart';
@@ -45,6 +46,7 @@ import '../models/login_model/Auth_login_model.dart';
 
 import '../models/plans_model/paln_details_model.dart';
 import '../models/plans_model/payment_list_model.dart';
+import '../models/plans_model/payment_methods_list.dart';
 import '../models/plans_model/plans_list_detail_model.dart';
 import '../models/report_problem_model/problem_list_model.dart';
 import '../models/report_problem_model/problem_type_model.dart';
@@ -403,7 +405,8 @@ class Apis implements IApi {
       d("Unknown Error: $e");
       return Error(e.toString());
     }
-  }@override
+  }
+  @override
   Future<ApiResponse> getPlanListDetails(Map<String, dynamic> data) async {
     apiService.setIsTokenRequired(value: true);
     try {
@@ -1217,7 +1220,42 @@ class Apis implements IApi {
       return Error(e.toString());
     }
   }
+  @override
+  Future<ApiResponse> getBankDetails() async {
+    apiService.setIsTokenRequired(value: true);
+    try {
+      final responseData = await dio.get(
+        "method/onebms.api.profile_api.get_bank_details",
+      );
+      d("RAW Response: ${responseData.data}");
+      return Success(BankDetailsModel.fromJson(responseData.data));
+    } on DioException catch (e) {
+      d("DioException Type: ${e.type}");
+      d("Status Code: ${e.response?.statusCode}");
+      d("Response Data: ${e.response?.data}");
+      d("Request URL: ${e.requestOptions.uri}");
+      return Error(getErrorMessage(e));
+    } catch (e) {
+      d("Unknown Error: $e");
+      return Error(e.toString());
+    }
+  }
+  @override
+  Future<ApiResponse> getPaymentMethodList(Map<String, dynamic> data) async {
+    apiService.setIsTokenRequired(value: true);
+    try {
+      final responseData = await dio.get(
+        "method/onebms.api.profile_api.get_payment_methods",
+        queryParameters: data,
+      );
 
+      return Success(PaymentMethodsList.fromJson(responseData.data));
+    } on DioException catch (e) {
+      return Error(getErrorMessage(e));
+    } catch (e) {
+      return Error(e.toString());
+    }
+  }
   //
   // @override
   // Future<ApiResponse> getMotherTongues() async {

@@ -21,7 +21,7 @@ import 'signup_form_data.dart';
 class SignUpCreateView extends BaseStateFullWidget {
   final String? email;
 
-   SignUpCreateView({super.key, this.email});
+  SignUpCreateView({super.key, this.email});
 
   @override
   State<SignUpCreateView> createState() => _SignUpCreateViewState();
@@ -36,7 +36,6 @@ class _SignUpCreateViewState extends State<SignUpCreateView>
 
   String? _resolvedEmail;
 
-  // ✅ Single shared form data object — passed to all steps
   final SignUpFormData _formData = SignUpFormData();
 
   @override
@@ -86,6 +85,10 @@ class _SignUpCreateViewState extends State<SignUpCreateView>
         MyToast.showToast(message: "Passwords do not match");
         return;
       }
+      if (_formData.termsAccepted != 1) {
+        MyToast.showToast(message: "Please accept the Terms & Conditions");
+        return;
+      }
       _submitSignUp();
     }
   }
@@ -102,6 +105,10 @@ class _SignUpCreateViewState extends State<SignUpCreateView>
     final data = _formData.toJson(_resolvedEmail ?? "");
     authVM.signUpUser(data, this);
   }
+
+  // ✅ Returns true only on step 3 when terms not accepted
+  bool get _isSubmitDisabled =>
+      _currentStep == 2 && _formData.termsAccepted != 1; // ✅ disable jab tak 1 na ho
 
   @override
   Widget build(BuildContext context) {
@@ -144,7 +151,13 @@ class _SignUpCreateViewState extends State<SignUpCreateView>
                       Align(
                         alignment: Alignment.topLeft,
                         child: GestureDetector(
-                          onTap: () => Navigator.pop(context),
+                          onTap: () {
+                            if (_currentStep > 0) {
+                              _goToPage(_currentStep - 1);
+                            } else {
+                              Navigator.pop(context);
+                            }
+                          },
                           child: Padding(
                             padding: const EdgeInsets.only(left: 10.0),
                             child: Row(
@@ -189,8 +202,7 @@ class _SignUpCreateViewState extends State<SignUpCreateView>
 
                 /// PROGRESS BAR
                 Padding(
-                  padding:
-                  EdgeInsets.symmetric(horizontal: widget.dimens.k18),
+                  padding: EdgeInsets.symmetric(horizontal: widget.dimens.k18),
                   child: Row(
                     children: List.generate(3, (index) {
                       return Expanded(
@@ -213,7 +225,6 @@ class _SignUpCreateViewState extends State<SignUpCreateView>
                 Expanded(
                   child: PageView(
                     controller: _pageController,
-                    // ✅ Prevent swipe — only Next button controls navigation
                     physics: const NeverScrollableScrollPhysics(),
                     onPageChanged: (index) {
                       setState(() => _currentStep = index);
@@ -221,7 +232,10 @@ class _SignUpCreateViewState extends State<SignUpCreateView>
                     children: [
                       StepOneView(formData: _formData),
                       StepTwoView(formData: _formData),
-                      StepThreeView(formData: _formData),
+                      StepThreeView(
+                        formData: _formData,
+                        onTermsChanged: () => setState(() {}), // ✅ rebuild on checkbox toggle
+                      ),
                     ],
                   ),
                 ),
@@ -230,17 +244,19 @@ class _SignUpCreateViewState extends State<SignUpCreateView>
                 Padding(
                   padding: EdgeInsets.fromLTRB(
                     widget.dimens.k18,
-                    0,
+                    1,
                     widget.dimens.k18,
                     widget.dimens.k25,
                   ),
                   child: authVM.apiResponse is Loading
                       ?  Loader()
                       : PrimaryButton(
-                    onPressed: _nextStep,
+                    onPressed: _isSubmitDisabled ? null : _nextStep, // ✅ disabled when terms not accepted
                     childText: _currentStep == 2 ? "Submit" : "Next",
                     issquare: false,
-                    color: ColorManager.primary,
+                    color: _isSubmitDisabled
+                        ? Colors.grey // ✅ grey when disabled
+                        : ColorManager.primary,
                   ),
                 ),
               ],
@@ -258,8 +274,7 @@ class _SignUpCreateViewState extends State<SignUpCreateView>
 
   @override
   void onSuccess(String result) {
-    MyToast.showToast(message: result,
-    typeToast: TypeToast.success);
+    MyToast.showToast(message: result, typeToast: TypeToast.success);
     _showVerificationDialog();
   }
 

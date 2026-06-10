@@ -1,17 +1,13 @@
 import 'package:flutter/material.dart';
-import '../../set-up/tell_about_your_self.dart';
 
-
-import 'package:flutter/material.dart';
-
-// ✅ Single source of truth for Gender enum
 enum Gender { male, female }
 
 class SignUpFormData {
   final TextEditingController firstNameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController = TextEditingController();
-  int termsAccepted = 1;
+
+  int termsAccepted = 0; // ✅ 0 = not accepted, 1 = accepted
   Gender? selectedGender;
   String? selectedQualification;
   String? selectedCountry;
@@ -33,7 +29,8 @@ class SignUpFormData {
 
   bool get isStepThreeValid =>
       passwordController.text.trim().isNotEmpty &&
-          passwordController.text.trim() == confirmPasswordController.text.trim();
+          passwordController.text.trim() == confirmPasswordController.text.trim() &&
+          termsAccepted == 1; // ✅ 1 = accepted
 
   Map<String, dynamic> toJson(String email) => {
     "email": email,
@@ -43,6 +40,6 @@ class SignUpFormData {
     "country": selectedCountry ?? "",
     "city": selectedCity ?? "",
     "password": passwordController.text.trim(),
-    "terms_conditions": termsAccepted,
+    "terms_and_conditions": termsAccepted, // ✅ 1 jaye ga API ko jab accepted
   };
 }

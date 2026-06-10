@@ -11,10 +11,12 @@ import 'signup_form_data.dart';
 
 class StepThreeView extends BaseStateFullWidget {
   final SignUpFormData formData;
+  final VoidCallback? onTermsChanged; // ✅ callback to notify parent
 
    StepThreeView({
     super.key,
     required this.formData,
+    this.onTermsChanged,
   });
 
   @override
@@ -24,13 +26,11 @@ class StepThreeView extends BaseStateFullWidget {
 class _StepThreeViewState extends State<StepThreeView> {
   bool passVisibility = false;
   bool confirmPassVisibility = false;
-  int termsAccepted = 1;
   late TapGestureRecognizer _termsRecognizer;
 
   @override
   void initState() {
     super.initState();
-
     _termsRecognizer = TapGestureRecognizer()
       ..onTap = () {
         Navigator.push(
@@ -70,9 +70,7 @@ class _StepThreeViewState extends State<StepThreeView> {
                     hintText: StringManager.password,
                     obscureText: !passVisibility,
                     suffixIcon: Icon(
-                      passVisibility
-                          ? Icons.visibility
-                          : Icons.visibility_off,
+                      passVisibility ? Icons.visibility : Icons.visibility_off,
                       color: ColorManager.fieldTextColor,
                     ),
                     suffixIconCallBack: () {
@@ -80,8 +78,7 @@ class _StepThreeViewState extends State<StepThreeView> {
                         passVisibility = !passVisibility;
                       });
                     },
-                    validator: (input) =>
-                        AppValidators.fieldValidator(input),
+                    validator: (input) => AppValidators.fieldValidator(input),
                     maxLines: 1,
                   ),
 
@@ -91,12 +88,10 @@ class _StepThreeViewState extends State<StepThreeView> {
                     "Confirm Password",
                     style: Theme.of(context).textTheme.bodyLarge,
                   ),
-
                   const SizedBox(height: 8),
 
                   CustomField(
-                    controller:
-                    widget.formData.confirmPasswordController,
+                    controller: widget.formData.confirmPasswordController,
                     hintText: StringManager.confirmPassword,
                     obscureText: !confirmPassVisibility,
                     suffixIcon: Icon(
@@ -107,20 +102,16 @@ class _StepThreeViewState extends State<StepThreeView> {
                     ),
                     suffixIconCallBack: () {
                       setState(() {
-                        confirmPassVisibility =
-                        !confirmPassVisibility;
+                        confirmPassVisibility = !confirmPassVisibility;
                       });
                     },
                     validator: (input) {
                       if (input == null || input.isEmpty) {
                         return "Confirm password is required";
                       }
-
-                      if (input !=
-                          widget.formData.passwordController.text) {
+                      if (input != widget.formData.passwordController.text) {
                         return "Passwords do not match";
                       }
-
                       return null;
                     },
                     maxLines: 1,
@@ -136,22 +127,19 @@ class _StepThreeViewState extends State<StepThreeView> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Checkbox(
-                value: widget.formData.termsAccepted == 0,
+                value: widget.formData.termsAccepted == 1, // ✅ 1 = checked
                 activeColor: ColorManager.textColor,
                 onChanged: (value) {
                   setState(() {
-                    widget.formData.termsAccepted =
-                    value == true ? 0 : 1;
+                    widget.formData.termsAccepted = value == true ? 1 : 0; // ✅ checked=1, unchecked=0
                   });
+                  widget.onTermsChanged?.call();
                 },
               ),
               Expanded(
                 child: RichText(
                   text: TextSpan(
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodyMedium
-                        ?.copyWith(
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: ColorManager.textColor,
                     ),
                     children: [
@@ -162,8 +150,7 @@ class _StepThreeViewState extends State<StepThreeView> {
                         text: "Terms & Conditions",
                         style: TextStyle(
                           color: ColorManager.textColor,
-                          decoration:
-                          TextDecoration.underline,
+                          decoration: TextDecoration.underline,
                           fontWeight: FontWeight.w600,
                         ),
                         recognizer: _termsRecognizer,

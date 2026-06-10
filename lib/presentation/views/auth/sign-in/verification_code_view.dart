@@ -32,7 +32,7 @@ class _VerificationCodeViewState extends State<VerificationCodeView>
   String? _resolvedEmail;
   String _otpValue = '';
   bool _hasOtpError = false;
-
+  bool _isResendCall = false;
   Timer? _timer;
   int _secondsRemaining = 120;
   bool _isResendEnabled = false;
@@ -156,6 +156,12 @@ class _VerificationCodeViewState extends State<VerificationCodeView>
                     /// OTP FIELD
                     OTPCodeField(
                       hasError: _hasOtpError,
+                      onChanged: (value) {          // 👈 har entry/removal pe fire hoga
+                        setState(() {
+                          _otpValue = value;
+                          _hasOtpError = false;     // error clear karo jab user type kare
+                        });
+                      },
                       onCompleted: (value) {
                         setState(() {
                           _otpValue = value;
@@ -173,7 +179,7 @@ class _VerificationCodeViewState extends State<VerificationCodeView>
                         Text(
                           _isResendEnabled
                               ? "You can resend code now"
-                              : "Resend in ${_secondsRemaining ~/ 60}:${(_secondsRemaining % 60).toString().padLeft(2, '0')}",
+                              : "Resend Code in ${_secondsRemaining ~/ 60}:${(_secondsRemaining % 60).toString().padLeft(2, '0')}",
                           style: context.textTheme.bodySmall?.copyWith(
                             color: ColorManager.textColorSubTitle,
                           ),
@@ -182,7 +188,7 @@ class _VerificationCodeViewState extends State<VerificationCodeView>
                         TextButton(
                           onPressed: _isResendEnabled
                               ? () {
-                            // ✅ Uses _resolvedEmail consistently
+                            _isResendCall = true; // 👈 flag set karo
                             authVM.emailVerificationCode(
                               {"email": _resolvedEmail?.trim()},
                               this,
@@ -206,27 +212,27 @@ class _VerificationCodeViewState extends State<VerificationCodeView>
 
                     /// VERIFY BUTTON
                     authVM.apiResponse is Loading
-                        ?  Loader()
+                        ? Loader()
                         : PrimaryButton(
-                      onPressed: () {
-                        if (_otpValue.length != 6) {
-                          setState(() => _hasOtpError = true);
-                          return;
-                        }
-
-                        // ✅ Uses _resolvedEmail consistently
-                        authVM.updateOtpVerificationCode(
+                      onPressed: _otpValue.length == 6
+                          ? () {
+                        authVM.otpVerificationCode(
                           {
                             "email": _resolvedEmail?.trim(),
                             "otp": _otpValue.trim(),
                           },
                           this,
                         );
-                      },
+                      }
+                          : null, // 👈 null = disabled
                       childText: StringManager.verify,
-                      color: ColorManager.primary,
+                      color: _otpValue.length == 6
+                          ? ColorManager.primary   // ✅ filled → primary color
+                          : Colors.grey.shade300,  // ✅ empty → disabled color
                       textStyle: context.textTheme.titleMedium!.copyWith(
-                        color: Colors.white,
+                        color: _otpValue.length == 6
+                            ? Colors.white
+                            : Colors.grey.shade500, // 👈 muted text when disabled
                       ),
                     ),
 
@@ -248,9 +254,13 @@ class _VerificationCodeViewState extends State<VerificationCodeView>
 
   @override
   void onSuccess(String result) {
-    MyToast.showToast(message: result,
-        typeToast: TypeToast.success);
-    // ✅ Pass resolved email as route argument
+    MyToast.showToast(message: result, typeToast: TypeToast.success);
+
+    if (_isResendCall) {
+      _isResendCall = false; // reset karo
+      return; // 👈 navigate mat karo
+    }
+
     widget.navigator.pushNamed(
       RouteManager.rSignUpCreateView,
       object: _resolvedEmail,

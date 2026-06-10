@@ -12,7 +12,7 @@ import '../../../base/base_widget.dart';
 
 class PaymentHistoryDetailView extends BaseStateFullWidget {
   final String planId;
-  PaymentHistoryDetailView({super.key, required this.planId});
+   PaymentHistoryDetailView({super.key, required this.planId});
 
   @override
   State<PaymentHistoryDetailView> createState() =>
@@ -22,10 +22,13 @@ class PaymentHistoryDetailView extends BaseStateFullWidget {
 class _PaymentHistoryDetailViewState extends State<PaymentHistoryDetailView>
     implements Result {
 
+  // ✅ REMOVED: `late PlansViewModel plansData;` — never used, access via context.read/Consumer instead
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      // ✅ Use context.read (not watch) inside initState — triggers the API call once
       context.read<PlansViewModel>().getPlanListDetails(
         this,
         planId: widget.planId,
@@ -68,7 +71,7 @@ class _PaymentHistoryDetailViewState extends State<PaymentHistoryDetailView>
             ),
             child: Column(
               children: [
-                /// Header
+                /// ── Header ────────────────────────────────────────────────
                 Row(
                   children: [
                     GestureDetector(
@@ -108,19 +111,25 @@ class _PaymentHistoryDetailViewState extends State<PaymentHistoryDetailView>
 
                 widget.dimens.k40.verticalBoxPadding,
 
-                /// Main Card
+                /// ── Body: driven entirely by Consumer ─────────────────────
                 Expanded(
+                  // ✅ Consumer<PlansViewModel> rebuilds this subtree whenever
+                  //    notifyListeners() is called — no setState needed here.
                   child: Consumer<PlansViewModel>(
                     builder: (context, provider, _) {
 
-                      /// Loading
+                      // 1️⃣ Loading state
                       if (provider.apiResponse is Loading) {
-                        return const Center(child: CircularProgressIndicator());
+                        return const Center(
+                          child: CircularProgressIndicator(),
+                        );
                       }
 
-                      final data = provider.plansListDetailsModel?.data;
 
-                      /// No data
+
+
+                      // 3️⃣ Empty / null data
+                      final data = provider.plansListDetailsModel?.data;
                       if (data == null) {
                         return Center(
                           child: Text(
@@ -133,20 +142,23 @@ class _PaymentHistoryDetailViewState extends State<PaymentHistoryDetailView>
                         );
                       }
 
+                      // 4️⃣ Success — render the full card
                       return SingleChildScrollView(
                         child: Column(
                           children: [
-                            /// Status card — shown when plan is inactive
+                            /// Show status card only when the plan is inactive
                             if ((data.active ?? 1) == 0)
                               _statusCard(
                                 planType: data.planType ?? '',
                                 title: data.title ?? '',
                               ),
 
+                            SizedBox(height: widget.dimens.k12),
+
                             Container(
                               width: double.infinity,
                               padding: EdgeInsets.all(widget.dimens.k5),
-                              decoration: BoxDecoration(
+                              decoration: const BoxDecoration(
                                 color: ColorManager.white,
                               ),
                               child: Column(
@@ -180,6 +192,8 @@ class _PaymentHistoryDetailViewState extends State<PaymentHistoryDetailView>
     );
   }
 
+  // ── Widgets ──────────────────────────────────────────────────────────────
+
   Widget _statusCard({
     required String planType,
     required String title,
@@ -208,9 +222,7 @@ class _PaymentHistoryDetailViewState extends State<PaymentHistoryDetailView>
               _activeBadge(0),
             ],
           ),
-
           widget.dimens.k18.verticalBoxPadding,
-
           Row(
             children: [
               Text(
@@ -231,16 +243,12 @@ class _PaymentHistoryDetailViewState extends State<PaymentHistoryDetailView>
               ),
             ],
           ),
-
           widget.dimens.k18.verticalBoxPadding,
-
           Text(
             "Plan:",
             style: TextStyle(fontSize: widget.dimens.k14, color: Colors.grey),
           ),
-
           widget.dimens.k5.verticalBoxPadding,
-
           Text(
             title,
             style: TextStyle(
@@ -275,6 +283,7 @@ class _PaymentHistoryDetailViewState extends State<PaymentHistoryDetailView>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // ── Header row ──────────────────────────────────────────────────
           Row(
             children: [
               Text(
@@ -292,47 +301,48 @@ class _PaymentHistoryDetailViewState extends State<PaymentHistoryDetailView>
 
           widget.dimens.k18.verticalBoxPadding,
 
+          // Plan ID row (label + value side by side)
           Row(
             children: [
               Text(
                 "Plan ID",
                 style: TextStyle(
-                  fontSize: widget.dimens.k18,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black87,
+                  fontSize: widget.dimens.k14,
+                  color: Colors.grey,
                 ),
               ),
               const Spacer(),
               Text(
                 name,
                 style: TextStyle(
-                  fontSize: widget.dimens.k12,
-                  color: Colors.grey,
+                  fontSize: widget.dimens.k14,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.black87,
                 ),
               ),
             ],
           ),
 
           widget.dimens.k18.verticalBoxPadding,
-          _detailItem(title: "Title:", value: title),
+          _detailItem(title: "Title", value: title),
 
           widget.dimens.k18.verticalBoxPadding,
-          _detailItem(title: "Plan Type:", value: planType),
+          _detailItem(title: "Plan Type", value: planType),
 
           widget.dimens.k18.verticalBoxPadding,
-          _detailItem(title: "Amount:", value: "PKR $amount"),
+          _detailItem(title: "Amount", value: "PKR $amount"),
 
           widget.dimens.k18.verticalBoxPadding,
-          _detailItem(title: "Effective Price:", value: "PKR $effectivePrice"),
+          _detailItem(title: "Effective Price", value: "PKR $effectivePrice"),
 
           widget.dimens.k18.verticalBoxPadding,
-          _detailItem(title: "Bonus:", value: "$bonus"),
+          _detailItem(title: "Bonus", value: "$bonus"),
 
           widget.dimens.k18.verticalBoxPadding,
-          _detailItem(title: "Boost:", value: "$boost"),
+          _detailItem(title: "Boost", value: "$boost"),
 
           widget.dimens.k18.verticalBoxPadding,
-          _detailItem(title: "Description:", value: description),
+          _detailItem(title: "Description", value: description),
         ],
       ),
     );
@@ -344,14 +354,17 @@ class _PaymentHistoryDetailViewState extends State<PaymentHistoryDetailView>
       children: [
         Text(
           title,
-          style: TextStyle(fontSize: widget.dimens.k14, color: Colors.grey),
+          style: TextStyle(
+            fontSize: widget.dimens.k13,
+            color: Colors.grey,
+          ),
         ),
-        widget.dimens.k5.verticalBoxPadding,
+        SizedBox(height: widget.dimens.k4),
         Text(
           value,
           style: TextStyle(
-            fontSize: widget.dimens.k16,
-            fontWeight: FontWeight.w600,
+            fontSize: widget.dimens.k15,
+            fontWeight: FontWeight.w500,
             color: Colors.black87,
           ),
         ),
@@ -367,8 +380,16 @@ class _PaymentHistoryDetailViewState extends State<PaymentHistoryDetailView>
         vertical: widget.dimens.k4,
       ),
       decoration: BoxDecoration(
-        color: ColorManager.white,
+        color: isActive
+            ? ColorManager.progressBg   // ✅ tinted bg for active
+            : ColorManager.rejectedBg,  //    tinted bg for inactive
         borderRadius: BorderRadius.circular(widget.dimens.k20),
+        border: Border.all(
+          color: isActive
+              ? ColorManager.progressText
+              : ColorManager.rejectedText,
+          width: 0.5,
+        ),
       ),
       child: Text(
         isActive ? "Active" : "Inactive",
@@ -383,15 +404,18 @@ class _PaymentHistoryDetailViewState extends State<PaymentHistoryDetailView>
     );
   }
 
+  // ── Result callbacks ─────────────────────────────────────────────────────
+
   @override
-  onError(String error) {
-    MyToast.showToast(message: error,typeToast: TypeToast.error);
-    // handle error
+  void onError(String error) {
+    // Data already reflected in Consumer via provider.apiResponse
+    MyToast.showToast(message: error, typeToast: TypeToast.error);
   }
 
   @override
-  onSuccess(result) {
-    MyToast.showToast(message: result,typeToast: TypeToast.success);
-    // success — data already set in provider
+  void onSuccess(result) {
+    // No toast needed — data is already shown via Consumer
+    // Uncomment the line below only if you want a success snack/toast:
+    // MyToast.showToast(message: "Loaded successfully", typeToast: TypeToast.success);
   }
 }

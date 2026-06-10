@@ -15,242 +15,238 @@ import '../../../widgets/otp_verification.dart';
 import '../../../widgets/primary_button.dart';
 import '../../../widgets/toast.dart';
 import '../auth/auth_view_model.dart';
+
 class LinkedDeviceVerificationView extends BaseStateFullWidget {
   final String? email;
-   LinkedDeviceVerificationView({super.key, this.email});
+  LinkedDeviceVerificationView({super.key, this.email});
 
   @override
-  State<LinkedDeviceVerificationView> createState() => _LinkedDeviceVerificationViewState();
+  State<LinkedDeviceVerificationView> createState() =>
+      _LinkedDeviceVerificationViewState();
 }
 
-class _LinkedDeviceVerificationViewState extends State<LinkedDeviceVerificationView> implements Result<String>, ErrorResult {
-late AuthViewModel authVM;
+class _LinkedDeviceVerificationViewState
+    extends State<LinkedDeviceVerificationView>
+    implements Result<String>, ErrorResult {
+  late AuthViewModel authVM;
 
-String? _resolvedEmail;
-String _otpValue = '';
-bool _hasOtpError = false;
+  String? _resolvedEmail;
+  String _otpValue = '';
+  bool _hasOtpError = false;
 
-Timer? _timer;
-int _secondsRemaining = 120;
-bool _isResendEnabled = false;
+  Timer? _timer;
+  int _secondsRemaining = 120;
+  bool _isResendEnabled = false;
 
-@override
-void didChangeDependencies() {
-  super.didChangeDependencies();
-  // Prefer route argument, fallback to constructor param
-  final routeEmail = ModalRoute.of(context)?.settings.arguments as String?;
-  _resolvedEmail = routeEmail ?? widget.email;
-}
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final routeEmail = ModalRoute.of(context)?.settings.arguments as String?;
+    _resolvedEmail = routeEmail ?? widget.email;
+  }
 
-@override
-void initState() {
-  super.initState();
-  _startTimer();
-}
+  @override
+  void initState() {
+    super.initState();
+    _startTimer();
+  }
 
-void _startTimer() {
-  _secondsRemaining = 120;
-  _isResendEnabled = false;
+  void _startTimer() {
+    _secondsRemaining = 120;
+    _isResendEnabled = false;
+    _timer?.cancel();
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (_secondsRemaining == 0) {
+        timer.cancel();
+        setState(() => _isResendEnabled = true);
+      } else {
+        setState(() => _secondsRemaining--);
+      }
+    });
+  }
 
-  _timer?.cancel();
-  _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-    if (_secondsRemaining == 0) {
-      timer.cancel();
-      setState(() {
-        _isResendEnabled = true;
-      });
-    } else {
-      setState(() {
-        _secondsRemaining--;
-      });
-    }
-  });
-}
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
 
-@override
-void dispose() {
-  _timer?.cancel();
-  super.dispose();
-}
-
-@override
-Widget build(BuildContext context) {
-  return Scaffold(
-    backgroundColor: Colors.white,
-    resizeToAvoidBottomInset: true,
-    body: Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            const Color(0xFFB11E24).withOpacity(0.18),
-            const Color(0xFFB11E24).withOpacity(0.0),
-          ],
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      resizeToAvoidBottomInset: true,
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              const Color(0xFFB11E24).withOpacity(0.18),
+              const Color(0xFFB11E24).withOpacity(0.0),
+            ],
+          ),
         ),
+        child: _body(),
       ),
-      child: _body(),
-    ),
-  );
-}
+    );
+  }
 
-Widget _body() {
-  return Consumer<AuthViewModel>(
-    builder: (context, provider, child) {
-      authVM = provider;
+  Widget _body() {
+    return Consumer<AuthViewModel>(
+      builder: (context, provider, child) {
+        authVM = provider;
 
-      return Column(
-        children: [
-          SizedBox(height: widget.dimens.k60),
+        return Column(
+          children: [
+            SizedBox(height: widget.dimens.k60),
 
-          /// BACK BUTTON
-          GestureDetector(
-            onTap: () => Navigator.pop(context),
-            child: Padding(
-              padding: const EdgeInsets.only(left: 10),
-              child: Row(
-                children: [
-                  Icon(Icons.arrow_back_ios, color: ColorManager.primary),
-                  Text(
-                    "Back",
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: ColorManager.primary,
+            /// BACK BUTTON
+            GestureDetector(
+              onTap: () => Navigator.pop(context),
+              child: Padding(
+                padding: const EdgeInsets.only(left: 10),
+                child: Row(
+                  children: [
+                    Icon(Icons.arrow_back_ios, color: ColorManager.primary),
+                    Text(
+                      "Back",
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        color: ColorManager.primary,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
 
-          Expanded(
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: widget.dimens.k18),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(height: widget.dimens.k50),
+            Expanded(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: widget.dimens.k18),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(height: widget.dimens.k50),
 
-                  Text(
-                    StringManager.verificationCode,
-                    style:  Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      fontSize: widget.dimens.k25,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-
-                  SizedBox(height: widget.dimens.k5),
-
-                  Text(
-                    "Enter your verification code send. We sent a code to $_resolvedEmail",
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      fontSize: widget.dimens.k14,
-                      color: ColorManager.textColorSubTitle,
-                    ),
-                  ),
-
-                  SizedBox(height: widget.dimens.k20),
-
-                  /// OTP FIELD
-                  OTPCodeField(
-                    hasError: _hasOtpError,
-                    onCompleted: (value) {
-                      setState(() {
-                        _otpValue = value;
-                        _hasOtpError = value.length != 6;
-                      });
-                    },
-                  ),
-
-                  SizedBox(height: widget.dimens.k10),
-
-                  /// TIMER + RESEND
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        _isResendEnabled
-                            ? "You can resend code now"
-                            : "Resend in ${_secondsRemaining ~/ 60}:${(_secondsRemaining % 60).toString().padLeft(2, '0')}",
-                        style:  Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: ColorManager.textColorSubTitle,
-                        ),
+                    Text(
+                      StringManager.verificationCode,
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        fontSize: widget.dimens.k25,
+                        fontWeight: FontWeight.w600,
                       ),
+                    ),
 
-                      TextButton(
-                        onPressed: _isResendEnabled
-                            ? () {
-                          // ✅ Uses _resolvedEmail consistently
-                          authVM.emailVerificationCode(
-                            {"email": _resolvedEmail?.trim()},
-                            this,
-                          );
-                          _startTimer();
-                        }
-                            : null,
-                        child: Text(
-                          "Resend",
-                          style: TextStyle(
-                            color: _isResendEnabled
-                                ? ColorManager.primary
-                                : Colors.grey,
+                    SizedBox(height: widget.dimens.k5),
+
+                    Text(
+                      "Enter your verification code. We sent a code to $_resolvedEmail",
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        fontSize: widget.dimens.k14,
+                        color: ColorManager.textColorSubTitle,
+                      ),
+                    ),
+
+                    SizedBox(height: widget.dimens.k20),
+
+                    /// OTP FIELD
+                    OTPCodeField(
+                      hasError: _hasOtpError,
+                      onCompleted: (value) {
+                        setState(() {
+                          _otpValue = value;
+                          _hasOtpError = value.length != 6;
+                        });
+                      },
+                    ),
+
+                    SizedBox(height: widget.dimens.k10),
+
+                    /// TIMER + RESEND
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          _isResendEnabled
+                              ? "You can resend code now"
+                              : "Resend in ${_secondsRemaining ~/ 60}:${(_secondsRemaining % 60).toString().padLeft(2, '0')}",
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: ColorManager.textColorSubTitle,
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-
-                  const Spacer(),
-
-                  /// VERIFY BUTTON
-                  authVM.apiResponse is Loading
-                      ?  Loader()
-                      : PrimaryButton(
-                    onPressed: () {
-                      if (_otpValue.length != 6) {
-                        setState(() => _hasOtpError = true);
-                        return;
-                      }
-
-                      // ✅ Uses _resolvedEmail consistently
-                      authVM.otpVerificationCode(
-                        {
-                          "email": _resolvedEmail?.trim(),
-                          "otp": _otpValue.trim(),
-                        },
-                        this,
-                      );
-                    },
-                    childText: StringManager.verify,
-                    color: ColorManager.primary,
-                    textStyle:  Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: Colors.white,
+                        TextButton(
+                          // ✅ FIX 1: Resend calls emailVerificationCode with resolved email
+                          onPressed: _isResendEnabled
+                              ? () {
+                            authVM.emailVerificationCode(
+                              {"email": _resolvedEmail?.trim()},
+                              this,
+                            );
+                            _startTimer();
+                          }
+                              : null,
+                          child: Text(
+                            "Resend",
+                            style: TextStyle(
+                              color: _isResendEnabled
+                                  ? ColorManager.primary
+                                  : Colors.grey,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
 
-                  SizedBox(height: widget.dimens.k40),
-                ],
+                    const Spacer(),
+
+                    /// VERIFY BUTTON
+                    authVM.apiResponse is Loading
+                        ? Loader()
+                        : PrimaryButton(
+                      onPressed: () {
+                        if (_otpValue.length != 6) {
+                          setState(() => _hasOtpError = true);
+                          return;
+                        }
+                        authVM.otpVerificationCode(
+                          {
+                            "email": _resolvedEmail?.trim(),
+                            "otp": _otpValue.trim(),
+                          },
+                          this,
+                        );
+                      },
+                      childText: StringManager.verify,
+                      color: ColorManager.primary,
+                      textStyle:
+                      Theme.of(context).textTheme.titleMedium?.copyWith(
+                        color: Colors.white,
+                      ),
+                    ),
+
+                    SizedBox(height: widget.dimens.k40),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
-      );
-    },
-  );
-}
+          ],
+        );
+      },
+    );
+  }
 
-@override
-void onError(String error) {
-  MyToast.showToast(message: error);
-}
+  // ✅ FIX 2: Show API message toast, then navigate to next screen
+  @override
+  void onSuccess(String result) {
+    MyToast.showToast(message: result, typeToast: TypeToast.success);
+    widget.navigator.pushNamed(
+      RouteManager.rSignUpCreateView,
+      object: _resolvedEmail,
+    );
+  }
 
-@override
-void onSuccess(String result) {
-  MyToast.showToast(message: result,
-      typeToast: TypeToast.success);
-  // ✅ Pass resolved email as route argument
-  widget.navigator.pushNamed(
-    RouteManager.rSignUpCreateView,
-    object: _resolvedEmail,
-  );
-}
+  // ✅ FIX 3: Show API error message (e.g. "Invalid OTP.")
+  @override
+  void onError(String error) {
+    MyToast.showToast(message: error);
+  }
 }

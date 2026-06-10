@@ -45,7 +45,7 @@ class _StepOneViewState extends State<StepOneView> {
           ),
           const SizedBox(height: 10),
           CustomField(
-            hintText: StringManager.username,
+            hintText: StringManager.firstName,
             keyboardType: TextInputType.text,
             // ✅ Uses shared formData controller
             controller: widget.formData.firstNameController,

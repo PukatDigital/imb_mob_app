@@ -7,11 +7,13 @@ import '../base/base_widget.dart';
 
 class OTPCodeField extends BaseStateFullWidget {
   final void Function(String)? onCompleted;
+  final void Function(String)? onChanged;
   final bool hasError;
 
-   OTPCodeField({
+  OTPCodeField({
     super.key,
     this.onCompleted,
+    this.onChanged,
     this.hasError = false,
   });
 
@@ -78,7 +80,9 @@ class _OTPCodeFieldState extends State<OTPCodeField> {
       backgroundColor: Colors.transparent,
       enableActiveFill: true,
 
-      onChanged: (_) {},
+      onChanged: (value) {
+        widget.onChanged?.call(value);
+      },
       onCompleted: widget.onCompleted,
     );
   }

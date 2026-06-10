@@ -13,11 +13,12 @@ class StringManager {
   static const String orderSim = "Order SIM";
   static const String orderHistory = "Order History";
   static const String emailPlaceholder = "Enter your email";
+
   static const String password = "Password";
   static const String next = "Next";
   static const String mnpNumber = "MNP Number";
   static const String resetPassword = "Reset Password";
-  static const String forgetPassword = "Forget password";
+  static const String forgetPassword = "Forget Password";
   static const String newPassword = "New password";
   static const String remember30Days = "Remember for 30 days";
   static const String or = "OR";
@@ -172,7 +173,7 @@ class StringManager {
 
   // Onboarding
   static const String onboardingHint = "Real people. Real connections. Real love.";
-  static const String loginHint = "Welcome back to Ideal Marriage Bureau";
+  static const String loginHint = "Welcome Back to Ideal Marriage Bureau";
   static const String loginSubHint = "Where real connections begin with trust.";
   static const String username = "Email or Phone Number";
   static const String loginWithGoogle = "Continue with Google";

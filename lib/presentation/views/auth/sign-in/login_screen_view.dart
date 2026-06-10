@@ -100,7 +100,7 @@ class _LoginFormViewState extends State<LoginFormView>
                         },
                       ),
                       Text(
-                        'Save login info',
+                        'Save login Info',
                         style: context.textTheme.titleMedium?.copyWith(
                             fontSize:  widget.dimens.k16,
                             fontWeight: FontWeight.w400,

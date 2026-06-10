@@ -56,10 +56,13 @@ abstract class IApi {
   Future<ApiResponse> getImpressionList();
   Future<ApiResponse> getFavouriteProfile(Map<String, dynamic> data);
   Future<ApiResponse> getExploreProfile(Map<String, dynamic> data);
+
   Future<ApiResponse> updateProfilePicture(Map<String, dynamic> data);
   Future<ApiResponse> getTermsAndConditions();
   Future<ApiResponse> getAllPlans();
   Future<ApiResponse> getAllPaymentList();
+  Future<ApiResponse> getBankDetails();
+  Future<ApiResponse> getPaymentMethodList(Map<String, dynamic> data);
 
 
 }
