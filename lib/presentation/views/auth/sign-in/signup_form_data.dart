@@ -42,4 +42,14 @@ class SignUpFormData {
     "password": passwordController.text.trim(),
     "terms_and_conditions": termsAccepted, // ✅ 1 jaye ga API ko jab accepted
   };
+  void reset() {
+    firstNameController.clear();
+    passwordController.clear();
+    confirmPasswordController.clear();
+    selectedGender = null;
+    selectedQualification = null;
+    selectedCountry = null;
+    selectedCity = null;
+    termsAccepted = 0;
+  }
 }

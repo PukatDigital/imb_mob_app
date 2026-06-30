@@ -46,35 +46,7 @@ class AddYourPicturesState extends State<AddYourPictures>
   void _loadFromPrefs() {
     if (_imagesLoaded) return;
     _imagesLoaded = true;
-
-    final saved = context.read<IPrefHelper>().retrieveSetupProfile();
-    if (saved == null) return;
-
-    final paths = [
-      saved.attach1 ?? '',
-      saved.attach2 ?? '',
-      saved.attach3 ?? '',
-      saved.attach4 ?? '',
-    ].where((p) => p.isNotEmpty).toList();
-
-    final slots = <_ImageSlot>[];
-
-    for (final path in paths) {
-      if (_isNetworkUrl(path)) {
-        // Edit mode: came from server
-        slots.add(_ImageSlot.network(path));
-      } else {
-        // New registration: local file
-        final file = File(path);
-        if (file.existsSync()) {
-          slots.add(_ImageSlot.local(file));
-        }
-      }
-    }
-
-    if (slots.isNotEmpty) {
-      setState(() => _slots = slots);
-    }
+    _reloadFromPrefs();
   }
 
   // ── Pick new image from gallery ────────────────────────────────────────
@@ -318,6 +290,7 @@ class AddYourPicturesState extends State<AddYourPictures>
                               : () async {
                             setState(() => _slots.removeAt(index));
                             await saveSetupProfileStep();
+                            _reloadFromPrefs(); // <-- add this
                           },
                           child: Container(
                             decoration: const BoxDecoration(
@@ -352,7 +325,31 @@ class AddYourPicturesState extends State<AddYourPictures>
       ),
     );
   }
+  void _reloadFromPrefs() {
+    final saved = context.read<IPrefHelper>().retrieveSetupProfile();
+    if (saved == null) return;
+
+    final paths = [
+      saved.attach1 ?? '',
+      saved.attach2 ?? '',
+      saved.attach3 ?? '',
+      saved.attach4 ?? '',
+    ].where((p) => p.isNotEmpty).toList();
+
+    final slots = <_ImageSlot>[];
+    for (final path in paths) {
+      if (_isNetworkUrl(path)) {
+        slots.add(_ImageSlot.network(path));
+      } else {
+        final file = File(path);
+        if (file.existsSync()) slots.add(_ImageSlot.local(file));
+      }
+    }
+
+    setState(() => _slots = slots);
+  }
 }
+
 
 // ── Simple discriminated union for a slot ─────────────────────────────────
 class _ImageSlot {

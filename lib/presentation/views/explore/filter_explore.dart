@@ -195,7 +195,7 @@ class _FilterExploreBottomViewState
                           .toList() ??
                           [],
                       selectedItem: ethnicity,
-                      hintText: "Select ethnicity",
+                      hintText: "Select location",
                       onChanged: (val) =>
                           setState(() => ethnicity = val),
                     ),

@@ -40,6 +40,7 @@ class _ProfileDetailsViewState extends State<ProfileDetailsView>
 
   File? _selectedImage;
   final ImagePicker _picker = ImagePicker();
+  bool _isUploadingImage = false;
 
 
   Future<void> _pickImage(ImageSource source) async {
@@ -51,6 +52,7 @@ class _ProfileDetailsViewState extends State<ProfileDetailsView>
     if (image != null) {
       setState(() {
         _selectedImage = File(image.path);
+        _isUploadingImage = true;
       });
 
       // ✅ Convert image to base64
@@ -80,14 +82,14 @@ class _ProfileDetailsViewState extends State<ProfileDetailsView>
         personalProfileData = provider;
         return Scaffold(
           backgroundColor: Colors.white,
-          body: _mainContent(),
+          body: _mainContent(provider.profileData ?? widget.profileData),
         );
       },
     );
   }
 
-  Widget _mainContent() {
-    final data = widget.profileData;
+  Widget _mainContent(ProfileData? data) {
+
     final size = MediaQuery.of(context).size;
 
     // ✅ Build lifestyle interest list from model
@@ -344,16 +346,19 @@ class _ProfileDetailsViewState extends State<ProfileDetailsView>
                   children: [
                     Expanded(
                       flex: 2,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius:
-                          BorderRadius.circular(widget.dimens.k20),
-                          image: DecorationImage(
-                            image: attachmentImages.isNotEmpty
-                                ? NetworkImage(attachmentImages[0])
-                            as ImageProvider
-                                : AssetImage(Assets.user),
-                            fit: BoxFit.cover,
+                      child: GestureDetector(
+                        onTap: attachmentImages.isNotEmpty
+                            ? () => _showImagePreview(attachmentImages[0])
+                            : null,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(widget.dimens.k20),
+                            image: DecorationImage(
+                              image: attachmentImages.isNotEmpty
+                                  ? NetworkImage(attachmentImages[0]) as ImageProvider
+                                  : AssetImage(Assets.user),
+                              fit: BoxFit.cover,
+                            ),
                           ),
                         ),
                       ),
@@ -364,22 +369,31 @@ class _ProfileDetailsViewState extends State<ProfileDetailsView>
                       child: Column(
                         children: [
                           Expanded(
-                              child: _smallImage(
-                                  attachmentImages.length > 1
-                                      ? attachmentImages[1]
-                                      : null)),
+                            child: _smallImage(
+                              attachmentImages.length > 1 ? attachmentImages[1] : null,
+                              onTap: attachmentImages.length > 1
+                                  ? () => _showImagePreview(attachmentImages[1])
+                                  : null,
+                            ),
+                          ),
                           widget.dimens.k8.verticalBoxPadding,
                           Expanded(
-                              child: _smallImage(
-                                  attachmentImages.length > 2
-                                      ? attachmentImages[2]
-                                      : null)),
+                            child: _smallImage(
+                              attachmentImages.length > 2 ? attachmentImages[2] : null,
+                              onTap: attachmentImages.length > 2
+                                  ? () => _showImagePreview(attachmentImages[2])
+                                  : null,
+                            ),
+                          ),
                           widget.dimens.k8.verticalBoxPadding,
                           Expanded(
-                              child: _smallImage(
-                                  attachmentImages.length > 3
-                                      ? attachmentImages[3]
-                                      : null)),
+                            child: _smallImage(
+                              attachmentImages.length > 3 ? attachmentImages[3] : null,
+                              onTap: attachmentImages.length > 3
+                                  ? () => _showImagePreview(attachmentImages[3])
+                                  : null,
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -419,7 +433,18 @@ class _ProfileDetailsViewState extends State<ProfileDetailsView>
               radius: widget.dimens.k60,
               backgroundImage: profileImage,
             ),
-            Positioned(
+            if (_isUploadingImage) // ✅ loading overlay
+              Positioned.fill(
+                child: CircleAvatar(
+                  radius: widget.dimens.k60,
+                  backgroundColor: Colors.black38,
+                  child: CircularProgressIndicator(
+                    color: ColorManager.white,
+                    strokeWidth: 2,
+                  ),
+                ),
+              ),
+            if (!_isUploadingImage) Positioned(
               bottom: 2,
               right: 2,
               child: GestureDetector(
@@ -550,24 +575,76 @@ class _ProfileDetailsViewState extends State<ProfileDetailsView>
   }
 
   // ✅ Small image: supports network URL or falls back to asset
-  Widget _smallImage(String? url) {
+  Widget _smallImage(String? url, {VoidCallback? onTap}) {
     ImageProvider img;
     if (url != null && url.isNotEmpty) {
       img = NetworkImage(url);
     } else {
       img = AssetImage(Assets.home1);
     }
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(widget.dimens.k15),
-        image: DecorationImage(
-          image: img,
-          fit: BoxFit.cover,
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(widget.dimens.k15),
+          image: DecorationImage(
+            image: img,
+            fit: BoxFit.cover,
+          ),
         ),
       ),
     );
   }
 
+  void _showImagePreview(String imageUrl) {
+    final size = MediaQuery.of(context).size;
+    showDialog(
+      context: context,
+      barrierColor: Colors.black.withOpacity(.50),
+      builder: (_) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: EdgeInsets.symmetric(
+            horizontal: widget.dimens.k16,
+            vertical: widget.dimens.k24,
+          ),
+          child: SizedBox(
+            height: size.height * 0.80,
+            width: size.width,
+            child: Stack(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(widget.dimens.k16),
+                  child: SizedBox.expand(
+                    child: Image.network(imageUrl, fit: BoxFit.cover),
+                  ),
+                ),
+                Positioned(
+                  top: widget.dimens.k10,
+                  right: widget.dimens.k10,
+                  child: GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: Container(
+                      padding: EdgeInsets.all(widget.dimens.k6),
+                      decoration: const BoxDecoration(
+                        color: Colors.black54,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.close,
+                        color: Colors.white,
+                        size: widget.dimens.k20,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
   Widget _detailItem({required String label, required String value}) {
     return Padding(
       padding: EdgeInsets.only(bottom: widget.dimens.k12),
@@ -736,16 +813,17 @@ class _ProfileDetailsViewState extends State<ProfileDetailsView>
   // }
 
   @override
-  void onError(String error) {
-    MyToast.showToast(message: error);
+  void onSuccess(String result) {
+    setState(() => _isUploadingImage = false); // ✅ stop loading
+    context.read<GetPersonalProfileViewModel>().getAllPersonalProfileDetails(
+      this,
+      profileId: widget.profileData?.userId ?? "",
+    );
   }
 
   @override
-  void onSuccess(String result) {
-    // MyToast.showToast(message: result);
-    context.read<GetPersonalProfileViewModel>().getAllPersonalProfileDetails(
-      this,
-      profileId: widget.profileData?.userId??"", // ✅ FIXED
-    );
+  void onError(String error) {
+    setState(() => _isUploadingImage = false); // ✅ stop loading
+    MyToast.showToast(message: error);
   }
 }

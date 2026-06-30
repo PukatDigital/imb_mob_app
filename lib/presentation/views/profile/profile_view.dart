@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -15,6 +17,7 @@ import '../../../application/routes/route_generator.dart';
 import '../../../constants/asset_manager.dart';
 import '../auth/auth_mixin.dart';
 import '../auth/auth_view_model.dart';
+import '../home/set_up_profile_dialog.dart';
 import 'covered_profile.dart';
 
 class ProfileScreen extends BaseStateFullWidget {
@@ -29,6 +32,7 @@ class _ProfileScreenState extends State<ProfileScreen>
   late GetPersonalProfileViewModel profileData;
   bool _pushNotificationEnabled = true;
   late final loginModel;
+  bool _dialogShown = false;
 
   @override
   void initState() {
@@ -38,12 +42,37 @@ class _ProfileScreenState extends State<ProfileScreen>
 
     SchedulerBinding.instance.addPostFrameCallback((_) {
       context.read<GetPersonalProfileViewModel>().getAllPersonalProfileDetails(
-        this,
-        profileId: loginModel?.data?.user?.name, // ✅ FIXED
+        _ProfileLoadResultHandler(_showSetupDialogIfNeeded),
+        profileId: loginModel?.data?.user?.name,
       );
     });
   }
 
+  void _showSetupDialogIfNeeded() {
+    if (_dialogShown) return;
+
+    final profileCompleted =
+        profileData.profileDetailsModel.data?.profileCompleted ?? 0;
+
+    if (profileCompleted == 0) {
+      _dialogShown = true;
+      Future.delayed(const Duration(milliseconds: 200), () async {
+        await showDialog(
+          context: context,
+          barrierDismissible: false,
+          barrierColor: Colors.transparent, // ✅ remove default dark barrier
+          builder: (_) => BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+            child: Container(
+              color: Colors.black.withOpacity(0.3),
+              child: SetUpProfileDialog(),
+            ),
+          ),
+        );
+        _dialogShown = false;
+      });
+    }
+  }
   final int _currentIndex = 0;
   // final List<String> coverImages = [
   //   Assets.home1,
@@ -298,12 +327,8 @@ class _ProfileScreenState extends State<ProfileScreen>
                       RouteManager.rSubscription,
                     );
                   }, Assets.subscription, "Subscription"),
-                  widget.dimens.k20.verticalBoxPadding,
-                  legalCard(() {
-                    widget.navigator.pushNamed(
-                      RouteManager.rLinkedDeviceVerificationView,
-                    );
-                  }, Assets.subscription, "Verification View"),
+
+
                   widget.dimens.k20.verticalBoxPadding,
                   legalCard(() {
                     widget.navigator.pushNamed(
@@ -360,6 +385,10 @@ class _ProfileScreenState extends State<ProfileScreen>
                   legalCard(() {}, Assets.privacyPolicy, "Privacy Policy"),
                   widget.dimens.k20.verticalBoxPadding,
                   legalCard(() {}, Assets.termsCondition, "Terms & Conditions"),
+                 // widget.dimens.k20.verticalBoxPadding,
+                  // legalCard(() {widget.navigator.pushNamed(
+                  //   RouteManager.rCreateNewPasswordView,
+                  // );}, Assets.termsCondition, "Create Password"),
                 ],
               ),
             ),
@@ -384,16 +413,16 @@ class _ProfileScreenState extends State<ProfileScreen>
                       color: ColorManager.fieldTextColor,
                     ),
                   ),
-                  widget.dimens.k20.verticalBoxPadding,
-                  legalCard(
-                    () {
-                      widget.navigator.pushNamed(
-                        RouteManager.rLinkedDeviceView,
-                      );
-                    },
-                    Assets.linked,
-                    "Accounts Linked",
-                  ),
+                  //widget.dimens.k20.verticalBoxPadding,
+                  // legalCard(
+                  //   () {
+                  //     widget.navigator.pushNamed(
+                  //       RouteManager.rLinkedDeviceView,
+                  //     );
+                  //   },
+                  //   Assets.linked,
+                  //   "Accounts Linked",
+                  // ),
                   widget.dimens.k20.verticalBoxPadding,
                   legalCard(
                     () {
@@ -728,15 +757,17 @@ class _ProfileScreenState extends State<ProfileScreen>
         (route) => false,
       );
     }
-
     if (result.contains("Profile deactivated successfully.")) {
       widget.iPrefHelper.clear();
 
-      Navigator.pushNamedAndRemoveUntil(
-        context,
-        RouteManager.rLoginView,
-        (route) => false,
-      );
+      Future.delayed(const Duration(seconds: 3), () {
+        if (!mounted) return;
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          RouteManager.rLoginView,
+              (route) => false,
+        );
+      });
     }
   }
 
@@ -763,5 +794,19 @@ class _ProfileScreenState extends State<ProfileScreen>
         ],
       ),
     );
+  }
+}
+class _ProfileLoadResultHandler implements Result<String> {
+  final VoidCallback onLoaded;
+  _ProfileLoadResultHandler(this.onLoaded);
+
+  @override
+  void onSuccess(String result) {
+    onLoaded();
+  }
+
+  @override
+  void onError(String error) {
+    // silent fail or log — no toast on screen open
   }
 }

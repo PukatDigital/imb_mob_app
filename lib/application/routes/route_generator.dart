@@ -10,6 +10,7 @@ import 'package:ideal_marriage_bureau/presentation/views/terms_and_conditions/te
 
 import 'package:provider/provider.dart';
 import '../../data/models/get_profile_model/profile_details_model.dart';
+import '../../data/models/plans_model/payment_list_model.dart';
 import '../../onboarding/onboarding.dart';
 
 import '../../presentation/views/auth/auth_view_model.dart';
@@ -23,6 +24,7 @@ import '../../presentation/views/auth/sign-in/verification_code_view.dart';
 
 import '../../presentation/views/block/block_list_view.dart';
 import '../../presentation/views/bottom_bar/bottom_bar_view.dart';
+import '../../presentation/views/home/home_view.dart';
 import '../../presentation/views/linked_devices/verification_screen_view.dart';
 import '../../presentation/views/notification/notification_list_view.dart';
 import '../../presentation/views/privacy/privacy_screen_view.dart';
@@ -128,14 +130,10 @@ class RouteGenerator {
             child: ProblemDetailView(problemId: problemId),
           ),
         );
-        case RouteManager.rPlanListDetails:
-        final planId = settings.arguments as String? ?? '';
-        return PageRouter.fadeScale(
-          settings,
-              () => ChangeNotifierProvider(
-            create: (_) => PlansViewModel(),   // ← use correct provider
-            child: PaymentHistoryDetailView(planId: planId),
-          ),
+      case RouteManager.rPlanListDetails:
+        final item = settings.arguments as PaymentData;
+        return MaterialPageRoute(
+          builder: (_) => PaymentHistoryDetailView(payment: item),
         );
         case RouteManager.rContinueWithPhone:
         return PageRouter.fadeScale(
@@ -265,7 +263,7 @@ class RouteGenerator {
         return PageRouter.fadeScale(
             settings,
                 () => ChangeNotifierProvider(
-              create: (BuildContext context) => AuthViewModel(),
+              create: (BuildContext context) => PlansViewModel(),
               child: PaymentView(),
             ));
 
@@ -319,14 +317,14 @@ class RouteGenerator {
 
 
 
-      // case RouteManager.rHomeView:
-      //   return PageRouter.fadeScale(
-      //     settings,
-      //         () => ChangeNotifierProvider(
-      //       create: (_) => AuthViewModel(),
-      //       child: HomeView(),
-      //     ),
-      //   );
+      case RouteManager.rHomeView:
+        return PageRouter.fadeScale(
+          settings,
+              () => ChangeNotifierProvider(
+            create: (_) => AuthViewModel(),
+            child: HomeView(),
+          ),
+        );
 
       // case RouteManager.rSignInView:
       //   return PageRouter.fadeScale(

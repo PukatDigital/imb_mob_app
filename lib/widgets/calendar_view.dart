@@ -1,89 +1,70 @@
 import 'package:flutter/material.dart';
+import 'package:ideal_marriage_bureau/application/app_theme/text_themes.dart';
+import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:ideal_marriage_bureau/application/core/extensions/extensions.dart';
 
 import '../../base/base_widget.dart';
+import '../application/app_theme/color_scheme.dart';
+import '../application/app_theme/text_themes.dart';
 
 class CalendarView extends BaseStateLessWidget {
   DateTime? selectedDate;
   final OnDaySelected onDaySelected;
   final bool Function(DateTime day)? enabledDayPredicate;
   final bool isPrevious;
+  final DateTime? lastDay;
 
-  CalendarView({super.key, this.selectedDate, required this.onDaySelected, this.enabledDayPredicate, this.isPrevious = false});
+  CalendarView({
+    super.key,
+    this.selectedDate,
+    required this.onDaySelected,
+    this.enabledDayPredicate,
+    this.isPrevious = false,
+    this.lastDay,
+  });
 
   @override
   Widget build(BuildContext context) {
-    /*return TableCalendar(
-      calendarFormat: CalendarFormat.month,
-      daysOfWeekHeight: context.getHeight(dimens.k2.cm),
-      currentDay: selectedDate,
-      startingDayOfWeek: StartingDayOfWeek.sunday,
-      focusedDay: selectedDate ?? DateTime.now(),
-      la  stDay: isPrevious ? DateTime.now() : DateTime(DateTime.now().year + 1, DateTime.now().month),
-      firstDay: isPrevious ? DateTime(1980) : DateTime.now(),
-      enabledDayPredicate: enabledDayPredicate ?? dayPredicate,
-      availableGestures: AvailableGestures.all,
-      calendarStyle: CalendarStyle(
-        isTodayHighlighted: true,
-        todayDecoration: const BoxDecoration(color: ColorManager.primary),
-        weekendTextStyle: context.textTheme.bodyLarge!,
-        outsideTextStyle: context.textTheme.bodyLarge!,
-        todayTextStyle: context.textTheme.bodyLarge!.copyWith(color: ColorManager.white),
-        holidayTextStyle: context.textTheme.bodyLarge!,
-        defaultTextStyle: context.textTheme.bodyLarge!,
+    final DateTime minDate = isPrevious ? DateTime(1980) : DateTime.now();
+    final DateTime maxDate =
+        lastDay ?? (isPrevious ? DateTime.now() : DateTime(DateTime.now().year + 1, DateTime.now().month));
+
+    return SfDateRangePicker  (
+      view: DateRangePickerView.month,
+      allowViewNavigation: true,
+      initialSelectedDate: selectedDate ?? (lastDay ?? DateTime.now()),
+      initialDisplayDate: selectedDate ?? (lastDay ?? DateTime.now()),
+      minDate: minDate,
+      maxDate: maxDate,
+      selectionMode: DateRangePickerSelectionMode.single,
+      enablePastDates: true,
+      backgroundColor: Colors.white,
+      headerStyle: DateRangePickerHeaderStyle(
+        textAlign: TextAlign.center,
+        textStyle: context.textTheme.titleLarge,
+        backgroundColor: Colors.white,
       ),
-      daysOfWeekStyle: DaysOfWeekStyle(weekdayStyle: context.textTheme.bodyMedium!, weekendStyle: context.textTheme.bodyMedium!),
-      headerStyle: HeaderStyle(
-        leftChevronVisible: true,
-        rightChevronVisible: true,
-        titleCentered: true,
-        titleTextStyle: context.textTheme.titleLarge!,
-        leftChevronIcon: const Icon(Icons.keyboard_arrow_left, size: 25, color: ColorManager.primary),
-        rightChevronIcon: const Icon(Icons.keyboard_arrow_right, size: 25, color: ColorManager.primary),
-        formatButtonVisible: false,
-
+      monthViewSettings: DateRangePickerMonthViewSettings(
+        firstDayOfWeek: 1,
+        viewHeaderStyle: DateRangePickerViewHeaderStyle( // 👈 moved in here
+          textStyle: context.textTheme.bodyMedium!.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       ),
-
-      onDaySelected: onDaySelected,
-      headerVisible: true,
-
-      calendarBuilders: CalendarBuilders(
-          disabledBuilder: (context, date, events) {
-            return null;
-          },
-          selectedBuilder: (context, date, events) {
-            return Container(
-                alignment: Alignment.center,
-                padding: EdgeInsets.all(dimens.k4),
-                decoration: const BoxDecoration(color: ColorManager.primary, shape: BoxShape.circle),
-                child: Text(date.day.toString(), style: context.textTheme.bodyLarge!.copyWith(color: ColorManager.white)));
-          },
-          todayBuilder: (context, date, events) => Container(
-              alignment: Alignment.center,
-              padding: EdgeInsets.all(dimens.k2),
-              decoration: const BoxDecoration(color: ColorManager.primary, shape: BoxShape.circle),
-              child: Text(date.day.toString(), style: context.textTheme.bodyLarge!.copyWith(color: ColorManager.white)))),
-    );*/
-    return CalendarDatePicker(
-      initialDate: selectedDate ?? DateTime.now(),  // ✅ use selectedDate if available
-      firstDate: isPrevious ? DateTime(1980) : DateTime.now(),
-      lastDate: DateTime.now(),
-      onDateChanged: (date) {
-        selectedDate = date;
-        onDaySelected(selectedDate!, selectedDate!);
+      selectionColor: ColorManager.primary,
+      todayHighlightColor: ColorManager.primary,
+      selectionTextStyle: context.textTheme.bodyLarge!.copyWith(color: ColorManager.white),
+      onSelectionChanged: (DateRangePickerSelectionChangedArgs args) {
+        if (args.value is DateTime) {
+          final DateTime picked = args.value as DateTime;
+          if (enabledDayPredicate == null || enabledDayPredicate!(picked)) {
+            selectedDate = picked;
+            onDaySelected(picked, picked);
+          }
+        }
       },
     );
-  }
-
-  bool dayPredicate(dateTime) {
-    if (isPrevious) {
-      return dateTime.isAfter(DateTime(1980));
-    } else {
-      if (dateTime.isBefore(DateTime.now()) && !dateTime.isToday()) {
-        return false;
-      } else {
-        return true;
-      }
-    }
   }
 }

@@ -44,6 +44,9 @@ class _CreateNewPasswordViewState
     final routeEmail = ModalRoute.of(context)?.settings.arguments as String?;
     _resolvedEmail = routeEmail ?? widget.email;
   }
+  bool get _isPasswordMatched =>
+      passwordController.text.trim().length >= 8 &&
+          confirmPasswordController.text.trim() == passwordController.text.trim();
 
   @override
   Widget build(BuildContext context) {
@@ -118,7 +121,7 @@ class _CreateNewPasswordViewState
 
                                       /// Title
                                       Text(
-                                        "Create new password",
+                                        "Create New Password",
                                         style: context.textTheme.titleLarge
                                             ?.copyWith(
                                           fontWeight: FontWeight.w700,
@@ -244,29 +247,23 @@ class _CreateNewPasswordViewState
                                       /// Update Button
                                       provider.apiResponse is Loading
                                           ?  Loader()
-                                          :PrimaryButton(
+                                          :
+                                      PrimaryButton(
                                         childText: "Update Password",
                                         isSafeArea: false,
-
-                                        onPressed: () {
-
-                                          if (formKey.currentState
-                                              ?.validate() ??
-                                              false) {
-
+                                        onPressed: _isPasswordMatched
+                                            ? () {
+                                          if (formKey.currentState?.validate() ?? false) {
                                             provider.updatePassword(
                                               {
-                                                "email":
-                                                _resolvedEmail,
-                                                "new_password":
-                                                passwordController
-                                                    .text
-                                                    .trim(),
+                                                "email": _resolvedEmail,
+                                                "new_password": passwordController.text.trim(),
                                               },
                                               this,
                                             );
                                           }
-                                        },
+                                        }
+                                            : null, // ← disabled when null
                                       ),
                                     ],
                                   ),
@@ -308,7 +305,7 @@ class _CreateNewPasswordViewState
       ) {
     showDialog(
       context: context,
-      barrierDismissible: true,
+      barrierDismissible: false,
       builder: (_) {
         return Dialog(
           shape: RoundedRectangleBorder(
@@ -377,39 +374,39 @@ class _CreateNewPasswordViewState
                 SizedBox(height: dimens.k28),
 
                 /// Login Button
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      elevation: 0,
-                      backgroundColor:
-                      ColorManager.rejectedText,
-                      padding: EdgeInsets.symmetric(
-                        vertical: dimens.k16,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius:
-                        BorderRadius.circular(
-                          dimens.k40,
-                        ),
-                      ),
-                    ),
-                    onPressed: () {
-                      Navigator.pushReplacementNamed(
-                        context,
-                        RouteManager.rLoginView,
-                      );
-                    },
-                    child: Text(
-                      'Go to Login',
-                      style: TextStyle(
-                        fontSize: dimens.k16,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ),
+                // SizedBox(
+                //   width: double.infinity,
+                //   child: ElevatedButton(
+                //     style: ElevatedButton.styleFrom(
+                //       elevation: 0,
+                //       backgroundColor:
+                //       ColorManager.rejectedText,
+                //       padding: EdgeInsets.symmetric(
+                //         vertical: dimens.k16,
+                //       ),
+                //       shape: RoundedRectangleBorder(
+                //         borderRadius:
+                //         BorderRadius.circular(
+                //           dimens.k40,
+                //         ),
+                //       ),
+                //     ),
+                //     onPressed: () {
+                //       Navigator.pushReplacementNamed(
+                //         context,
+                //         RouteManager.rLoginView,
+                //       );
+                //     },
+                //     child: Text(
+                //       'Go to Login',
+                //       style: TextStyle(
+                //         fontSize: dimens.k16,
+                //         fontWeight: FontWeight.w600,
+                //         color: Colors.white,
+                //       ),
+                //     ),
+                //   ),
+                // ),
               ],
             ),
           ),
@@ -425,17 +422,21 @@ class _CreateNewPasswordViewState
       typeToast: TypeToast.error,
     );
   }
-
   @override
   onSuccess(result) {
-    MyToast.showToast(
-      message: result.toString(),
-      typeToast: TypeToast.success,
-    );
-
+    passwordController.clear();        // <-- add this
+    confirmPasswordController.clear();
     showPasswordResetDailogue(
       context,
       widget.dimens,
     );
+
+    Future.delayed(const Duration(seconds: 3), () {
+      if (!mounted) return;
+      Navigator.pushReplacementNamed(
+        context,
+        RouteManager.rLoginView,
+      );
+    });
   }
 }

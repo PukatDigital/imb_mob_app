@@ -44,6 +44,7 @@ abstract class IApi {
   Future<ApiResponse> submitSetUpProfile(Map<String, dynamic> data);
   Future<ApiResponse> sendIntrest(Map<String, dynamic> data);
   Future<ApiResponse> createReportProblem(Map<String, dynamic> data);
+  Future<ApiResponse> createPaymentRecord(Map<String, dynamic> data);
   Future<ApiResponse> deactivateAccount(Map<String, dynamic> data);
   Future<ApiResponse> updateProfile(Map<String, dynamic> data);
   Future<ApiResponse> addToFavourite(Map<String, dynamic> data);

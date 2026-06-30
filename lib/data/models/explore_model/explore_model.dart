@@ -28,7 +28,7 @@ class ExploreDataModel {
 class Data {
   int? profileCompleted;
   int? totalProfiles;
-  List<Profiles>? profiles;
+  List<ExploreProfiles>? profiles;
 
   Data({this.profileCompleted, this.totalProfiles, this.profiles});
 
@@ -36,9 +36,9 @@ class Data {
     profileCompleted = json['profile_completed'];
     totalProfiles = json['total_profiles'];
     if (json['profiles'] != null) {
-      profiles = <Profiles>[];
+      profiles = <ExploreProfiles>[];
       json['profiles'].forEach((v) {
-        profiles!.add(new Profiles.fromJson(v));
+        profiles!.add(new ExploreProfiles.fromJson(v));
       });
     }
   }
@@ -54,7 +54,7 @@ class Data {
   }
 }
 
-class Profiles {
+class ExploreProfiles {
   String? profileId;
   String? userId;
   String? profileName;
@@ -69,14 +69,14 @@ class Profiles {
   String? profession;
   double? matchPercentage;
   String? profilePicture;
-  Attachments? attachments;
+  ExploreAttachments? attachments;
   int? profileCompleted;
   bool? isFavourite;
   bool? isBlocked;
   int? noOfTimesAddedAsFavourite;
   int? noOfTimesGetBlocked;
 
-  Profiles(
+  ExploreProfiles(
       {this.profileId,
         this.userId,
         this.profileName,
@@ -98,7 +98,7 @@ class Profiles {
         this.noOfTimesAddedAsFavourite,
         this.noOfTimesGetBlocked});
 
-  Profiles.fromJson(Map<String, dynamic> json) {
+  ExploreProfiles.fromJson(Map<String, dynamic> json) {
     profileId = json['profile_id'];
     userId = json['user_id'];
     profileName = json['profile_name'];
@@ -114,7 +114,7 @@ class Profiles {
     matchPercentage = json['match_percentage'];
     profilePicture = json['profile_picture'];
     attachments = json['attachments'] != null
-        ? new Attachments.fromJson(json['attachments'])
+        ? new ExploreAttachments.fromJson(json['attachments'])
         : null;
     profileCompleted = json['profile_completed'];
     isFavourite = json['is_favourite'];
@@ -151,15 +151,15 @@ class Profiles {
   }
 }
 
-class Attachments {
+class ExploreAttachments {
   String? attach1;
   String? attach2;
   String? attach3;
   String? attach4;
 
-  Attachments({this.attach1, this.attach2, this.attach3, this.attach4});
+  ExploreAttachments({this.attach1, this.attach2, this.attach3, this.attach4});
 
-  Attachments.fromJson(Map<String, dynamic> json) {
+  ExploreAttachments.fromJson(Map<String, dynamic> json) {
     attach1 = json['attach_1'];
     attach2 = json['attach_2'];
     attach3 = json['attach_3'];

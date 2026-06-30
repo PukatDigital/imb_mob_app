@@ -93,7 +93,7 @@ class _HistoryViewState extends State<PaymentHistoryView> implements ErrorResult
                     Navigator.pushNamed(
                       context,
                       RouteManager.rPlanListDetails,
-                      arguments: item.name,
+                      arguments: item,
                     );
                   },
                   child: Container(

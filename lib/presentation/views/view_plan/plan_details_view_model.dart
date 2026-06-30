@@ -51,7 +51,25 @@ class PlansViewModel extends BaseViewModel {
     );
   }
 
+  void createPaymentRecord(
+      Map<String, dynamic> data, Result result) async
+  {
+    apiResponse = Loading();
+    notifyListeners();
 
+    apiResponse = await api.createPaymentRecord(data);
+
+    apiResponse.fold<String>(
+      onSuccess: (message) {
+        notifyListeners();
+        result.onSuccess(message);
+      },
+      onError: (error) {
+        notifyListeners();
+        result.onError(error);
+      },
+    );
+  }
   Future<void> getPlanListDetails(
       Result result, {
         required String planId,

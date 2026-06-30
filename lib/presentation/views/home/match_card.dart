@@ -1,6 +1,9 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:ideal_marriage_bureau/base/base_widget.dart';
 import 'package:ideal_marriage_bureau/data/models/get_profile_model/get_all_profile_list_model.dart';
+import 'package:ideal_marriage_bureau/presentation/views/home/set_up_profile_dialog.dart';
 import 'package:ideal_marriage_bureau/presentation/views/home/user_profile/user_profile_details.dart';
 import 'package:provider/provider.dart';
 
@@ -45,6 +48,8 @@ class MatchCard extends BaseStateLessWidget {
   Widget build(BuildContext context) {
     final login = iPrefHelper.loginModel;
     final viewModel = context.read<GetProfileViewModel>();
+
+    debugPrint('🧠 ViewModel instance in MatchCard: ${context.read<GetProfileViewModel>().hashCode}');
     final screenHeight = MediaQuery.of(context).size.height;
     final bottomPadding = MediaQuery.of(context).padding.bottom; // ✅ accounts for gesture/button nav
     final bottomNavHeight =  bottomPadding; // ✅ your actual bottom nav bar height
@@ -127,6 +132,24 @@ class MatchCard extends BaseStateLessWidget {
                     ? ColorManager.primary.withOpacity(.3)
                     : ColorManager.white.withOpacity(.3),
                 onTap: () {
+                  final profileCompleted = viewModel.myProfileCompleted;
+                  debugPrint('🔍 profileCompleted on tap: $profileCompleted');
+                  if (profileCompleted == null || profileCompleted != 1) {
+                    showDialog(
+                      context: context,
+                      barrierDismissible: false,
+                      barrierColor: Colors.transparent,
+                      builder: (_) => BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                        child: Container(
+                          color: Colors.black.withOpacity(0.3),
+                          child: SetUpProfileDialog(),
+                        ),
+                      ),
+                    );
+                    return;
+                  }
+
                   final isFav = profile.isFavourite ?? false;
                   final data = {
                     "added_by": login?.data?.user?.name?.trim(),

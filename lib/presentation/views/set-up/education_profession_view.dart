@@ -140,7 +140,18 @@ class EducationProfessionViewState extends State<EducationProfessionView>
   Widget build(BuildContext context) {
     return Consumer<SetUpProfileViewModel>(
         builder: (context, provider, child) {
+
           newDocVM = provider;
+          final employeeTypeList = newDocVM
+              .employeeTypesModel
+              .data
+              ?.employeeTypes
+              ?.map((e) => e.name)
+              .where((e) => e != null && e.isNotEmpty)
+              .cast<String>()
+              .toSet()
+              .toList() ??
+              [];
           return newDocVM.apiResponse is Loading
               ?  Center(child: Loader())
               : SingleChildScrollView(
@@ -193,14 +204,16 @@ class EducationProfessionViewState extends State<EducationProfessionView>
                 _label(context, StringManager.employeeType),
                 widget.dimens.k3.verticalBoxPadding,
                 CustomDropDown<String>(
-                  list: newDocVM.employeeTypesModel.data?.employeeTypes
-                      ?.map((e) => e.name ?? '')
-                      .toList() ??
-                      [],
-                  selectedItem: employeeType,
+                  list: employeeTypeList,
+                  selectedItem: employeeTypeList.contains(employeeType)
+                      ? employeeType
+                      : null,
                   hintText: "Select employee type",
-                  onChanged: (val) =>
-                      setState(() => employeeType = val),
+                  onChanged: (val) {
+                    setState(() {
+                      employeeType = val;
+                    });
+                  },
                 ),
                 widget.dimens.k10.verticalBoxPadding,
                 _label(context, StringManager.jobTitle),

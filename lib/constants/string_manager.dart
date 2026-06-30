@@ -33,6 +33,7 @@ class StringManager {
   static const String continueText = "Continue";
   static const String verify = "Verify";
   static const String forgotpassword1 = "Forgot your password?";
+  static const String qualification1 = "What's your qualification?";
   static const String continueWithPhone = "Continue with phone number?";
   static const String continueWithemail = "Continue with email?";
   static const String forgotSub = "No worries! Enter your email or phone number and we’ll send you a reset link";

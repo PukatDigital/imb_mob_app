@@ -32,6 +32,7 @@ class _ForgetViewState extends State<ForgetView>
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   TextUtils textUtils = TextUtils();
+  bool _codeSent = false;
 
   AuthViewModel get authVM =>
       Provider.of<AuthViewModel>(context, listen: false);
@@ -166,41 +167,47 @@ class _ForgetViewState extends State<ForgetView>
                       ),
 
                       const Spacer(),
-
-                      /// Continue With Phone
-                      Center(
-                        child: GestureDetector(
-                          onTap: () {},
-
-                          child: Text(
-                            StringManager.continueWithPhone,
-
-                            style:
-                            context.textTheme.bodyMedium?.copyWith(
-                              color: ColorManager.rejectedText,
-                              fontWeight: FontWeight.w500,
-                              fontSize: widget.dimens.k14,
-                            ),
-                          ),
-                        ),
-                      ),
-
-                      widget.dimens.k24.verticalBoxPadding,
+                      //
+                      // /// Continue With Phone
+                      // Center(
+                      //   child: GestureDetector(
+                      //     onTap: () {
+                      //       widget.navigator.pushNamed(
+                      //         RouteManager.rContinueWithPhone,
+                      //
+                      //       );
+                      //     },
+                      //
+                      //     child: Text(
+                      //       StringManager.continueWithPhone,
+                      //
+                      //       style:
+                      //       context.textTheme.bodyMedium?.copyWith(
+                      //         color: ColorManager.rejectedText,
+                      //         fontWeight: FontWeight.w500,
+                      //         fontSize: widget.dimens.k14,
+                      //       ),
+                      //     ),
+                      //   ),
+                      // ),
+                      //
+                      // widget.dimens.k24.verticalBoxPadding,
 
                       /// Send Code Button
                       PrimaryButton(
-                        childText: "Send Code",
+                        childText: _codeSent ? "Please Wait..." : "Send Code",
                         isSafeArea: false,
-
-                        onPressed: () {
+                        onPressed: _codeSent
+                            ? null
+                            : () {
                           FocusScope.of(context).unfocus();
 
                           if (validate) {
+                            setState(() => _codeSent = true);
 
                             authVM.forgetEmailVerificationCode(
                               {
-                                "email":
-                                emailController.text.trim(),
+                                "email": emailController.text.trim(),
                               },
                               this,
                             );

@@ -8,7 +8,9 @@ import '../../../../application/app_theme/color_scheme.dart';
 import '../../../../application/core/result.dart';
 import '../../../../base/base_widget.dart';
 import '../../../../widgets/toast.dart';
+import '../../../application/common/enum.dart';
 import '../../../constants/asset_manager.dart';
+import '../home/set_up_profile_dialog.dart';
 import '../home/user_profile/user_profile_details.dart';
 import 'filter_explore.dart';
 import '../../../data/models/explore_model/explore_model.dart';
@@ -26,7 +28,7 @@ class _ExploreViewState extends State<ExploreView>
 
   bool isSearchVisible = false;
   bool isFilterOpen = false;
-
+  bool _dialogShown = false;
   TextEditingController searchController = TextEditingController();
 
   // Active filter params
@@ -62,6 +64,7 @@ class _ExploreViewState extends State<ExploreView>
 
   @override
   Widget build(BuildContext context) {
+
     return Consumer<ExploreViewModel>(
       builder: (_, provider, __) {
         exploreData = provider;
@@ -272,8 +275,9 @@ class _ExploreViewState extends State<ExploreView>
     );
   }
 
-  Widget _profileCard(Profiles item) {
+  Widget _profileCard(ExploreProfiles item) {
     final imageUrl = item.profilePicture ?? '';
+
 
     return GestureDetector(
       onDoubleTap: (){
@@ -315,13 +319,28 @@ class _ExploreViewState extends State<ExploreView>
             children: [
               Align(
                 alignment: Alignment.topRight,
-                child: CircleAvatar(
-                  backgroundColor: ColorManager.loginContainer.withOpacity(.4),
-                  child: Image.asset(
-                    item.isFavourite == true
-                        ? Assets.favoriteImage // use filled icon if favourite
-                        : Assets.favorite,
-                    height: widget.dimens.k22,
+                child: GestureDetector(
+                  onTap: () {
+                    final login = widget.iPrefHelper.loginModel;
+                    final isFav = item.isFavourite ?? false;
+                    final data = {
+                      "added_by": login?.data?.user?.name?.trim(),
+                      "target_user_id": item.userId?.trim(),
+                      "type": isFav ? "remove" : "add",
+                    };
+                    exploreData.addToFavouriteList(
+                      data,
+                      _FavouriteResultHandler(context, item),
+                    );
+                  },
+                  child: CircleAvatar(
+                    backgroundColor: ColorManager.loginContainer.withOpacity(.4),
+                    child: Image.asset(
+                      item.isFavourite == true
+                          ? Assets.favoriteImage
+                          : Assets.favorite,
+                      height: widget.dimens.k22,
+                    ),
                   ),
                 ),
               ),
@@ -364,11 +383,67 @@ class _ExploreViewState extends State<ExploreView>
     );
   }
 
+
   @override
   void onError(String error) {
     MyToast.showToast(message: error);
   }
+  @override
+  void onSuccess(String result)  {
+    if (_dialogShown) return;
+
+    final profileCompleted = exploreData.exploreDataModel.data?.profileCompleted ?? 0;
+
+    if (profileCompleted != 1) {
+      _dialogShown = true;
+      Future.delayed(const Duration(milliseconds: 200), () async {
+        await showDialog(
+          context: context,
+          barrierDismissible: false,
+          barrierColor: Colors.transparent, // ✅ remove default dark barrier
+          builder: (_) => PopScope(
+            canPop: false,
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+              child: Container(
+                color: Colors.black.withOpacity(0.3),
+                child: SetUpProfileDialog(),
+              ),
+            ),
+          ),
+        );
+        _dialogShown = false;
+      });
+    }
+  }
+}
+
+
+/// RESULT HANDLER
+class _FavouriteResultHandler implements Result {
+  final BuildContext context;
+  final ExploreProfiles profile;
+
+  _FavouriteResultHandler(this.context, this.profile);
 
   @override
-  void onSuccess(String result) {}
+  void onError(String error) {
+    MyToast.showToast(
+      message: error,
+      typeToast: TypeToast.error,
+    );
+  }
+
+  @override
+  void onSuccess( result) {
+    MyToast.showToast(
+      message: result,
+      typeToast: TypeToast.success,
+    );
+
+    // toggle local state
+    profile.isFavourite = !(profile.isFavourite ?? false);
+
+    context.read<ExploreViewModel>().notifyListeners();
+  }
 }

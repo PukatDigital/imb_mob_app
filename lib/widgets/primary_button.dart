@@ -54,9 +54,9 @@ class PrimaryButton extends BaseStateLessWidget {
         style: ElevatedButton.styleFrom(
           // ✅ isDisabled ho to opacity 0.5
           backgroundColor: isDisabled
-              ? (color ?? ColorManager.primary).withOpacity(0.5)
+              ? (color ?? ColorManager.fieldTextColor)
               : (color ?? ColorManager.primary),
-          disabledBackgroundColor: (color ?? ColorManager.primary).withOpacity(0.5), // ✅ jab onPressed null ho
+          disabledBackgroundColor: (color ?? ColorManager.fieldTextColor).withOpacity(0.5), // ✅ jab onPressed null ho
           disabledForegroundColor: ColorManager.white,
           elevation: elevation ?? 0,
           fixedSize: Size(width ?? context.width, buttonHeight),

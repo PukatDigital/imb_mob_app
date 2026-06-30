@@ -1,8 +1,11 @@
+ import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:ideal_marriage_bureau/application/core/result.dart';
 import 'package:ideal_marriage_bureau/base/base_widget.dart';
 import 'package:ideal_marriage_bureau/data/models/get_profile_model/get_all_profile_list_model.dart';
+import 'package:ideal_marriage_bureau/presentation/views/explore/explore_model_view_model.dart';
 import 'package:ideal_marriage_bureau/presentation/views/home/set_up_profile_dialog.dart';
 import 'package:ideal_marriage_bureau/presentation/views/home/top_tabs.dart';
 import 'package:provider/provider.dart';
@@ -21,13 +24,20 @@ class HomeView extends BaseStateFullWidget {
   State<HomeView> createState() => _HomeViewState();
 }
 
-class _HomeViewState extends State<HomeView> implements ErrorResult {
-  HomeTab selectedTab = HomeTab.matched;
+class _HomeViewState extends State<HomeView> implements ErrorResult, Result<String> {
+  HomeTab selectedTab = HomeTab.forYou;
+
 
   final PageController _pageController = PageController();
   bool _dialogShown = false;
   int _currentIndex = 0;
+  void _onTabChange(HomeTab tab) {
+    setState(() => selectedTab = tab);
 
+    if (tab == HomeTab.matched) {
+      context.read<ExploreViewModel>().exploreList(this, filterParams: {});
+    }
+  }
   void _handleProfileDialog(int index) {
     final list = context.read<GetProfileViewModel>().profiles;
 
@@ -40,8 +50,18 @@ class _HomeViewState extends State<HomeView> implements ErrorResult {
       Future.delayed(const Duration(milliseconds: 200), () async {
         await showDialog(
           context: context,
-          barrierDismissible: true,
-          builder: (_) => SetUpProfileDialog(),
+          barrierDismissible: false,
+          barrierColor: Colors.transparent,
+          builder: (_) => PopScope(
+            canPop: false,
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+              child: Container(
+                color: Colors.black.withOpacity(0.3),
+                child: SetUpProfileDialog(),
+              ),
+            ),
+          ),
         );
 
         _dialogShown = false;
@@ -51,12 +71,16 @@ class _HomeViewState extends State<HomeView> implements ErrorResult {
   @override
   void initState() {
     super.initState();
-
     SchedulerBinding.instance.addPostFrameCallback((_) {
+      final myUserId = widget.iPrefHelper.loginModel?.data?.user?.name?.trim() ?? '';
+      debugPrint('🔍 myUserId being passed: $myUserId'); // check this
       context.read<GetProfileViewModel>().getAllProfiles(this);
+      context.read<GetProfileViewModel>().getMyProfileCompleted(myUserId);
+      debugPrint('🧠 ViewModel instance in initState: ${context.read<GetProfileViewModel>().hashCode}');
+      debugPrint('🔍 login model: ${widget.iPrefHelper.loginModel?.data?.toJson()}');
+      debugPrint('🔍 all pref keys: ${widget.iPrefHelper.loginModel?.data?.user?.apiKey}');
     });
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -180,5 +204,11 @@ class _HomeViewState extends State<HomeView> implements ErrorResult {
   void dispose() {
     _pageController.dispose();
     super.dispose();
+  }
+
+  @override
+  onSuccess(String result) {
+    // TODO: implement onSuccess
+    throw UnimplementedError();
   }
 }

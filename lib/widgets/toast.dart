@@ -22,7 +22,7 @@ class MyToast {
           elevation: 0,
           behavior: SnackBarBehavior.floating,
           margin: const EdgeInsets.only(
-            bottom: 80,
+            bottom: 100,
             left: 16,
             right: 16,
           ),

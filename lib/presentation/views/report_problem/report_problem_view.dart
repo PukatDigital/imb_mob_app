@@ -463,11 +463,22 @@ class _ReportProblemViewState extends State<ReportProblemView>
       },
     );
   }
+  void _resetForm() {
+    setState(() {
+      selectedProblemType = null;
+      _selectedImage = null;
+      selectedFileName = null;
+      attachmentBase64 = '';
+    });
+    subjectController.clear();
+    descriptionController.clear();
+  }
   @override
   onError(String error) {
-    MyToast.showToast(message: error, typeToast: TypeToast.error);
+   // MyToast.showToast(message: error, typeToast: TypeToast.error);
     showCustomStatusDialog(
       context: context,
+      barrierDismissible: false ,
       dimens: widget.dimens,
       icon: Assets.error,
       title: "Not report submitted ",
@@ -482,12 +493,13 @@ class _ReportProblemViewState extends State<ReportProblemView>
   }
   @override
   onSuccess(result) {
-    MyToast.showToast(
-      message: result.toString(),
-      typeToast: TypeToast.success,
-    );
-
+    // MyToast.showToast(
+    //   message: result.toString(),
+    //   typeToast: TypeToast.success,
+    // );
+    _resetForm();
     showCustomStatusDialog(
+      barrierDismissible: false,
       context: context,
       dimens: widget.dimens,
       icon: Assets.success,

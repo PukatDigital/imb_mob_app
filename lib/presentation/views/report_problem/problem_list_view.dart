@@ -368,9 +368,9 @@ class _ProblemListViewState extends State<ProblemListView> implements Result {
 
   @override
   onSuccess(result) {
-    MyToast.showToast(
-      message: result.toString(),
-      typeToast: TypeToast.success,
-    );
+    // MyToast.showToast(
+    //   message: result.toString(),
+    //   typeToast: TypeToast.success,
+    // );
   }
 }

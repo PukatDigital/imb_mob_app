@@ -897,6 +897,31 @@ class Apis implements IApi {
     }
   }
   @override
+  Future<ApiResponse> createPaymentRecord(Map<String, dynamic> data) async {
+    apiService.setIsTokenRequired(value: true);
+    try {
+      d("🚀 SUBMIT DATA: ${jsonEncode(data)}"); // log actual JSON
+      final responseData = await dio.post(
+        "method/onebms.api.profile_api.create_payment_record",
+        data: jsonEncode(data), // always send JSON
+        options: Options(
+          headers: {
+            "Content-Type": "application/json",
+          },
+        ),
+      );
+      d("✅ STATUS: ${responseData.statusCode}");
+      d("📩 RESPONSE: ${responseData.data}");
+      return Success(responseData.data['message']);
+    } on DioException catch (e) {
+      d("❌ DIO ERROR: ${e.response?.data}");
+      return Error(getErrorMessage(e));
+    } catch (e) {
+      d("❌ UNKNOWN ERROR: $e");
+      return Error(e.toString());
+    }
+  }
+  @override
   Future<ApiResponse> deactivateAccount(Map<String, dynamic> data) async {
     apiService.setIsTokenRequired(value: true);
     try {
@@ -1131,7 +1156,9 @@ class Apis implements IApi {
         "method/onebms.api.profile_api.get_matched_profile",
         queryParameters: data,
       );
+      d(responseData.data);
       return Success(ExploreDataModel.fromJson(responseData.data));
+
     } on DioException catch (e) {
       return Error(getErrorMessage(e));
     } catch (e) {

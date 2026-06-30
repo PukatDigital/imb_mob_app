@@ -10,6 +10,7 @@ import '../../../../application/core/result.dart';
 import '../../../../base/base_widget.dart';
 import '../../../../widgets/toast.dart';
 import '../../../application/network/result.dart';
+import '../../../application/routes/route_generator.dart';
 import '../../../constants/asset_manager.dart';
 import '../../../widgets/primary_button.dart';
 import '../../../../data/models/plans_model/paln_details_model.dart';
@@ -277,9 +278,10 @@ class _PlanViewState extends State<PlanView> implements ErrorResult {
           PrimaryButton(
             height: widget.dimens.k40,
             onPressed: () {
-              Navigator.push(
+              Navigator.pushNamed(
                 context,
-                MaterialPageRoute(builder: (_) => PaymentView()),
+                RouteManager.rPaymentView,
+                arguments: plan.name,
               );
             },
             childText: "Get ${plan.credits ?? 'Plan'} cr- ${plan.planType}",

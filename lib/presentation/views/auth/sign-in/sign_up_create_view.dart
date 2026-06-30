@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:ideal_marriage_bureau/application/common/enum.dart';
 import 'package:ideal_marriage_bureau/application/core/extensions/extensions.dart';
@@ -9,6 +11,7 @@ import 'package:provider/provider.dart';
 import '../../../../application/app_theme/color_scheme.dart';
 import '../../../../application/core/result.dart';
 import '../../../../application/network/result.dart';
+import '../../../../application/routes/route_generator.dart';
 import '../../../../base/base_widget.dart';
 import '../../../../constants/string_manager.dart';
 import '../../../../widgets/loader.dart';
@@ -274,15 +277,31 @@ class _SignUpCreateViewState extends State<SignUpCreateView>
 
   @override
   void onSuccess(String result) {
-    MyToast.showToast(message: result, typeToast: TypeToast.success);
+    _formData.reset();
     _showVerificationDialog();
+
+    Future.delayed(const Duration(seconds: 3), () {        
+      if (!mounted) return;
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        RouteManager.rLoginView ,
+            (route) => false,
+      );
+    });
   }
 
   void _showVerificationDialog() {
     showDialog(
       context: context,
-      barrierDismissible: true,
-      builder: (context) => VerificationDialog(),
+      barrierDismissible: false,
+      barrierColor: Colors.transparent, // ✅ remove default dark barrier
+      builder: (_) => BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+        child: Container(
+          color: Colors.black.withOpacity(0.3),
+          child: VerificationDialog(),
+        ),
+      ),
     );
   }
 }

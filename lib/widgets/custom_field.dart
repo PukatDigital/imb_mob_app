@@ -96,7 +96,8 @@ class _CustomTextFieldState extends State<CustomField> {
     super.initState();
     _controller = widget.controller ?? TextEditingController(text: widget.initialValue ?? '');
     _controller.addListener(() {
-      setState(() {}); // rebuild to update background color dynamically
+      if (!mounted) return; // ← this must be line 99
+      setState(() {});
     });
   }
 

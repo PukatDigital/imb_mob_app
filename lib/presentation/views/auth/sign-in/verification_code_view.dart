@@ -128,116 +128,120 @@ class _VerificationCodeViewState extends State<VerificationCodeView>
             Expanded(
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: widget.dimens.k18),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(height: widget.dimens.k80),
+                child: SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(height: widget.dimens.k80),
 
-                    Text(
-                      StringManager.verificationCode,
-                      style: context.textTheme.bodyLarge?.copyWith(
-                        fontSize: widget.dimens.k32,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-
-                    SizedBox(height: widget.dimens.k5),
-
-                    Text(
-                      "Enter the OTP sent to your email",
-                      style: context.textTheme.bodyLarge?.copyWith(
-                        fontSize: widget.dimens.k16,
-                        color: ColorManager.textColorSubTitle,
-                      ),
-                    ),
-
-                    SizedBox(height: widget.dimens.k20),
-
-                    /// OTP FIELD
-                    OTPCodeField(
-                      hasError: _hasOtpError,
-                      onChanged: (value) {          // 👈 har entry/removal pe fire hoga
-                        setState(() {
-                          _otpValue = value;
-                          _hasOtpError = false;     // error clear karo jab user type kare
-                        });
-                      },
-                      onCompleted: (value) {
-                        setState(() {
-                          _otpValue = value;
-                          _hasOtpError = value.length != 6;
-                        });
-                      },
-                    ),
-
-                    SizedBox(height: widget.dimens.k10),
-
-                    /// TIMER + RESEND
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          _isResendEnabled
-                              ? "You can resend code now"
-                              : "Resend Code in ${_secondsRemaining ~/ 60}:${(_secondsRemaining % 60).toString().padLeft(2, '0')}",
-                          style: context.textTheme.bodySmall?.copyWith(
-                            color: ColorManager.textColorSubTitle,
-                          ),
+                      Text(
+                        StringManager.verificationCode,
+                        style: context.textTheme.bodyLarge?.copyWith(
+                          fontSize: widget.dimens.k32,
+                          fontWeight: FontWeight.w600,
                         ),
+                      ),
 
-                        TextButton(
-                          onPressed: _isResendEnabled
-                              ? () {
-                            _isResendCall = true; // 👈 flag set karo
-                            authVM.emailVerificationCode(
-                              {"email": _resolvedEmail?.trim()},
-                              this,
-                            );
-                            _startTimer();
-                          }
-                              : null,
-                          child: Text(
-                            "Resend",
-                            style: TextStyle(
-                              color: _isResendEnabled
-                                  ? ColorManager.primary
-                                  : Colors.grey,
+                      SizedBox(height: widget.dimens.k5),
+
+                      Text(
+                        "Enter the OTP sent to your email",
+                        style: context.textTheme.bodyLarge?.copyWith(
+                          fontSize: widget.dimens.k16,
+                          color: ColorManager.textColorSubTitle,
+                        ),
+                      ),
+
+                      SizedBox(height: widget.dimens.k20),
+
+                      /// OTP FIELD
+                      OTPCodeField(
+                        hasError: _hasOtpError,
+                        onChanged: (value) {          // 👈 har entry/removal pe fire hoga
+                          setState(() {
+                            _otpValue = value;
+                            _hasOtpError = false;     // error clear karo jab user type kare
+                          });
+                        },
+                        onCompleted: (value) {
+                          setState(() {
+                            _otpValue = value;
+                            _hasOtpError = value.length != 6;
+                          });
+                        },
+                      ),
+
+                      SizedBox(height: widget.dimens.k10),
+
+                      /// TIMER + RESEND
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            _isResendEnabled
+                                ? "You can resend code now"
+                                : "Resend Code in ${_secondsRemaining ~/ 60}:${(_secondsRemaining % 60).toString().padLeft(2, '0')}",
+                            style: context.textTheme.bodySmall?.copyWith(
+                              color: ColorManager.textColorSubTitle,
                             ),
                           ),
-                        ),
-                      ],
-                    ),
 
-                    const Spacer(),
-
-                    /// VERIFY BUTTON
-                    authVM.apiResponse is Loading
-                        ? Loader()
-                        : PrimaryButton(
-                      onPressed: _otpValue.length == 6
-                          ? () {
-                        authVM.otpVerificationCode(
-                          {
-                            "email": _resolvedEmail?.trim(),
-                            "otp": _otpValue.trim(),
-                          },
-                          this,
-                        );
-                      }
-                          : null, // 👈 null = disabled
-                      childText: StringManager.verify,
-                      color: _otpValue.length == 6
-                          ? ColorManager.primary   // ✅ filled → primary color
-                          : Colors.grey.shade300,  // ✅ empty → disabled color
-                      textStyle: context.textTheme.titleMedium!.copyWith(
-                        color: _otpValue.length == 6
-                            ? Colors.white
-                            : Colors.grey.shade500, // 👈 muted text when disabled
+                          TextButton(
+                            onPressed: _isResendEnabled
+                                ? () {
+                              _isResendCall = true; // 👈 flag set karo
+                              authVM.emailVerificationCode(
+                                {"email": _resolvedEmail?.trim()},
+                                this,
+                              );
+                              _startTimer();
+                            }
+                                : null,
+                            child: Text(
+                              "Resend",
+                              style: TextStyle(
+                                color: _isResendEnabled
+                                    ? ColorManager.primary
+                                    : Colors.grey,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
 
-                    SizedBox(height: widget.dimens.k40),
-                  ],
+                      SizedBox(height: widget.dimens.k40),
+
+                      /// VERIFY BUTTON
+                      authVM.apiResponse is Loading
+                          ? Loader()
+                          : PrimaryButton(
+                        onPressed: _otpValue.length == 6
+                            ? () {
+                          authVM.otpVerificationCode(
+                            {
+                              "email": _resolvedEmail?.trim(),
+                              "otp": _otpValue.trim(),
+                            },
+                            this,
+                          );
+                        }
+                            : null,
+                        childText: StringManager.verify,
+                        color: _otpValue.length == 6
+                            ? ColorManager.primary
+                            : Colors.grey.shade300,
+                        textStyle: context.textTheme.titleMedium!.copyWith(
+                          color: _otpValue.length == 6
+                              ? Colors.white
+                              : Colors.grey.shade500,
+                        ),
+                      ),
+                      SizedBox(height: widget.dimens.k40),
+
+                    ],
+                  ),
                 ),
               ),
             ),

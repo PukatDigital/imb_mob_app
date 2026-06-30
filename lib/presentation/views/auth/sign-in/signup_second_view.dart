@@ -58,19 +58,26 @@ class _StepTwoViewState extends State<StepTwoView>  implements ErrorResult {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  "What's your qualification?",
-                  style: Theme.of(context).textTheme.bodyLarge,
-                ),
+                Text.rich(TextSpan(
+                  text: StringManager.qualification1 ,
+                  style: context.textTheme.bodyMedium,
+                  children: [
+                    TextSpan(
+                      text: " *",
+                      style: context.textTheme.bodyMedium
+                          ?.copyWith(color: ColorManager.primary),
+                    ),
+                  ],
+                )),
                 const SizedBox(height: 8),
                 CustomDropDown<String>(
-                  list: newDocVM.educationModel.data?.education
+                  list: (newDocVM.educationModel.data?.education
                       ?.map((e) => e.name ?? '')
-                      .toList() ??
-                      [],
-                  selectedItem:  widget.formData.selectedQualification,
+                      .toList() ?? [])
+                    ..sort(),
+                  selectedItem: widget.formData.selectedQualification,
                   hintText: "Select your qualification",
-                  onChanged: (val) => setState(() =>  widget.formData.selectedQualification = val),
+                  onChanged: (val) => setState(() => widget.formData.selectedQualification = val),
                 ),
                 // CustomDropDown<String>(
                 //   list: qualifications,
@@ -97,13 +104,13 @@ class _StepTwoViewState extends State<StepTwoView>  implements ErrorResult {
                 )),
                 const SizedBox(height: 8),
                 CustomDropDown<String>(
-                  list: newDocVM.countriesModel.data?.countries
+                  list: (newDocVM.countriesModel.data?.countries
                       ?.map((e) => e.name ?? '')
-                      .toList() ??
-                      [],
-                  selectedItem:  widget.formData.selectedCountry,
+                      .toList() ?? [])
+                    ..sort(),
+                  selectedItem: widget.formData.selectedCountry,
                   hintText: "Select your country",
-                  onChanged: (val) => setState(() =>  widget.formData.selectedCountry = val),
+                  onChanged: (val) => setState(() => widget.formData.selectedCountry = val),
                 ),
                 // CustomDropDown<String>(
                 //   list: countries,
@@ -129,13 +136,13 @@ class _StepTwoViewState extends State<StepTwoView>  implements ErrorResult {
                 )),
                 const SizedBox(height: 8),
                 CustomDropDown<String>(
-                  list: newDocVM.citiesModel.data?.ethnicities
+                  list: (newDocVM.citiesModel.data?.ethnicities
                       ?.map((e) => e.name ?? '')
-                      .toList() ??
-                      [],
-                  selectedItem:  widget.formData.selectedCity,
+                      .toList() ?? [])
+                    ..sort(),
+                  selectedItem: widget.formData.selectedCity,
                   hintText: "Select your country",
-                  onChanged: (val) => setState(() =>  widget.formData.selectedCity = val),
+                  onChanged: (val) => setState(() => widget.formData.selectedCity = val),
                 ),
                 // CustomDropDown<String>(
                 //   list: cities,

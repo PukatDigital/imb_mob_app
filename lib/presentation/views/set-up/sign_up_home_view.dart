@@ -53,6 +53,7 @@ class _SignUpCreationViewState extends State<SignUpCreationView>
   final GlobalKey<PartnerPreferencesViewState>  _page5Key = GlobalKey();
   final GlobalKey<AddYourPicturesState>         _page6Key = GlobalKey();
   final GlobalKey<BioAndOtherDetailsViewState>  _page7Key = GlobalKey();
+  bool _isLoading = false;
   // ── Save current step to prefs ───────────────────────────────────────────
   // void _saveCurrentStep() {
   //   switch (_currentStep) {
@@ -247,10 +248,10 @@ class _SignUpCreationViewState extends State<SignUpCreationView>
       "for_girl":         saved.forGirl ?? '',
       "for_boy":          saved.forBoy ?? '',
       "life_partner":     saved.lifePartner ?? '',
-      "attach_1":   resolvedImages.isNotEmpty ? resolvedImages[0] : '',
-      "attach_2": resolvedImages.length > 1 ? resolvedImages[1] : '',
-      "attach_3":   resolvedImages.length > 2 ? resolvedImages[2] : '',
-      "attach_4":   resolvedImages.length > 3 ? resolvedImages[3] : '',
+      "attach_1": resolvedImages.isNotEmpty ? resolvedImages[0] : null,
+      "attach_2": resolvedImages.length > 1 ? resolvedImages[1] : null,
+      "attach_3": resolvedImages.length > 2 ? resolvedImages[2] : null,
+      "attach_4": resolvedImages.length > 3 ? resolvedImages[3] : null,
       "bio":               saved.bio ?? '',
       "marriage_intension": saved.marriageIntension ?? '',
       "creater_profile":   saved.createrProfile ?? '',
@@ -352,23 +353,38 @@ class _SignUpCreationViewState extends State<SignUpCreationView>
   //   };
   // }
   Future<void> _nextStep() async {
-    await _saveCurrentStep();
+    setState(() => _isLoading = true);
 
-    if (_currentStep < 6) {
-      _pageController.nextPage(
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-      );
-    } else {
-      final payload = await _buildSubmitPayload();
-      final saved   = context.read<IPrefHelper>().retrieveSetupProfile();
-      final isEdit  = (saved?.profileCompleted ?? 0) == 1;
+    try {
+      await _saveCurrentStep();
 
-      if (isEdit) {
-        newDocVM.updateProfileData(payload, this);   // ← update API
+      if (_currentStep < 6) {
+        _pageController.nextPage(
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+        );
+        setState(() => _isLoading = false);
       } else {
-        newDocVM.submitSetUpProfileData(payload, this); // ← create API
+        final payload = await _buildSubmitPayload();
+
+        final data = payload['data'] as Map<String, dynamic>;
+        print("📸 attach_1: ${data['attach_1']?.toString().substring(0, 30) ?? 'null'}");
+        print("📸 attach_2: ${data['attach_2']}");
+        print("📸 attach_3: ${data['attach_3']}");
+        print("📸 attach_4: ${data['attach_4']}");
+
+        final saved  = context.read<IPrefHelper>().retrieveSetupProfile();
+        final isEdit = (saved?.profileCompleted ?? 0) == 1;
+
+        if (isEdit) {
+          newDocVM.updateProfileData(payload, this);
+        } else {
+          newDocVM.submitSetUpProfileData(payload, this);
+        }
       }
+    } catch (e) {
+      print("❌ _nextStep error: $e");
+      setState(() => _isLoading = false); // <-- always reset on error
     }
   }
   // Future<void> _nextStep() async {
@@ -431,8 +447,8 @@ class _SignUpCreationViewState extends State<SignUpCreationView>
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8)),
             ),
-            onPressed: () {
-              _saveCurrentStep();
+            onPressed: () async {  // ✅ add async
+              await _saveCurrentStep();  // ✅ add await
               Navigator.of(ctx).pop();
               Navigator.of(context).pop();
             },
@@ -617,7 +633,7 @@ class _SignUpCreationViewState extends State<SignUpCreationView>
                       children: [
                         PrimaryButton(
                           width: size.width / 2.3,
-                          onPressed: _previousStep,
+                          onPressed: _isLoading ? null : _previousStep,
                           childText: "Previous",
                           textStyle: TextStyle(
                               color: ColorManager.primary),
@@ -657,6 +673,7 @@ class _SignUpCreationViewState extends State<SignUpCreationView>
   }
   @override
   onSuccess(result) {
+    setState(() => _isLoading = false);
     try {
       print("FULL RESULT: $result");
 
@@ -696,6 +713,7 @@ class _SignUpCreationViewState extends State<SignUpCreationView>
   }
   @override
   onError(String error) {
+    setState(() => _isLoading = false);
     MyToast.showToast(message: error, typeToast: TypeToast.error);
   }
 }

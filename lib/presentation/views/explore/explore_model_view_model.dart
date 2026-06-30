@@ -34,6 +34,19 @@ class ExploreViewModel extends BaseViewModel {
       onError: result.onError,
     );
   }
+  void addToFavouriteList(Map<String, dynamic> data, Result result) async {
+    d(data);
+
+    apiResponse = Loading();
+    notifyListeners(); // important if using Provider
+
+    apiResponse = await api.addToFavourite(data);
+
+    apiResponse.fold(
+      onSuccess: result.onSuccess,
+      onError: result.onError,
+    );
+  }
   void getAllMartialStatusData(ErrorResult result) async {
     apiResponse = Loading();
     apiResponse = await api.getAllMartialStatus();

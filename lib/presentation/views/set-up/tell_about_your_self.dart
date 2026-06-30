@@ -74,7 +74,7 @@ class TellAboutYourSelfViewState extends State<TellAboutYourSelfView>
       lastNameController.text   = saved.lastName ?? '';
       ethnicity  = saved.ethnicity;
       _dateController.text      = saved.dateOfBirth ?? '';
-      motherTongue              = saved.motherTongue;
+      motherTongue              = saved.motherTongue   ;
       caste                     = saved.caste;
       manHeight                 = saved.height;
       manWeight                 = saved.weight;
@@ -159,45 +159,125 @@ class TellAboutYourSelfViewState extends State<TellAboutYourSelfView>
     context.read<IPrefHelper>().saveSetupProfile(updated);
   }
   void _openCalendarDialog(TextEditingController controller) {
-    DateTime tempSelected = _selectedDate ?? DateTime.now();
+    DateTime? tempSelected = _selectedDate;
+    String? errorMessage;
+
+    // Maximum selectable date: 15 years ago from today
+    final DateTime maxSelectableDate = DateTime(
+      DateTime.now().year - 15,
+      DateTime.now().month,
+      DateTime.now().day,
+    );
 
     showDialog(
       context: context,
-      builder: (context) => StatefulBuilder(        // ✅ manages state inside dialog
+      builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) {
           return AlertDialog(
             insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-            title: Text("Select Date",
-                style: context.textTheme.titleMedium!
-                    .copyWith(color: ColorManager.primary)),
+            title: Center(
+              child: Text("Select Date",
+                  style: context.textTheme.titleMedium!
+                      .copyWith(color: ColorManager.primary)),
+            ),
             content: SizedBox(
               width: double.maxFinite,
               height: 350,
-              child: CalendarView(
-                selectedDate: tempSelected,
-                isPrevious: true,
-                onDaySelected: (selectedDay, focusedDay) {
-                  setDialogState(() {               // ✅ only updates inside dialog
-                    tempSelected = selectedDay;
-                  });
-                },
+              child: Column(
+                children: [
+                  Expanded(
+                    child: CalendarView(
+                      selectedDate: tempSelected ?? maxSelectableDate,
+                      isPrevious: true,
+                      lastDay: maxSelectableDate,
+                      // Disable dates that would make age < 15
+                      enabledDayPredicate: (day) {
+                        return !day.isAfter(maxSelectableDate);
+                      },
+                      onDaySelected: (selectedDay, focusedDay) {
+                        // Extra guard: ignore taps on disabled dates
+                        if (selectedDay.isAfter(maxSelectableDate)) {
+                          setDialogState(() {
+                            errorMessage = "Minimum age must be 15 years";
+                          });
+                          // Show toast as well
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: const Text(
+                                "Minimum age must be 15 years",
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              backgroundColor: Colors.red.shade600,
+                              duration: const Duration(seconds: 2),
+                              behavior: SnackBarBehavior.floating,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                          );
+                          return;
+                        }
+                        setDialogState(() {
+                          tempSelected = selectedDay;
+                          errorMessage = null;
+                        });
+                      },
+                    ),
+                  ),
+                  if (errorMessage != null) ...[
+                    const SizedBox(height: 8),
+                    Text(
+                      errorMessage!,
+                      style: TextStyle(
+                        color: Colors.red.shade600,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ],
               ),
             ),
             actions: [
               TextButton(
-                onPressed: () => Navigator.pop(context),  // ✅ cancel
+                onPressed: () => Navigator.pop(context),
                 child: Text("Cancel",
                     style: TextStyle(color: ColorManager.fieldTextColor)),
               ),
               TextButton(
                 onPressed: () {
-                  Navigator.pop(context);                 // ✅ confirm then update
+                  if (tempSelected == null) {
+                    setDialogState(() => errorMessage = "Please select a date");
+                    return;
+                  }
+
+                  // Final age check on Confirm button
+                  if (tempSelected!.isAfter(maxSelectableDate)) {
+                    setDialogState(() => errorMessage = "Minimum age must be 15 years");
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: const Text(
+                          "Minimum age must be 15 years",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        backgroundColor: Colors.red.shade600,
+                        duration: const Duration(seconds: 2),
+                        behavior: SnackBarBehavior.floating,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    );
+                    return;
+                  }
+
+                  Navigator.pop(context);
                   if (mounted) {
                     setState(() {
                       _selectedDate = tempSelected;
                       controller.text =
-                      "${tempSelected.year}-${tempSelected.month.toString().padLeft(2, '0')}-${tempSelected.day.toString().padLeft(2, '0')}";
+                      "${tempSelected!.year}-${tempSelected!.month.toString().padLeft(2, '0')}-${tempSelected!.day.toString().padLeft(2, '0')}";
                     });
                   }
                 },

@@ -9,6 +9,7 @@ import 'package:ideal_marriage_bureau/data/models/get_profile_model/profile_deta
 import 'package:ideal_marriage_bureau/presentation/views/home/home_view_model.dart';
 import 'package:ideal_marriage_bureau/presentation/views/home/user_profile/user_more_dialog.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../application/app_theme/color_scheme.dart';
 import '../../../../application/core/result.dart';
 import '../../../../base/base_widget.dart';
@@ -68,15 +69,22 @@ class _UserProfileDetailsViewState extends State<UserProfileDetailsView>
   @override
   void initState() {
     super.initState();
+    _checkHiSent();
     SchedulerBinding.instance.addPostFrameCallback((_) {
       // ✅ widget.profile is Profiles — .profileId is directly accessible
       context.read<GetProfileViewModel>().getAllProfileDetails(
-        this,
+        _ProfileDetailsResultHandler(this),
         profileId: widget.profileId ,
       );
     });
   }
-
+  Future<void> _checkHiSent() async {
+    final prefs = await SharedPreferences.getInstance();
+    final sentList = prefs.getStringList('hi_sent_profiles') ?? [];
+    setState(() {
+      hasSaidHi = sentList.contains(widget.profileId);
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return Consumer<GetProfileViewModel>(
@@ -480,7 +488,10 @@ class _UserProfileDetailsViewState extends State<UserProfileDetailsView>
             children: [
               Expanded(
                 flex: 2,
-                child: _networkImageBox(images[0], radius: widget.dimens.k20),
+                child: GestureDetector(
+                  onTap: () => _showImagePreview(images[0]),
+                  child: _networkImageBox(images[0], radius: widget.dimens.k20),
+                ),
               ),
               if (images.length > 1) ...[
                 widget.dimens.k8.horizontalBoxPadding,
@@ -489,24 +500,33 @@ class _UserProfileDetailsViewState extends State<UserProfileDetailsView>
                   child: Column(
                     children: [
                       Expanded(
-                          child: _networkImageBox(images[1],
-                              radius: widget.dimens.k15)),
+                        child: GestureDetector(
+                          onTap: () => _showImagePreview(images[1]),
+                          child: _networkImageBox(images[1], radius: widget.dimens.k15),
+                        ),
+                      ),
                       if (images.length > 2) ...[
                         widget.dimens.k8.verticalBoxPadding,
                         Expanded(
-                            child: _networkImageBox(images[2],
-                                radius: widget.dimens.k15)),
+                          child: GestureDetector(
+                            onTap: () => _showImagePreview(images[2]),
+                            child: _networkImageBox(images[2], radius: widget.dimens.k15),
+                          ),
+                        ),
                       ],
                       if (images.length > 3) ...[
                         widget.dimens.k8.verticalBoxPadding,
                         Expanded(
-                            child: _networkImageBox(images[3],
-                                radius: widget.dimens.k15)),
+                          child: GestureDetector(
+                            onTap: () => _showImagePreview(images[3]),
+                            child: _networkImageBox(images[3], radius: widget.dimens.k15),
+                          ),
+                        ),
                       ],
                     ],
                   ),
                 ),
-              ],
+              ]
             ],
           ),
         ),
@@ -514,6 +534,55 @@ class _UserProfileDetailsViewState extends State<UserProfileDetailsView>
     );
   }
 
+  void _showImagePreview(String imageUrl) {
+    final size = MediaQuery.of(context).size;
+    showDialog(
+      context: context,
+      barrierColor: Colors.black.withOpacity(.50),
+      builder: (_) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: EdgeInsets.symmetric(
+            horizontal: widget.dimens.k16,
+            vertical: widget.dimens.k24,
+          ),
+          child: SizedBox(
+            height: size.height * 0.80,
+            width: size.width,
+            child: Stack(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(widget.dimens.k16),
+                  child: SizedBox.expand(
+                    child: Image.network(imageUrl, fit: BoxFit.cover),
+                  ),
+                ),
+                Positioned(
+                  top: widget.dimens.k10,
+                  right: widget.dimens.k10,
+                  child: GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: Container(
+                      padding: EdgeInsets.all(widget.dimens.k6),
+                      decoration: const BoxDecoration(
+                        color: Colors.black54,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.close,
+                        color: Colors.white,
+                        size: widget.dimens.k20,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
   Widget _chatButton() {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: widget.dimens.k45),
@@ -672,13 +741,30 @@ class _UserProfileDetailsViewState extends State<UserProfileDetailsView>
 
   @override
   void onError(String error) => MyToast.showToast(message: error, typeToast: TypeToast.error);
+  @override
+  void onSuccess(String result) async {
+    final prefs = await SharedPreferences.getInstance();
+    final sentList = prefs.getStringList('hi_sent_profiles') ?? [];
+    if (!sentList.contains(widget.profileId)) {
+      sentList.add(widget.profileId);
+      await prefs.setStringList('hi_sent_profiles', sentList);
+    }
+    setState(() => hasSaidHi = true);
+    MyToast.showToast(message: "Hi sent successfully! 👋", typeToast: TypeToast.success);
+  }
+}
+class _ProfileDetailsResultHandler implements Result<String> {
+  final _UserProfileDetailsViewState state;
+
+  _ProfileDetailsResultHandler(this.state);
 
   @override
   void onSuccess(String result) {
-    setState(() {
-      hasSaidHi = true;  // ← only set true on API success
-    });
-    MyToast.showToast(message: result, typeToast: TypeToast.success);
+    // do nothing, or setState for profile loaded indicator
+  }
 
+  @override
+  void onError(String error) {
+    MyToast.showToast(message: error, typeToast: TypeToast.error);
   }
 }

@@ -24,14 +24,14 @@ class _VerificationDialogState extends State<VerificationDialog> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                IconButton(onPressed: (){
-                  Navigator.pop(context);
-                }, icon: Icon(Icons.close,color: ColorManager.fieldTextColor,))
-              ],
-            ),
+            // Row(
+            //   mainAxisAlignment: MainAxisAlignment.end,
+            //   children: [
+            //     IconButton(onPressed: (){
+            //       Navigator.pop(context);
+            //     }, icon: Icon(Icons.close,color: ColorManager.fieldTextColor,))
+            //   ],
+            // ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -39,12 +39,14 @@ class _VerificationDialogState extends State<VerificationDialog> {
               ],
             ),
             widget.dimens.k18.verticalBoxPadding,
-            Text(
-              "Account created successfully",
-              textAlign: TextAlign.start,
-              style: context.textTheme.bodyLarge?.copyWith(
-                fontWeight: FontWeight.w600,
-                fontSize: widget.dimens.k22,
+            Center(
+              child: Text(
+                "Account created successfully",
+                textAlign: TextAlign.center,
+                style: context.textTheme.bodyLarge?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  fontSize: widget.dimens.k22,
+                ),
               ),
             ),
             widget.dimens.k5.verticalBoxPadding,

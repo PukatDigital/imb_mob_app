@@ -1,6 +1,8 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:ideal_marriage_bureau/application/core/result.dart';
+import 'package:ideal_marriage_bureau/application/routes/route_generator.dart';
 import 'package:ideal_marriage_bureau/presentation/views/view_plan/plan_details_view_model.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:ideal_marriage_bureau/application/app_theme/color_scheme.dart';
@@ -8,6 +10,8 @@ import 'package:ideal_marriage_bureau/application/core/extensions/extensions.dar
 import 'package:ideal_marriage_bureau/base/base_widget.dart';
 import 'package:provider/provider.dart';
 import '../../../application/common/enum.dart';
+import '../../../application/common/log.dart';
+import '../../../application/network/result.dart';
 import '../../../constants/asset_manager.dart';
 import '../../../widgets/toast.dart';
 import '../../../data/models/plans_model/payment_methods_list.dart';
@@ -32,15 +36,22 @@ class _PaymentViewState extends State<PaymentView> implements ErrorResult, Resul
   final LayerLink _layerLink = LayerLink();
   List<Data> _filteredMethods = [];
   late PlansViewModel planData;
-
+  bool get _canSubmit {
+    if (selectedMethod == null || _selectedImage == null) return false;
+    if (_isOtherMethod(selectedMethod) && remarksController.text.trim().isEmpty) return false;
+    return true;
+  }
+  bool _isSubmitting = false;
+  String? _selectedPlanName;
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      _selectedPlanName = ModalRoute.of(context)?.settings.arguments as String?;
       context.read<PlansViewModel>().getBankDetails(this);
       context.read<PlansViewModel>().getProblemList(this, searchName: "");
     });
-
+    remarksController.addListener(() => setState(() {}));
     _searchFocusNode.addListener(() {
       if (_searchFocusNode.hasFocus) {
         _filteredMethods = List.from(
@@ -265,6 +276,7 @@ class _PaymentViewState extends State<PaymentView> implements ErrorResult, Resul
                         widget.dimens.k10.verticalBoxPadding,
                         Expanded(
                           child: SingleChildScrollView(
+                            primary: false,
                             child: Container(
                               padding: EdgeInsets.all(widget.dimens.k18),
                               decoration: BoxDecoration(
@@ -572,7 +584,7 @@ class _PaymentViewState extends State<PaymentView> implements ErrorResult, Resul
             widget.dimens.k8.horizontalBoxPadding,
             Text(
               _selectedImage != null
-                  ? _selectedImage!.path.split('/').last
+                  ? "image_${DateTime.now().second}"
                   : "No file chosen",
               style: TextStyle(
                 color: _selectedImage != null
@@ -647,23 +659,33 @@ class _PaymentViewState extends State<PaymentView> implements ErrorResult, Resul
       ),
     );
   }
-
   Widget _submitButton() {
+    final isLoading = context.watch<PlansViewModel>().apiResponse is Loading;
+
     return SizedBox(
       width: double.infinity,
       height: widget.dimens.k45,
       child: ElevatedButton(
-        onPressed: () {
-          showPaymentSuccessDialog(context, widget.dimens);
-        },
+        onPressed: isLoading ? null : _validateAndSubmit, // always tappable
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xffD16A72),
+          backgroundColor: _canSubmit
+              ? ColorManager.primary
+              : ColorManager.fieldTextColor, // grey when incomplete
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(widget.dimens.k30),
           ),
         ),
-        child: Text(
+        child: isLoading
+            ? SizedBox(
+          height: widget.dimens.k22,
+          width: widget.dimens.k22,
+          child: CircularProgressIndicator(
+            strokeWidth: 2,
+            color: Colors.white,
+          ),
+        )
+            : Text(
           "Submit",
           style: TextStyle(
             color: Colors.white,
@@ -674,12 +696,30 @@ class _PaymentViewState extends State<PaymentView> implements ErrorResult, Resul
       ),
     );
   }
+  Future<void> _submitPayment() async {
+    if (_selectedImage == null || selectedMethod == null) return;
 
-  void showPaymentSuccessDialog(BuildContext context, dynamic dimens) {
+    final bytes = await _selectedImage!.readAsBytes();
+    final base64Image = base64Encode(bytes);
+
+    final data = {
+      "payment_method": selectedMethod!.paymentMethod ?? "",
+      "plan": _selectedPlanName ?? "",   // adjust to your actual plan field
+      "payment_remarks": remarksController.text.trim(),
+      "attachment": base64Image,
+    };
+    d("activePlans value: ${_selectedPlanName}");
+    _isSubmitting = true;
+    context.read<PlansViewModel>().createPaymentRecord(data, this);
+    d("activePlans value: ${_selectedPlanName}");
+  }
+
+  void showPaymentSuccessDialog(BuildContext context) {
     showDialog(
       context: context,
-      barrierDismissible: true,
+      barrierDismissible: false,
       builder: (_) {
+        final dimens = widget.dimens;
         return Dialog(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(dimens.k24),
@@ -690,24 +730,21 @@ class _PaymentViewState extends State<PaymentView> implements ErrorResult, Resul
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Align(
-                  alignment: Alignment.topRight,
-                  child: GestureDetector(
-                    onTap: () => Navigator.pop(context),
-                    child: Icon(Icons.close,
-                        size: dimens.k20, color: Colors.grey),
-                  ),
-                ),
-                Container(
-                  padding: EdgeInsets.all(dimens.k10),
-                  decoration: const BoxDecoration(
-                    color: Color(0xff15B97A),
-                    shape: BoxShape.circle,
-                  ),
+                // Align(
+                //   alignment: Alignment.topRight,
+                //   child: GestureDetector(
+                //     onTap: () => Navigator.pop(context),
+                //     child: Icon(Icons.close,
+                //         size: dimens.k20, color: Colors.grey),
+                //   ),
+                // ),
+                CircleAvatar(
+                  radius: dimens.k25,
+                  backgroundColor:  Colors.transparent,
                   child: Image.asset(
-                    Assets.pVerfication,
-                    height: dimens.k30,
-                    width: dimens.k30,
+                    Assets.success,
+                    height: dimens.k50,
+                    width: dimens.k50,
                     fit: BoxFit.contain,
                   ),
                 ),
@@ -743,7 +780,11 @@ class _PaymentViewState extends State<PaymentView> implements ErrorResult, Resul
                         borderRadius: BorderRadius.circular(dimens.k40),
                       ),
                     ),
-                    onPressed: () => Navigator.pop(context),
+                    onPressed: () => Navigator.pushNamedAndRemoveUntil(
+                      context,
+                      RouteManager.rBottomBarView,
+                          (route) => false, // clears entire stack
+                    ),
                     child: Text(
                       'Back to home',
                       style: TextStyle(
@@ -761,7 +802,30 @@ class _PaymentViewState extends State<PaymentView> implements ErrorResult, Resul
       },
     );
   }
-
+  void _validateAndSubmit() {
+    if (selectedMethod == null) {
+      MyToast.showToast(message: "Please select a payment method");
+      return;
+    }
+    if (_selectedImage == null) {
+      MyToast.showToast(message: "Please attach a payment receipt");
+      return;
+    }
+    if (_isOtherMethod(selectedMethod) && remarksController.text.trim().isEmpty) {
+      MyToast.showToast(message: "Please enter remarks");
+      return;
+    }
+    _submitPayment();
+  }
+  void _resetForm() {
+    setState(() {
+      selectedMethod = null;
+      _selectedImage = null;
+      _filteredMethods = [];
+    });
+    searchController.clear();
+    remarksController.clear();
+  }
   @override
   void onError(String error) {
     MyToast.showToast(message: error);
@@ -769,13 +833,18 @@ class _PaymentViewState extends State<PaymentView> implements ErrorResult, Resul
 
   @override
   void onSuccess(String result) {
+    if (_isSubmitting) {
+      _isSubmitting = false;
+      _resetForm();
+      showPaymentSuccessDialog(context);
+      return;
+    }
     // Set first API method as default selection after load
     final methods =
         context.read<PlansViewModel>().paymentMethodsList.data ?? [];
     if (methods.isNotEmpty && selectedMethod == null) {
       setState(() {
-        selectedMethod = methods.first;
-        searchController.text = methods.first.paymentMethod ?? "";
+
         _filteredMethods = List.from(methods);
       });
     }

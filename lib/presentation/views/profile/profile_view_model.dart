@@ -11,7 +11,7 @@ import '../../../data/models/get_profile_model/deactivate_profile_model.dart';
 class GetPersonalProfileViewModel extends BaseViewModel {
   ProfileDetailsModel profileDetailsModel = ProfileDetailsModel();
   DeactivateProfileModel deactivateProfileModel = DeactivateProfileModel();
-
+  ProfileData? get profileData => profileDetailsModel.data; // expose the private field
   Future<void> getAllPersonalProfileDetails(Result result, {required String profileId}) async {
     apiResponse = Loading();
     notifyListeners();
