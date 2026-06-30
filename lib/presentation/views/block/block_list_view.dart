@@ -1,7 +1,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:ideal_marriage_bureau/application/common/enum.dart';
 import 'package:ideal_marriage_bureau/application/core/extensions/extensions.dart';
 import 'package:ideal_marriage_bureau/presentation/views/block/block_profile_view_model.dart';
 import 'package:provider/provider.dart';
@@ -264,10 +263,10 @@ class _BlockListViewState extends State<BlockListView>
   void onSuccess(String result) {
     if (_isRefreshing) return;
 
-    MyToast.showToast(
-      message: result,
-      typeToast: TypeToast.success,
-    );
+    // MyToast.showToast(
+    //   message: result,
+    //   typeToast: TypeToast.success,
+    // );
 
     _isRefreshing = true;
 

@@ -38,6 +38,7 @@ class _LoginFormViewState extends State<LoginFormView>
       setState(() => remember = true);
     }
   }
+  @override
   Widget build(BuildContext context) {
     var size = MediaQuery.sizeOf(context);
      return Consumer <AuthViewModel> (
@@ -188,7 +189,7 @@ class _LoginFormViewState extends State<LoginFormView>
                   :
               PrimaryButton(
 
-                childText: 'Login',
+                childText: 'Log In',
                 textStyle: context.textTheme.bodyMedium?.copyWith(
                   fontSize: widget.dimens.k16,
                   fontWeight: FontWeight.w500,

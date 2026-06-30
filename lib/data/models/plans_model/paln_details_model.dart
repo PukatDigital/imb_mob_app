@@ -13,16 +13,16 @@ class ActivePlans {
     if (json['data'] != null) {
       data = <Data>[];
       json['data'].forEach((v) {
-        data!.add(new Data.fromJson(v));
+        data!.add(Data.fromJson(v));
       });
     }
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['type'] = this.type;
-    data['success'] = this.success;
-    data['message'] = this.message;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['type'] = type;
+    data['success'] = success;
+    data['message'] = message;
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
@@ -67,17 +67,17 @@ class Data {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['name'] = this.name;
-    data['title'] = this.title;
-    data['plan_type'] = this.planType;
-    data['credits'] = this.credits;
-    data['bonus'] = this.bonus;
-    data['effective_price'] = this.effectivePrice;
-    data['amount'] = this.amount;
-    data['boost'] = this.boost;
-    data['description'] = this.description;
-    data['active'] = this.active;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['name'] = name;
+    data['title'] = title;
+    data['plan_type'] = planType;
+    data['credits'] = credits;
+    data['bonus'] = bonus;
+    data['effective_price'] = effectivePrice;
+    data['amount'] = amount;
+    data['boost'] = boost;
+    data['description'] = description;
+    data['active'] = active;
     return data;
   }
 }

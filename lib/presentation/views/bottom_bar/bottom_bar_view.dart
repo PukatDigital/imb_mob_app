@@ -322,7 +322,7 @@ class _DeactivateCheckResult implements Result {
   @override
   void onSuccess(result) {
     final vm = context.read<GetPersonalProfileViewModel>();
-    final profileDeactive = vm.deactivateProfileModel?.data?.profileDeactive;
+    final profileDeactive = vm.deactivateProfileModel.data?.profileDeactive;
 
     if (profileDeactive == 1) { // ✅ 1 = deactivated → show dialog
       state.showDeactivateDialouge(context, dimens);

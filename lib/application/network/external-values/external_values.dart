@@ -6,7 +6,11 @@ class ExternalValues implements IExternalValues {
     //return 'https://jsdealers.seccurio.com/api/v1/';
     return 'https://ideal.ssab-bms.com/api/';
   }
-
+  @override
+  String getChatUrl() {
+    //return 'https://jsdealers.seccurio.com/api/v1/';
+    return 'https://chat.ideal.ssab-bms.com';
+  }
   @override
   String getImageUrl() {
     return "";

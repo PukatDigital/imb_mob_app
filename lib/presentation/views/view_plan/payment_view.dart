@@ -9,7 +9,6 @@ import 'package:ideal_marriage_bureau/application/app_theme/color_scheme.dart';
 import 'package:ideal_marriage_bureau/application/core/extensions/extensions.dart';
 import 'package:ideal_marriage_bureau/base/base_widget.dart';
 import 'package:provider/provider.dart';
-import '../../../application/common/enum.dart';
 import '../../../application/common/log.dart';
 import '../../../application/network/result.dart';
 import '../../../constants/asset_manager.dart';
@@ -708,10 +707,10 @@ class _PaymentViewState extends State<PaymentView> implements ErrorResult, Resul
       "payment_remarks": remarksController.text.trim(),
       "attachment": base64Image,
     };
-    d("activePlans value: ${_selectedPlanName}");
+    d("activePlans value: $_selectedPlanName");
     _isSubmitting = true;
     context.read<PlansViewModel>().createPaymentRecord(data, this);
-    d("activePlans value: ${_selectedPlanName}");
+    d("activePlans value: $_selectedPlanName");
   }
 
   void showPaymentSuccessDialog(BuildContext context) {

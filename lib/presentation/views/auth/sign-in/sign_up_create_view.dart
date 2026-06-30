@@ -1,7 +1,6 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:ideal_marriage_bureau/application/common/enum.dart';
 import 'package:ideal_marriage_bureau/application/core/extensions/extensions.dart';
 import 'package:ideal_marriage_bureau/presentation/views/auth/sign-in/signup_second_view.dart';
 import 'package:ideal_marriage_bureau/presentation/views/auth/sign-in/sing_up_one_view.dart';

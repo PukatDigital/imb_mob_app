@@ -9,7 +9,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
 import '../../../application/app_theme/color_scheme.dart';
-import '../../../application/app_theme/text_themes.dart';
 import '../../../application/common/enum.dart';
 import '../../../application/core/result.dart';
 import '../../../application/helper/validators.dart';
@@ -64,7 +63,7 @@ class _ReportProblemViewState extends State<ReportProblemView>
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
 
-      final compressed = await File(pickedFile.path);
+      final compressed = File(pickedFile.path);
       setState(() {
         _selectedImage = compressed;
 

@@ -1,10 +1,7 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:ideal_marriage_bureau/application/common/enum.dart';
 import 'package:ideal_marriage_bureau/application/core/extensions/extensions.dart';
-import 'package:ideal_marriage_bureau/application/routes/route_generator.dart';
-import 'package:ideal_marriage_bureau/data/models/get_profile_model/get_all_profile_list_model.dart';
 import 'package:ideal_marriage_bureau/data/models/get_profile_model/profile_details_model.dart';
 import 'package:ideal_marriage_bureau/presentation/views/home/home_view_model.dart';
 import 'package:ideal_marriage_bureau/presentation/views/home/user_profile/user_more_dialog.dart';
@@ -40,7 +37,7 @@ class _UserProfileDetailsViewState extends State<UserProfileDetailsView>
   bool isPartnerPreferences = false;
   bool hasSaidHi = false;
   // ✅ ProfileData — no conflict with Data from get_all_profile_list_model
-  ProfileData? get _d => detailsVM.profileDetailsModel?.data;
+  ProfileData? get _d => detailsVM.profileDetailsModel.data;
 
   void _showChatMenu(BuildContext context, Offset position) {
     final overlay =

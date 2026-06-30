@@ -14,10 +14,10 @@ class ProfileDetailsModel {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['type'] = this.type;
-    data['success'] = this.success;
-    data['message'] = this.message;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['type'] = type;
+    data['success'] = success;
+    data['message'] = message;
     if (this.data != null) {
       data['data'] = this.data!.toJson();
     }
@@ -87,6 +87,7 @@ class ProfileData {
   List<BlockedProfiles>? blockedProfiles;
   List<LifeStyleAndInterest>? lifeStyleAndInterest;
   int? totalFavouriteProfiles;
+  int? chatUserId;
   int? totalBlockedProfiles;
   int? noOfTimesAddedAsFavourite;
   int? noOfTimesGetBlocked;
@@ -153,6 +154,7 @@ class ProfileData {
     this.blockedProfiles,
     this.lifeStyleAndInterest,
     this.totalFavouriteProfiles,
+    this.chatUserId,
     this.totalBlockedProfiles,
     this.noOfTimesAddedAsFavourite,
     this.noOfTimesGetBlocked,
@@ -236,6 +238,7 @@ class ProfileData {
         lifeStyleAndInterest!.add(LifeStyleAndInterest.fromJson(v));
       });
     }
+    chatUserId = json['chat_user_id'];
     totalFavouriteProfiles = json['total_favourite_profiles'];
     totalBlockedProfiles = json['total_blocked_profiles'];
     noOfTimesAddedAsFavourite = json['no_of_times_added_as_favourite'];
@@ -243,82 +246,83 @@ class ProfileData {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['profile_id'] = this.profileId;
-    data['user_id'] = this.userId;
-    data['profile_name'] = this.profileName;
-    data['last_name'] = this.lastName;
-    data['email'] = this.email;
-    data['phone_no'] = this.phoneNo;
-    data['date_of_birth'] = this.dateOfBirth;
-    data['profile_completed'] = this.profileCompleted;
-    data['caste'] = this.caste;
-    data['gender'] = this.gender;
-    data['religion'] = this.religion;
-    data['nationality'] = this.nationality;
-    data['belongs_to'] = this.belongsTo;
-    data['weight'] = this.weight;
-    data['material_status'] = this.materialStatus;
-    data['ethnicity'] = this.ethnicity;
-    data['hight'] = this.hight;
-    data['mother_tongue'] = this.motherTongue;
-    data['country'] = this.country;
-    data['religious_practice'] = this.religiousPractice;
-    data['zodiac_sign'] = this.zodiacSign;
-    data['have_childern'] = this.haveChildern;
-    data['living_arrangement'] = this.livingArrangement;
-    data['chatting_period'] = this.chattingPeriod;
-    data['employer'] = this.employer;
-    data['house_size'] = this.houseSize;
-    data['drink_alcohol'] = this.drinkAlcohol;
-    data['can_move_abroad_for_marriage'] = this.canMoveAbroadForMarriage;
-    data['area_society'] = this.areaSociety;
-    data['father_name'] = this.fatherName;
-    data['family_values'] = this.familyValues;
-    data['married'] = this.married;
-    data['unmarried'] = this.unmarried;
-    data['father_occupation'] = this.fatherOccupation;
-    data['other_family_details'] = this.otherFamilyDetails;
-    data['qualification'] = this.qualification;
-    data['profession'] = this.profession;
-    data['employee_type'] = this.employeeType;
-    data['job_title'] = this.jobTitle;
-    data['income_range'] = this.incomeRange;
-    data['business'] = this.business;
-    data['name_institution'] = this.nameInstitution;
-    data['business_text'] = this.businessText;
-    data['future_plan'] = this.futurePlan;
-    data['smoke'] = this.smoke;
-    data['family_involvement'] = this.familyInvolvement;
-    data['halal_food'] = this.halalFood;
-    data['for_boy'] = this.forBoy;
-    data['marriage_period'] = this.marriagePeriod;
-    data['for_girl'] = this.forGirl;
-    data['life_partner'] = this.lifePartner;
-    data['creater_profile'] = this.createrProfile;
-    data['enable_notification'] = this.enableNotification;
-    data['bio'] = this.bio;
-    data['marriage_intension'] = this.marriageIntension;
-    data['profile_picture'] = this.profilePicture;
-    if (this.attachments != null) {
-      data['attachments'] = this.attachments!.toJson();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['profile_id'] = profileId;
+    data['user_id'] = userId;
+    data['profile_name'] = profileName;
+    data['last_name'] = lastName;
+    data['email'] = email;
+    data['phone_no'] = phoneNo;
+    data['date_of_birth'] = dateOfBirth;
+    data['profile_completed'] = profileCompleted;
+    data['caste'] = caste;
+    data['gender'] = gender;
+    data['religion'] = religion;
+    data['nationality'] = nationality;
+    data['belongs_to'] = belongsTo;
+    data['weight'] = weight;
+    data['material_status'] = materialStatus;
+    data['ethnicity'] = ethnicity;
+    data['hight'] = hight;
+    data['mother_tongue'] = motherTongue;
+    data['country'] = country;
+    data['religious_practice'] = religiousPractice;
+    data['zodiac_sign'] = zodiacSign;
+    data['have_childern'] = haveChildern;
+    data['living_arrangement'] = livingArrangement;
+    data['chatting_period'] = chattingPeriod;
+    data['employer'] = employer;
+    data['house_size'] = houseSize;
+    data['drink_alcohol'] = drinkAlcohol;
+    data['can_move_abroad_for_marriage'] = canMoveAbroadForMarriage;
+    data['area_society'] = areaSociety;
+    data['father_name'] = fatherName;
+    data['family_values'] = familyValues;
+    data['married'] = married;
+    data['unmarried'] = unmarried;
+    data['father_occupation'] = fatherOccupation;
+    data['other_family_details'] = otherFamilyDetails;
+    data['qualification'] = qualification;
+    data['profession'] = profession;
+    data['employee_type'] = employeeType;
+    data['job_title'] = jobTitle;
+    data['income_range'] = incomeRange;
+    data['business'] = business;
+    data['name_institution'] = nameInstitution;
+    data['business_text'] = businessText;
+    data['future_plan'] = futurePlan;
+    data['smoke'] = smoke;
+    data['family_involvement'] = familyInvolvement;
+    data['halal_food'] = halalFood;
+    data['for_boy'] = forBoy;
+    data['marriage_period'] = marriagePeriod;
+    data['for_girl'] = forGirl;
+    data['life_partner'] = lifePartner;
+    data['creater_profile'] = createrProfile;
+    data['enable_notification'] = enableNotification;
+    data['bio'] = bio;
+    data['marriage_intension'] = marriageIntension;
+    data['profile_picture'] = profilePicture;
+    if (attachments != null) {
+      data['attachments'] = attachments!.toJson();
     }
-    if (this.favouriteProfiles != null) {
+    if (favouriteProfiles != null) {
       data['favourite_profiles'] =
-          this.favouriteProfiles!.map((v) => v.toJson()).toList();
+          favouriteProfiles!.map((v) => v.toJson()).toList();
     }
-    if (this.blockedProfiles != null) {
+    if (blockedProfiles != null) {
       data['blocked_profiles'] =
-          this.blockedProfiles!.map((v) => v.toJson()).toList();
+          blockedProfiles!.map((v) => v.toJson()).toList();
     }
-    if (this.lifeStyleAndInterest != null) {
+    if (lifeStyleAndInterest != null) {
       data['life_style_and_interest'] =
-          this.lifeStyleAndInterest!.map((v) => v.toJson()).toList();
+          lifeStyleAndInterest!.map((v) => v.toJson()).toList();
     }
-    data['total_favourite_profiles'] = this.totalFavouriteProfiles;
-    data['total_blocked_profiles'] = this.totalBlockedProfiles;
-    data['no_of_times_added_as_favourite'] = this.noOfTimesAddedAsFavourite;
-    data['no_of_times_get_blocked'] = this.noOfTimesGetBlocked;
+    data['chat_user_id'] = chatUserId;
+    data['total_favourite_profiles'] = totalFavouriteProfiles;
+    data['total_blocked_profiles'] = totalBlockedProfiles;
+    data['no_of_times_added_as_favourite'] = noOfTimesAddedAsFavourite;
+    data['no_of_times_get_blocked'] = noOfTimesGetBlocked;
     return data;
   }
 }
@@ -339,11 +343,11 @@ class Attachments {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['attach_1'] = this.attach1;
-    data['attach_2'] = this.attach2;
-    data['attach_3'] = this.attach3;
-    data['attach_4'] = this.attach4;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['attach_1'] = attach1;
+    data['attach_2'] = attach2;
+    data['attach_3'] = attach3;
+    data['attach_4'] = attach4;
     return data;
   }
 }
@@ -362,10 +366,10 @@ class FavouriteProfiles {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['profile_id'] = this.profileId;
-    data['profile_name'] = this.profileName;
-    data['added_on'] = this.addedOn;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['profile_id'] = profileId;
+    data['profile_name'] = profileName;
+    data['added_on'] = addedOn;
     return data;
   }
 }
@@ -384,10 +388,10 @@ class BlockedProfiles {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['profile_id'] = this.profileId;
-    data['profile_name'] = this.profileName;
-    data['reason'] = this.reason;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['profile_id'] = profileId;
+    data['profile_name'] = profileName;
+    data['reason'] = reason;
     return data;
   }
 }
@@ -404,9 +408,9 @@ class LifeStyleAndInterest {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['name'] = this.name;
-    data['value'] = this.value;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['name'] = name;
+    data['value'] = value;
     return data;
   }
 }

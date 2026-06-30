@@ -16,7 +16,6 @@ import '../../../application/common/log.dart';
 import '../../../application/routes/route_generator.dart';
 import '../../../constants/asset_manager.dart';
 import '../auth/auth_mixin.dart';
-import '../auth/auth_view_model.dart';
 import '../home/set_up_profile_dialog.dart';
 import 'covered_profile.dart';
 

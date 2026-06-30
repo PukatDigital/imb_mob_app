@@ -6,13 +6,11 @@ import 'package:ideal_marriage_bureau/presentation/views/view_plan/plan_details_
 
 import 'package:provider/provider.dart';
 
-import '../../../application/common/enum.dart';
 import '../../../application/core/result.dart';
 import '../../../application/network/result.dart';
 import '../../../application/routes/route_generator.dart';
 import '../../../data/models/plans_model/payment_list_model.dart';
 import '../../../widgets/toast.dart';
-import 'plan_history_details_view.dart';
 
 
 class PaymentHistoryView extends BaseStateFullWidget {

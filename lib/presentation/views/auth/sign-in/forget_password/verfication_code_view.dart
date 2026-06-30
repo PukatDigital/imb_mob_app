@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 
 import '../../../../../application/app_theme/color_scheme.dart';
 
-import '../../../../../application/app_theme/text_themes.dart';
 import '../../../../../application/common/enum.dart';
 import '../../../../../application/core/result.dart';
 import '../../../../../application/network/result.dart';
@@ -32,7 +31,7 @@ class _VerificationCodeViewState extends State<ForgetPasswordOTPView>
   String? _resolvedEmail;
   String _otpValue = '';
   bool _hasOtpError = false;
-
+  bool _isResendCall = false;
   Timer? _timer;
   int _secondsRemaining = 120;
   bool _isResendEnabled = false;
@@ -42,7 +41,11 @@ class _VerificationCodeViewState extends State<ForgetPasswordOTPView>
     super.didChangeDependencies();
     // Prefer route argument, fallback to constructor param
     final routeEmail = ModalRoute.of(context)?.settings.arguments as String?;
-    _resolvedEmail = routeEmail ?? widget.email;
+    _resolvedEmail = (routeEmail != null && routeEmail.isNotEmpty)
+        ? routeEmail
+        : widget.email;
+    // final routeEmail = ModalRoute.of(context)?.settings.arguments as String?;
+    // _resolvedEmail = routeEmail ?? widget.email;
   }
 
   @override
@@ -178,27 +181,48 @@ class _VerificationCodeViewState extends State<ForgetPasswordOTPView>
                             color: ColorManager.textColorSubTitle,
                           ),
                         ),
-
                         TextButton(
                           onPressed: _isResendEnabled
                               ? () {
-                            // ✅ Uses _resolvedEmail consistently
-                            authVM.emailVerificationCode(
-                              {"email": _resolvedEmail?.trim()},
-                              this,
-                            );
-                            _startTimer();
+                            final email = _resolvedEmail?.trim();
+                            if (email == null || email.isEmpty) {
+                              MyToast.showToast(message: "Email not found. Please go back and try again.");
+                              return;
+                            }
+
+                            _isResendCall = true;
+                            authVM.forgetEmailVerificationCode({"email": email}, this);
                           }
                               : null,
                           child: Text(
                             "Resend",
                             style: TextStyle(
-                              color: _isResendEnabled
-                                  ? ColorManager.primary
-                                  : Colors.grey,
+                              color: _isResendEnabled ? ColorManager.primary : Colors.grey,
                             ),
                           ),
                         ),
+                        // TextButton(
+                        //   onPressed: _isResendEnabled
+                        //       ? () {
+                        //     // ✅ Uses _resolvedEmail consistently
+                        //     _isResendCall = true;
+                        //     authVM.forgetEmailVerificationCode(
+                        //       {"email": _resolvedEmail?.trim()},
+                        //       this,
+                        //     );
+                        //
+                        //     _startTimer();
+                        //   }
+                        //       : null,
+                        //   child: Text(
+                        //     "Resend",
+                        //     style: TextStyle(
+                        //       color: _isResendEnabled
+                        //           ? ColorManager.primary
+                        //           : Colors.grey,
+                        //     ),
+                        //   ),
+                        // ),
                       ],
                     ),
 
@@ -245,15 +269,43 @@ class _VerificationCodeViewState extends State<ForgetPasswordOTPView>
   void onError(String error) {
     MyToast.showToast(message: error);
   }
-
   @override
   void onSuccess(String result) {
-    MyToast.showToast(message: result,
-        typeToast: TypeToast.success);
-    // ✅ Pass resolved email as route argument
+    MyToast.showToast(message: result, typeToast: TypeToast.success);
+
+    if (_isResendCall) {
+      _isResendCall = false;
+      _startTimer(); // ✅ restart only on real success
+      return;
+    }
+
     widget.navigator.pushNamed(
       RouteManager.rCreateNewPasswordView,
       object: _resolvedEmail,
     );
   }
+  // @override
+  // void onSuccess(String result) {
+  //   MyToast.showToast(message: result, typeToast: TypeToast.success);
+  //
+  //   if (_isResendCall) {
+  //     _isResendCall = false; // reset karo
+  //     return; // 👈 navigate mat karo
+  //   }
+  //
+  //     widget.navigator.pushNamed(
+  //       RouteManager.rCreateNewPasswordView,
+  //       object: _resolvedEmail,
+  //     );
+  // }
+  // @override
+  // void onSuccess(String result) {
+  //   MyToast.showToast(message: result,
+  //       typeToast: TypeToast.success);
+  //   // ✅ Pass resolved email as route argument
+  //   widget.navigator.pushNamed(
+  //     RouteManager.rCreateNewPasswordView,
+  //     object: _resolvedEmail,
+  //   );
+  // }
 }

@@ -13,19 +13,19 @@ class ProblemType {
     if (json['problem_category'] != null) {
       problemCategory = <ProblemCategory>[];
       json['problem_category'].forEach((v) {
-        problemCategory!.add(new ProblemCategory.fromJson(v));
+        problemCategory!.add(ProblemCategory.fromJson(v));
       });
     }
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['success'] = this.success;
-    data['message'] = this.message;
-    data['type'] = this.type;
-    if (this.problemCategory != null) {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['success'] = success;
+    data['message'] = message;
+    data['type'] = type;
+    if (problemCategory != null) {
       data['problem_category'] =
-          this.problemCategory!.map((v) => v.toJson()).toList();
+          problemCategory!.map((v) => v.toJson()).toList();
     }
     return data;
   }
@@ -41,8 +41,8 @@ class ProblemCategory {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['name'] = this.name;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['name'] = name;
     return data;
   }
 }

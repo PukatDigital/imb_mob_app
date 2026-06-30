@@ -10,14 +10,14 @@ class ExploreDataModel {
     type = json['type'];
     success = json['success'];
     message = json['message'];
-    data = json['data'] != null ? new Data.fromJson(json['data']) : null;
+    data = json['data'] != null ? Data.fromJson(json['data']) : null;
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['type'] = this.type;
-    data['success'] = this.success;
-    data['message'] = this.message;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['type'] = type;
+    data['success'] = success;
+    data['message'] = message;
     if (this.data != null) {
       data['data'] = this.data!.toJson();
     }
@@ -38,17 +38,17 @@ class Data {
     if (json['profiles'] != null) {
       profiles = <ExploreProfiles>[];
       json['profiles'].forEach((v) {
-        profiles!.add(new ExploreProfiles.fromJson(v));
+        profiles!.add(ExploreProfiles.fromJson(v));
       });
     }
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['profile_completed'] = this.profileCompleted;
-    data['total_profiles'] = this.totalProfiles;
-    if (this.profiles != null) {
-      data['profiles'] = this.profiles!.map((v) => v.toJson()).toList();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['profile_completed'] = profileCompleted;
+    data['total_profiles'] = totalProfiles;
+    if (profiles != null) {
+      data['profiles'] = profiles!.map((v) => v.toJson()).toList();
     }
     return data;
   }
@@ -114,7 +114,7 @@ class ExploreProfiles {
     matchPercentage = json['match_percentage'];
     profilePicture = json['profile_picture'];
     attachments = json['attachments'] != null
-        ? new ExploreAttachments.fromJson(json['attachments'])
+        ? ExploreAttachments.fromJson(json['attachments'])
         : null;
     profileCompleted = json['profile_completed'];
     isFavourite = json['is_favourite'];
@@ -124,29 +124,29 @@ class ExploreProfiles {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['profile_id'] = this.profileId;
-    data['user_id'] = this.userId;
-    data['profile_name'] = this.profileName;
-    data['date_of_birth'] = this.dateOfBirth;
-    data['age'] = this.age;
-    data['location'] = this.location;
-    data['marital_status'] = this.maritalStatus;
-    data['children'] = this.children;
-    data['religion'] = this.religion;
-    data['education'] = this.education;
-    data['caste'] = this.caste;
-    data['profession'] = this.profession;
-    data['match_percentage'] = this.matchPercentage;
-    data['profile_picture'] = this.profilePicture;
-    if (this.attachments != null) {
-      data['attachments'] = this.attachments!.toJson();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['profile_id'] = profileId;
+    data['user_id'] = userId;
+    data['profile_name'] = profileName;
+    data['date_of_birth'] = dateOfBirth;
+    data['age'] = age;
+    data['location'] = location;
+    data['marital_status'] = maritalStatus;
+    data['children'] = children;
+    data['religion'] = religion;
+    data['education'] = education;
+    data['caste'] = caste;
+    data['profession'] = profession;
+    data['match_percentage'] = matchPercentage;
+    data['profile_picture'] = profilePicture;
+    if (attachments != null) {
+      data['attachments'] = attachments!.toJson();
     }
-    data['profile_completed'] = this.profileCompleted;
-    data['is_favourite'] = this.isFavourite;
-    data['is_blocked'] = this.isBlocked;
-    data['no_of_times_added_as_favourite'] = this.noOfTimesAddedAsFavourite;
-    data['no_of_times_get_blocked'] = this.noOfTimesGetBlocked;
+    data['profile_completed'] = profileCompleted;
+    data['is_favourite'] = isFavourite;
+    data['is_blocked'] = isBlocked;
+    data['no_of_times_added_as_favourite'] = noOfTimesAddedAsFavourite;
+    data['no_of_times_get_blocked'] = noOfTimesGetBlocked;
     return data;
   }
 }
@@ -167,11 +167,11 @@ class ExploreAttachments {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['attach_1'] = this.attach1;
-    data['attach_2'] = this.attach2;
-    data['attach_3'] = this.attach3;
-    data['attach_4'] = this.attach4;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['attach_1'] = attach1;
+    data['attach_2'] = attach2;
+    data['attach_3'] = attach3;
+    data['attach_4'] = attach4;
     return data;
   }
 }

@@ -4,7 +4,6 @@ import 'package:ideal_marriage_bureau/application/core/extensions/extensions.dar
 import 'package:provider/provider.dart';
 
 import '../../../../application/app_theme/color_scheme.dart';
-import '../../../../application/app_theme/text_themes.dart';
 import '../../../../application/common/log.dart';
 import '../../../../application/core/result.dart';
 import '../../../../application/network/result.dart';

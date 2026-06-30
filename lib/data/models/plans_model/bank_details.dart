@@ -10,14 +10,14 @@ class BankDetailsModel {
     type = json['type'];
     success = json['success'];
     message = json['message'];
-    data = json['data'] != null ? new Data.fromJson(json['data']) : null;
+    data = json['data'] != null ? Data.fromJson(json['data']) : null;
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['type'] = this.type;
-    data['success'] = this.success;
-    data['message'] = this.message;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['type'] = type;
+    data['success'] = success;
+    data['message'] = message;
     if (this.data != null) {
       data['data'] = this.data!.toJson();
     }
@@ -45,11 +45,11 @@ class Data {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['account_title'] = this.accountTitle;
-    data['account_number'] = this.accountNumber;
-    data['iban_number'] = this.ibanNumber;
-    data['description'] = this.description;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['account_title'] = accountTitle;
+    data['account_number'] = accountNumber;
+    data['iban_number'] = ibanNumber;
+    data['description'] = description;
     return data;
   }
 }

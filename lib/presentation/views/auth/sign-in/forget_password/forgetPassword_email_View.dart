@@ -29,14 +29,17 @@ class _ForgetViewState extends State<ForgetView>
 
   final TextEditingController emailController = TextEditingController();
 
+  @override
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   TextUtils textUtils = TextUtils();
   bool _codeSent = false;
 
+  @override
   AuthViewModel get authVM =>
       Provider.of<AuthViewModel>(context, listen: false);
 
+  @override
   bool get validate => formKey.currentState?.validate() ?? false;
 
   @override
@@ -256,27 +259,48 @@ class _ForgetViewState extends State<ForgetView>
   void onError(String error) {
     MyToast.showToast(message: error);
   }
-
   @override
   void onSuccess(result) {
-
     MyToast.showToast(
       message: result,
       typeToast: TypeToast.success,
     );
 
-    if (emailController.text.trim().isEmpty) {
+    final trimmedEmail = emailController.text.trim();
 
-      MyToast.showToast(
-        message: "Email required",
-      );
-
+    if (trimmedEmail.isEmpty) {
+      MyToast.showToast(message: "Email required");
       return;
     }
 
     widget.navigator.pushNamed(
       RouteManager.rForgetPasswordOTPView,
-      object: emailController.text.trim(),
+      object: trimmedEmail,   // ✅ correct
     );
   }
+  // @override
+  // void onSuccess(result) {
+  //
+  //   MyToast.showToast(
+  //     message: result,
+  //     typeToast: TypeToast.success,
+  //   );
+  //
+  //   if (emailController.text.trim().isEmpty) {
+  //
+  //     MyToast.showToast(
+  //       message: "Email required",
+  //     );
+  //
+  //     return;
+  //   }
+  //   widget.navigator.pushNamed(
+  //     RouteManager.rForgetPasswordOTPView,
+  //     object: email.text.trim(),
+  //   );
+  //   // widget.navigator.pushNamed(
+  //   //   RouteManager.rForgetPasswordOTPView,
+  //   //   object: emailController.text.trim(),
+  //   // );
+  // }
 }

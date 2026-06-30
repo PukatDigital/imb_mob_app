@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:ideal_marriage_bureau/application/app_theme/text_themes.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:ideal_marriage_bureau/application/core/extensions/extensions.dart';
 
 import '../../base/base_widget.dart';
 import '../application/app_theme/color_scheme.dart';
-import '../application/app_theme/text_themes.dart';
 
 class CalendarView extends BaseStateLessWidget {
   DateTime? selectedDate;

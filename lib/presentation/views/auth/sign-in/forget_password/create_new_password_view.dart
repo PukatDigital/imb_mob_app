@@ -17,7 +17,7 @@ import '../../auth_view_model.dart';
 
 class CreateNewPasswordView extends BaseStateFullWidget {
   final String? email;
-  CreateNewPasswordView({super.key,this.email});
+  CreateNewPasswordView({super.key, this.email});
 
   @override
   State<CreateNewPasswordView> createState() =>
@@ -38,15 +38,39 @@ class _CreateNewPasswordViewState
   bool obscurePassword = true;
   bool obscureConfirmPassword = true;
   late AuthViewModel authVM;
+
+  @override
+  void initState() {
+    super.initState();
+    // Rebuild the widget whenever either field changes so that
+    // _isPasswordMatched is re-evaluated and the button enables/disables live.
+    passwordController.addListener(_onFieldChanged);
+    confirmPasswordController.addListener(_onFieldChanged);
+  }
+
+  void _onFieldChanged() {
+    if (mounted) setState(() {});
+  }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     final routeEmail = ModalRoute.of(context)?.settings.arguments as String?;
     _resolvedEmail = routeEmail ?? widget.email;
   }
+
   bool get _isPasswordMatched =>
       passwordController.text.trim().length >= 8 &&
           confirmPasswordController.text.trim() == passwordController.text.trim();
+
+  @override
+  void dispose() {
+    passwordController.removeListener(_onFieldChanged);
+    confirmPasswordController.removeListener(_onFieldChanged);
+    passwordController.dispose();
+    confirmPasswordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -159,7 +183,7 @@ class _CreateNewPasswordViewState
 
                                       /// Password Field
                                       CustomField(
-                                        hintText: "Enter password",
+                                        hintText: "Enter Password",
                                         controller: passwordController,
                                         obscureText: obscurePassword,
                                         suffixIcon: GestureDetector(
@@ -301,7 +325,7 @@ class _CreateNewPasswordViewState
 
   void showPasswordResetDailogue(
       BuildContext context,
-      dynamic? dimens,
+      dynamic dimens,
       ) {
     showDialog(
       context: context,
@@ -372,41 +396,40 @@ class _CreateNewPasswordViewState
                 ),
 
                 SizedBox(height: dimens.k28),
-
-                /// Login Button
                 // SizedBox(
-                //   width: double.infinity,
-                //   child: ElevatedButton(
-                //     style: ElevatedButton.styleFrom(
-                //       elevation: 0,
-                //       backgroundColor:
-                //       ColorManager.rejectedText,
-                //       padding: EdgeInsets.symmetric(
-                //         vertical: dimens.k16,
-                //       ),
-                //       shape: RoundedRectangleBorder(
-                //         borderRadius:
-                //         BorderRadius.circular(
-                //           dimens.k40,
-                //         ),
-                //       ),
-                //     ),
-                //     onPressed: () {
-                //       Navigator.pushReplacementNamed(
-                //         context,
-                //         RouteManager.rLoginView,
-                //       );
-                //     },
-                //     child: Text(
-                //       'Go to Login',
-                //       style: TextStyle(
-                //         fontSize: dimens.k16,
-                //         fontWeight: FontWeight.w600,
-                //         color: Colors.white,
-                //       ),
-                //     ),
-                //   ),
-                // ),
+//   width: double.infinity,
+//   child: ElevatedButton(
+//     style: ElevatedButton.styleFrom(
+//       elevation: 0,
+//       backgroundColor:
+//       ColorManager.rejectedText,
+//       padding: EdgeInsets.symmetric(
+//         vertical: dimens.k16,
+//       ),
+//       shape: RoundedRectangleBorder(
+//         borderRadius:
+//         BorderRadius.circular(
+//           dimens.k40,
+//         ),
+//       ),
+//     ),
+//     onPressed: () {
+//       Navigator.pushReplacementNamed(
+//         context,
+//         RouteManager.rLoginView,
+//       );
+//     },
+//     child: Text(
+//       'Go to Login',
+//       style: TextStyle(
+//         fontSize: dimens.k16,
+//         fontWeight: FontWeight.w600,
+//         color: Colors.white,
+//       ),
+//     ),
+//   ),
+// ),
+
               ],
             ),
           ),
@@ -422,9 +445,10 @@ class _CreateNewPasswordViewState
       typeToast: TypeToast.error,
     );
   }
+
   @override
   onSuccess(result) {
-    passwordController.clear();        // <-- add this
+    passwordController.clear();
     confirmPasswordController.clear();
     showPasswordResetDailogue(
       context,

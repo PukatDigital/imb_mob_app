@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
-import 'package:ideal_marriage_bureau/presentation/views/view_plan/payment_view.dart';
 import 'package:ideal_marriage_bureau/presentation/views/view_plan/plan_details_view_model.dart';
 import 'package:provider/provider.dart';
 import 'package:ideal_marriage_bureau/application/core/extensions/extensions.dart';

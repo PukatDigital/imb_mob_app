@@ -2,15 +2,16 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:ideal_marriage_bureau/application/app_theme/color_scheme.dart';
 import 'package:ideal_marriage_bureau/application/core/result.dart';
 import 'package:ideal_marriage_bureau/base/base_widget.dart';
 import 'package:ideal_marriage_bureau/data/models/get_profile_model/get_all_profile_list_model.dart';
-import 'package:ideal_marriage_bureau/presentation/views/explore/explore_model_view_model.dart';
 import 'package:ideal_marriage_bureau/presentation/views/home/set_up_profile_dialog.dart';
 import 'package:ideal_marriage_bureau/presentation/views/home/top_tabs.dart';
 import 'package:provider/provider.dart';
 
 import '../../../application/network/result.dart';
+import '../../../data/models/explore_model/explore_model.dart';
 import '../../../widgets/toast.dart';
 import 'home_view_model.dart';
 import 'match_card.dart';
@@ -35,9 +36,18 @@ class _HomeViewState extends State<HomeView> implements ErrorResult, Result<Stri
     setState(() => selectedTab = tab);
 
     if (tab == HomeTab.matched) {
-      context.read<ExploreViewModel>().exploreList(this, filterParams: {});
+      context.read<GetProfileViewModel>().exploreList(this, filterParams: _filterParams);
+    } else if (tab == HomeTab.forYou) {
+      context.read<GetProfileViewModel>().getAllProfiles(this);
     }
   }
+  // void _onTabChange(HomeTab tab) {
+  //   setState(() => selectedTab = tab);
+  //
+  //   if (tab == HomeTab.matched) {
+  //     context.read<ExploreViewModel>().exploreList(this, filterParams: {});
+  //   }
+  // }
   void _handleProfileDialog(int index) {
     final list = context.read<GetProfileViewModel>().profiles;
 
@@ -68,6 +78,33 @@ class _HomeViewState extends State<HomeView> implements ErrorResult, Result<Stri
       });
     }
   }
+  List<Profiles> _mapExploreToProfiles(List<ExploreProfiles>? exploreList) {
+    if (exploreList == null) return [];
+    return exploreList.map((e) {
+      return Profiles(
+        profileId: e.profileId,
+        userId: e.userId,
+        profileName: e.profileName,
+        dateOfBirth: e.dateOfBirth,
+        location: e.location,
+
+        profilePicture: e.profilePicture,
+        attachments: e.attachments != null
+            ? Attachments(
+          attach1: e.attachments!.attach1,
+          attach2: e.attachments!.attach2,
+          attach3: e.attachments!.attach3,
+          attach4: e.attachments!.attach4,
+        )
+            : null,
+        profileCompleted: e.profileCompleted,
+        isFavourite: e.isFavourite,
+        isBlocked: e.isBlocked,
+        noOfTimesAddedAsFavourite: e.noOfTimesAddedAsFavourite,
+        noOfTimesGetBlocked: e.noOfTimesGetBlocked,
+      );
+    }).toList();
+  }
   @override
   void initState() {
     super.initState();
@@ -76,21 +113,29 @@ class _HomeViewState extends State<HomeView> implements ErrorResult, Result<Stri
       debugPrint('🔍 myUserId being passed: $myUserId'); // check this
       context.read<GetProfileViewModel>().getAllProfiles(this);
       context.read<GetProfileViewModel>().getMyProfileCompleted(myUserId);
+      context.read<GetProfileViewModel>().exploreList(this, filterParams:_filterParams);
       debugPrint('🧠 ViewModel instance in initState: ${context.read<GetProfileViewModel>().hashCode}');
       debugPrint('🔍 login model: ${widget.iPrefHelper.loginModel?.data?.toJson()}');
       debugPrint('🔍 all pref keys: ${widget.iPrefHelper.loginModel?.data?.user?.apiKey}');
     });
   }
+  final Map<String, dynamic> _filterParams = {
+
+  };
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: ColorManager.border,
       extendBodyBehindAppBar: true,
       body: Consumer<GetProfileViewModel>(
         builder: (context, viewModel, _) {
           final profileCom =
               viewModel.getProfileModel.data?.profileCompleted ?? 0;
 
-          final fullList = viewModel.profiles;
+          final fullList = selectedTab == HomeTab.matched
+              ? _mapExploreToProfiles(viewModel.exploreDataModel.data?.profiles)
+              : viewModel.profiles;
 
           // 👉 Restrict list if profile not completed
           final currentList = profileCom == 1
@@ -98,6 +143,7 @@ class _HomeViewState extends State<HomeView> implements ErrorResult, Result<Stri
               : (fullList.length > 4 ? fullList.sublist(0, 4) : fullList);
 
           return Stack(
+
             children: [
               /// 🔹 Vertical PageView
               if (currentList.isNotEmpty)
@@ -179,12 +225,14 @@ class _HomeViewState extends State<HomeView> implements ErrorResult, Result<Stri
                 child: Align(
                   alignment: Alignment.topCenter,
                   child: TopTabs(
+
                     selectedTab: selectedTab,
-                    onTabChange: (tab) {
-                      setState(() {
-                        selectedTab = tab;
-                      });
-                    },
+                    onTabChange: _onTabChange,
+                    // onTabChange: (tab) {
+                    //   setState(() {
+                    //     selectedTab = tab;
+                    //   });
+                    // },
                   ),
                 ),
               ),
@@ -209,6 +257,6 @@ class _HomeViewState extends State<HomeView> implements ErrorResult, Result<Stri
   @override
   onSuccess(String result) {
     // TODO: implement onSuccess
-    throw UnimplementedError();
+    // throw UnimplementedError();
   }
 }

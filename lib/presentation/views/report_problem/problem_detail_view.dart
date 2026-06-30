@@ -5,7 +5,6 @@ import 'package:ideal_marriage_bureau/presentation/views/report_problem/report_p
 import 'package:provider/provider.dart';
 
 import '../../../application/app_theme/color_scheme.dart';
-import '../../../application/app_theme/text_themes.dart';
 import '../../../application/network/result.dart';
 import '../../../base/base_widget.dart';
 
@@ -115,7 +114,7 @@ class _ProblemDetailViewState extends State<ProblemDetailView>
                     }
 
                     final model = provider.profileDetailsModel;
-                    final detail = model?.detail;
+                    final detail = model.detail;
 
                     /// No data
                     if (detail == null) {
@@ -137,9 +136,9 @@ class _ProblemDetailViewState extends State<ProblemDetailView>
                         children: [
                           if(detail.status == 'Rejected')
                           _responseCard(
-                            status: detail?.status ?? '',
-                            remark: detail?.remarks ?? '',
-                            date: '${detail?.postingDate ?? ''} . ${_formatTime(detail?.postingTime)}',
+                            status: detail.status ?? '',
+                            remark: detail.remarks ?? '',
+                            date: '${detail.postingDate ?? ''} . ${_formatTime(detail.postingTime)}',
                           //  time: detail?.postingTime ??'',
                           ),
                           Container(
@@ -150,12 +149,12 @@ class _ProblemDetailViewState extends State<ProblemDetailView>
                               children: [
                                 widget.dimens.k16.verticalBoxPadding,
                                 _submissionCard(
-                                  problemType: detail?.problemCategory ?? '',
-                                  ticketId: detail?.name??'',
-                                  subject: detail?.subject ?? '',
-                                  description: detail?.description ?? '',
-                                  image: detail?.attachmentUrl ?? '',
-                                  date: '${detail?.postingDate ?? ''} . ${_formatTime(detail?.postingTime)}',
+                                  problemType: detail.problemCategory ?? '',
+                                  ticketId: detail.name??'',
+                                  subject: detail.subject ?? '',
+                                  description: detail.description ?? '',
+                                  image: detail.attachmentUrl ?? '',
+                                  date: '${detail.postingDate ?? ''} . ${_formatTime(detail.postingTime)}',
                                 ),
                               ],
                             ),

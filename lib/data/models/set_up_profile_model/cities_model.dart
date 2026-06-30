@@ -5,16 +5,16 @@ class CitiesModel {
   CitiesModel({this.data, this.type});
 
   CitiesModel.fromJson(Map<String, dynamic> json) {
-    data = json['data'] != null ? new Data.fromJson(json['data']) : null;
+    data = json['data'] != null ? Data.fromJson(json['data']) : null;
     type = json['type'];
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     if (this.data != null) {
       data['data'] = this.data!.toJson();
     }
-    data['type'] = this.type;
+    data['type'] = type;
     return data;
   }
 }
@@ -32,17 +32,17 @@ class Data {
     if (json['ethnicities'] != null) {
       ethnicities = <Ethnicities>[];
       json['ethnicities'].forEach((v) {
-        ethnicities!.add(new Ethnicities.fromJson(v));
+        ethnicities!.add(Ethnicities.fromJson(v));
       });
     }
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['success'] = this.success;
-    data['message'] = this.message;
-    if (this.ethnicities != null) {
-      data['ethnicities'] = this.ethnicities!.map((v) => v.toJson()).toList();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['success'] = success;
+    data['message'] = message;
+    if (ethnicities != null) {
+      data['ethnicities'] = ethnicities!.map((v) => v.toJson()).toList();
     }
     return data;
   }
@@ -58,8 +58,8 @@ class Ethnicities {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['name'] = this.name;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['name'] = name;
     return data;
   }
 }

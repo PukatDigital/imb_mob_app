@@ -62,8 +62,12 @@ abstract class IApi {
   Future<ApiResponse> getTermsAndConditions();
   Future<ApiResponse> getAllPlans();
   Future<ApiResponse> getAllPaymentList();
+
   Future<ApiResponse> getBankDetails();
   Future<ApiResponse> getPaymentMethodList(Map<String, dynamic> data);
+  Future<ApiResponse> getConversationListData();
+  Future<ApiResponse> getMessageHistory(int conversationId, Map<String, dynamic> queryParams);
+  Future<ApiResponse> sentMessage(Map<String, dynamic> data);
 
 
 }

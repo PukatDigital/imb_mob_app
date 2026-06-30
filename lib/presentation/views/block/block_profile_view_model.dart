@@ -1,13 +1,11 @@
 
 import 'package:ideal_marriage_bureau/application/core/extensions/extensions.dart';
-import 'package:ideal_marriage_bureau/data/models/set_up_profile_model/mother_tongues_model.dart';
 import '../../../application/common/log.dart';
 import '../../../application/core/result.dart';
 import '../../../application/network/result.dart';
 import '../../../base/base_view_model.dart';
 import '../../../data/models/block_model/block_model.dart';
 import '../../../data/models/get_profile_model/profile_details_model.dart';
-import '../../../data/models/set_up_profile_model/life_style_and_interest_model.dart';
 
 class BlockViewModel extends BaseViewModel {
   BlockedProfileModel blockedProfileModel = BlockedProfileModel();

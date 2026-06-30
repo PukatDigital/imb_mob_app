@@ -10,14 +10,14 @@ class BlockedProfileModel {
     type = json['type'];
     success = json['success'];
     message = json['message'];
-    data = json['data'] != null ? new Data.fromJson(json['data']) : null;
+    data = json['data'] != null ? Data.fromJson(json['data']) : null;
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['type'] = this.type;
-    data['success'] = this.success;
-    data['message'] = this.message;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['type'] = type;
+    data['success'] = success;
+    data['message'] = message;
     if (this.data != null) {
       data['data'] = this.data!.toJson();
     }
@@ -48,7 +48,7 @@ class Data {
     if (json['blocked_profiles'] != null) {
       blockedProfiles = <BlockedProfiles>[];
       json['blocked_profiles'].forEach((v) {
-        blockedProfiles!.add(new BlockedProfiles.fromJson(v));
+        blockedProfiles!.add(BlockedProfiles.fromJson(v));
       });
     }
     totalBlockedProfiles = json['total_blocked_profiles'];
@@ -56,16 +56,16 @@ class Data {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['profile_id'] = this.profileId;
-    data['user_id'] = this.userId;
-    data['profile_name'] = this.profileName;
-    if (this.blockedProfiles != null) {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['profile_id'] = profileId;
+    data['user_id'] = userId;
+    data['profile_name'] = profileName;
+    if (blockedProfiles != null) {
       data['blocked_profiles'] =
-          this.blockedProfiles!.map((v) => v.toJson()).toList();
+          blockedProfiles!.map((v) => v.toJson()).toList();
     }
-    data['total_blocked_profiles'] = this.totalBlockedProfiles;
-    data['no_of_times_get_blocked'] = this.noOfTimesGetBlocked;
+    data['total_blocked_profiles'] = totalBlockedProfiles;
+    data['no_of_times_get_blocked'] = noOfTimesGetBlocked;
     return data;
   }
 }
@@ -93,12 +93,12 @@ class BlockedProfiles {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['profile_id'] = this.profileId;
-    data['user_id'] = this.userId;
-    data['profile_name'] = this.profileName;
-    data['profile_picture'] = this.profilePicture;
-    data['reason'] = this.reason;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['profile_id'] = profileId;
+    data['user_id'] = userId;
+    data['profile_name'] = profileName;
+    data['profile_picture'] = profilePicture;
+    data['reason'] = reason;
     return data;
   }
 }

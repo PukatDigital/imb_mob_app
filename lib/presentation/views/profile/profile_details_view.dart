@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:ideal_marriage_bureau/application/core/extensions/extensions.dart';
@@ -14,7 +13,6 @@ import '../../../../widgets/toast.dart';
 import '../../../constants/asset_manager.dart';
 import '../../../data/local_data_source/preference/i_pref_helper.dart';
 import '../../../data/models/get_profile_model/profile_details_model.dart';
-import '../auth/auth_view_model.dart';
 import '../set-up/edit_profile/edit_profile_mapping.dart';
 import '../set-up/sign_up_home_view.dart';
 

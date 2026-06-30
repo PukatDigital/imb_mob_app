@@ -1,40 +1,49 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:ideal_marriage_bureau/application/core/extensions/extensions.dart';
+import 'package:ideal_marriage_bureau/data/models/chat_model/conversation_list_model.dart'
+as conv;
+import 'package:ideal_marriage_bureau/data/models/chat_model/message_history_model.dart'
+as msg;
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:provider/provider.dart';
 import '../../../../application/app_theme/color_scheme.dart';
 import '../../../../base/base_widget.dart';
+import '../../../../di/di.dart';
+import '../../../application/common/log.dart';
+import '../../../application/core/result.dart';
+import '../../../application/network/result.dart';
 import '../../../constants/asset_manager.dart';
+import '../../../widgets/toast.dart';
 import 'chat_details_remove.dart';
+import 'chat_view_model.dart';
 
 class ChatDetailView extends BaseStateFullWidget {
-  final Map<String, dynamic> profile;
-  ChatDetailView({super.key, required this.profile});
+  final conv.Data conversation;
+  ChatDetailView({super.key, required this.conversation});
+
   @override
   State<ChatDetailView> createState() => _ChatDetailViewState();
 }
 
-class _ChatDetailViewState extends State<ChatDetailView> {
+class _ChatDetailViewState extends State<ChatDetailView> implements Result<String> , ErrorResult{
   final TextEditingController messageController = TextEditingController();
   final FlutterSoundRecorder _recorder = FlutterSoundRecorder();
   final FlutterSoundPlayer _player = FlutterSoundPlayer();
+  final ScrollController _scrollController = ScrollController();
 
   bool isRecording = false;
   bool isTyping = false;
   bool isPlaying = false;
   String? playingFile;
-
   Duration recordingDuration = Duration.zero;
   String? recordedFilePath;
 
-  final List<Map<String, dynamic>> messages = [
-    {"text": "Hi 👋", "isMe": true},
-    {"text": "Hello, how are you?", "isMe": false},
-    {"text": "Mostly reading or traveling.", "isMe": false},
-    {"text": "Nice 😊", "isMe": true},
-  ];
+  ChatViewModel? chatVm;
+  bool _fetched = false;
+  bool _socketInitialized = false;
+
 
   @override
   void initState() {
@@ -50,25 +59,23 @@ class _ChatDetailViewState extends State<ChatDetailView> {
   Future<void> _initRecorderAndPlayer() async {
     await _recorder.openRecorder();
     _recorder.setSubscriptionDuration(const Duration(milliseconds: 100));
-
     _recorder.onProgress!.listen((event) {
-      setState(() {
-        recordingDuration = event.duration;
-      });
+      setState(() => recordingDuration = event.duration);
     });
-
     await _player.openPlayer();
   }
 
   @override
   void dispose() {
     messageController.dispose();
+    _scrollController.dispose();
     _recorder.closeRecorder();
     if (_player.isOpen()) _player.closePlayer();
+
+    chatVm?.disposeSocket();
     super.dispose();
   }
 
-  // Start Recording
   Future<void> _startRecording() async {
     final status = await Permission.microphone.request();
     if (status != PermissionStatus.granted) return;
@@ -83,23 +90,17 @@ class _ChatDetailViewState extends State<ChatDetailView> {
       recordingDuration = Duration.zero;
     });
   }
+
   Future<void> _stopRecording() async {
     final path = await _recorder.stopRecorder();
     setState(() {
       isRecording = false;
       recordedFilePath = path;
     });
-    if (path != null) {
-      messages.add({
-        "text": "[Voice message]",
-        "isMe": true,
-        "audioPath": path,
-        "duration": recordingDuration.inSeconds,
-      });
-      recordingDuration = Duration.zero;
-      setState(() {});
-    }
+
+    recordingDuration = Duration.zero;
   }
+
   Future<void> _playAudio(String path) async {
     if (!_player.isOpen()) await _player.openPlayer();
     if (isPlaying && playingFile == path) {
@@ -125,16 +126,38 @@ class _ChatDetailViewState extends State<ChatDetailView> {
       });
     }
   }
+
   void _sendMessage() {
-    if (messageController.text.trim().isEmpty) return;
-    setState(() {
-      messages.add({
-        "text": messageController.text.trim(),
-        "isMe": true,
-      });
-    });
+    final text = messageController.text.trim();
+    if (text.isEmpty || chatVm == null) return;
+    final receiverId = widget.conversation.userId;
+
     messageController.clear();
+
+    chatVm!.sendMessageRealtime(
+      tempId: DateTime.now().millisecondsSinceEpoch,
+
+      senderId: null,
+      receiverId: receiverId,
+      text: text,
+      result: this,
+    );
+
+    _scrollToBottom();
   }
+
+  void _scrollToBottom() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          0, // list reverse: true hai isliye 0 = bottom (latest message)
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeOut,
+        );
+      }
+    });
+  }
+
   void _showChatMenu(BuildContext context, Offset position) {
     final overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
     showMenu(
@@ -149,30 +172,66 @@ class _ChatDetailViewState extends State<ChatDetailView> {
         PopupMenuItem(
           padding: EdgeInsets.zero,
           enabled: false,
-          child: ChatMoreDialogView(userName: "John Doe"),
+          child: ChatMoreDialogView(userName: widget.conversation.fullName ?? ""),
         ),
       ],
     );
   }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: Stack(
-        children: [
-          _background(),
-          Column(
-            children: [
-              widget.dimens.k50.verticalBoxPadding,
-              _header(),
-              Expanded(child: _chatList()),
-              _messageField(),
-            ],
-          ),
-        ],
+    return ChangeNotifierProvider<ChatViewModel>(
+      create: (_) => inject<ChatViewModel>(),
+      child: Builder(
+        builder: (innerContext) {
+          if (!_fetched) {
+            _fetched = true;
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              chatVm = innerContext.read<ChatViewModel>();
+              chatVm!.getMessageHistoryData(
+                this,
+                conversationId: widget.conversation.userId ?? 0,
+              );
+
+
+              if (!_socketInitialized) {
+                _socketInitialized = true;
+                chatVm!.initSocket(
+                  conversationId: widget.conversation.userId ?? 0,
+                  currentUserId: widget.conversation.userId ?? 0,
+                );
+              }
+            });
+          }
+
+          return Consumer<ChatViewModel>(
+            builder: (_, provider, __) {
+              chatVm = provider;
+              final messages = provider.messageHistoryModel.data ?? [];
+
+              return Scaffold(
+                backgroundColor: Colors.white,
+                body: Stack(
+                  children: [
+                    _background(),
+                    Column(
+                      children: [
+                        widget.dimens.k50.verticalBoxPadding,
+                        _header(),
+                        Expanded(child: _chatList(messages, provider)),
+                        _messageField(),
+                      ],
+                    ),
+                  ],
+                ),
+              );
+            },
+          );
+        },
       ),
     );
   }
+
   Widget _background() {
     return Container(
       decoration: BoxDecoration(
@@ -187,14 +246,20 @@ class _ChatDetailViewState extends State<ChatDetailView> {
       ),
     );
   }
+
   Widget _header() {
+    final isOnline = widget.conversation.isOnline == 1;
+
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: widget.dimens.k15),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           GestureDetector(
-            onTap: () => Navigator.pop(context),
+            onTap: (){
+    context.read<ChatViewModel>().getConversationList(this);
+    Navigator.pop(context);
+    } ,
             child: Row(
               children: [
                 Icon(Icons.arrow_back_ios,
@@ -214,14 +279,21 @@ class _ChatDetailViewState extends State<ChatDetailView> {
               CircleAvatar(
                 radius: widget.dimens.k20,
                 backgroundImage:
-                AssetImage(widget.profile["image"] ?? Assets.home2),
+                // (widget.conversation.avatarUrl != null &&
+                //
+                //     widget.conversation.avatarUrl.isNotEmpty)
+                //     ? NetworkImage(widget.conversation.avatarUrl) as ImageProvider
+                //     :
+                AssetImage(Assets.home2),
+
+
               ),
               widget.dimens.k10.horizontalBoxPadding,
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    widget.profile["name"] ?? "",
+                    widget.conversation.fullName ?? "",
                     style: context.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w600,
                       fontSize: widget.dimens.k16,
@@ -231,19 +303,13 @@ class _ChatDetailViewState extends State<ChatDetailView> {
                     children: [
                       CircleAvatar(
                         radius: widget.dimens.k4,
-                        backgroundColor: widget.profile["isOnline"] == true
-                            ? ColorManager.onlineColor
-                            : ColorManager.textColorSubTitle,
+                        backgroundColor: isOnline ? Colors.green : Colors.red,
                       ),
                       widget.dimens.k5.horizontalBoxPadding,
                       Text(
-                        widget.profile["isOnline"] == true
-                            ? "Online"
-                            : "Offline",
+                        isOnline ? "Online" : "Offline",
                         style: context.textTheme.bodySmall?.copyWith(
-                          color: widget.profile["isOnline"] == true
-                              ? Colors.green
-                              : ColorManager.fieldTextColor,
+                          color: isOnline ? Colors.green : ColorManager.fieldTextColor,
                         ),
                       ),
                     ],
@@ -259,10 +325,7 @@ class _ChatDetailViewState extends State<ChatDetailView> {
             child: CircleAvatar(
               backgroundColor: ColorManager.primary.withOpacity(.2),
               radius: widget.dimens.k18,
-              child: Icon(
-                Icons.more_vert,
-                color: ColorManager.primary,
-              ),
+              child: Icon(Icons.more_vert, color: ColorManager.primary),
             ),
           ),
         ],
@@ -270,33 +333,63 @@ class _ChatDetailViewState extends State<ChatDetailView> {
     );
   }
 
-  Widget _chatList() {
-    return ListView.builder(
-      padding: EdgeInsets.all(widget.dimens.k15),
-      itemCount: messages.length,
-      itemBuilder: (_, index) {
-        final msg = messages[index];
-        return _messageBubble(msg);
+  Widget _chatList(List<msg.Data> messages, ChatViewModel provider) {
+    if (provider.apiResponse is Loading && messages.isEmpty) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    if (messages.isEmpty) {
+      return const Center(child: Text("No messages yet"));
+    }
+    return NotificationListener<ScrollNotification>(
+      onNotification: (notification) {
+        if (notification.metrics.pixels == notification.metrics.minScrollExtent &&
+            provider.hasMore &&
+            !provider.isLoadingMore) {
+          provider.getMessageHistoryData(
+            this,
+            conversationId: widget.conversation.userId ?? 0,
+            loadMore: true,
+          );
+        }
+        return false;
       },
+      child: ListView.builder(
+        controller: _scrollController,
+        reverse: true,
+        padding: EdgeInsets.all(widget.dimens.k15),
+        itemCount: messages.length,
+        itemBuilder: (_, index) {
+          final data = messages[messages.length - 1 - index];
+
+          return KeyedSubtree(
+            key: ValueKey(data.id),
+            child: _messageBubble(data),
+          );
+        },
+      ),
     );
   }
 
-  Widget _messageBubble(Map<String, dynamic> msg) {
-    bool isMe = msg["isMe"] ?? true;
-    String text = msg["text"] ?? "";
+  Widget _messageBubble(msg.Data data) {
+
+    final bool isMe = data.receiverId == widget.conversation.userId;
+    final String text = data.message ?? "";
 
     return Padding(
       padding: EdgeInsets.symmetric(vertical: widget.dimens.k6),
       child: Row(
-        mainAxisAlignment:
-        isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+        mainAxisAlignment: isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (!isMe)
             CircleAvatar(
               radius: widget.dimens.k16,
               backgroundImage:
-              AssetImage(widget.profile["image"] ?? Assets.home2),
+              // (widget.conversation.avatarUrl != null &&
+              //     widget.conversation.avatarUrl.isNotEmpty)
+              //     ? NetworkImage(widget.conversation.avatarUrl) as ImageProvider
+              //     :
+              AssetImage(Assets.home2),
             ),
           if (!isMe) SizedBox(width: widget.dimens.k8),
           Container(
@@ -306,9 +399,7 @@ class _ChatDetailViewState extends State<ChatDetailView> {
             ),
             constraints: BoxConstraints(maxWidth: context.width * 0.7),
             decoration: BoxDecoration(
-              color: isMe
-                  ? ColorManager.primary
-                  : ColorManager.primary.withOpacity(.1),
+              color: isMe ? ColorManager.primary : ColorManager.primary.withOpacity(.1),
               borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(isMe ? widget.dimens.k14 : 0),
                 topRight: Radius.circular(widget.dimens.k14),
@@ -316,42 +407,7 @@ class _ChatDetailViewState extends State<ChatDetailView> {
                 bottomRight: Radius.circular(isMe ? 0 : widget.dimens.k14),
               ),
             ),
-            child: msg.containsKey("audioPath")
-                ? Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                InkWell(
-                  onTap: () => _playAudio(msg["audioPath"]),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        isPlaying && playingFile == msg["audioPath"]
-                            ? Icons.stop
-                            : Icons.play_arrow,
-                        color: isMe ? Colors.white : Colors.black,
-                      ),
-                      SizedBox(width: 8),
-                      Text(
-                        "Voice Message",
-                        style: context.textTheme.bodyMedium?.copyWith(
-                          color: isMe ? Colors.white : Colors.black,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(height: 4),
-                Text(
-                  "${msg["duration"] ?? 0} sec",
-                  style: context.textTheme.bodySmall?.copyWith(
-                    color: isMe ? Colors.white70 : Colors.black54,
-                  ),
-                )
-              ],
-            )
-                : Text(
+            child: Text(
               text,
               style: context.textTheme.bodyMedium?.copyWith(
                 color: isMe ? Colors.white : Colors.black,
@@ -368,6 +424,7 @@ class _ChatDetailViewState extends State<ChatDetailView> {
       ),
     );
   }
+
   Widget _messageField() {
     return SafeArea(
       child: Padding(
@@ -388,41 +445,33 @@ class _ChatDetailViewState extends State<ChatDetailView> {
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(widget.dimens.k30),
-                    borderSide: BorderSide(
-                      color: ColorManager.fieldTextColor,
-                      width: 1.5,
-                    ),
+                    borderSide: BorderSide(color: ColorManager.fieldTextColor, width: 1.5),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(widget.dimens.k30),
-                    borderSide: BorderSide(
-                      color: ColorManager.fieldTextColor,
-                      width: 1.5,
-                    ),
+                    borderSide: BorderSide(color: ColorManager.fieldTextColor, width: 1.5),
                   ),
-                  suffixIcon: IconButton(
-                    onPressed: () async {
-                      if (isRecording) {
-                        await _stopRecording();
-                      } else {
-                        await _startRecording();
-                      }
-                    },
-                    icon: Icon(
-                      isRecording ? Icons.stop : Icons.mic_none,
-                      color:
-                      isRecording ? Colors.red : ColorManager.fieldTextColor,
-                      size: widget.dimens.k26,
-                    ),
-                  ),
+                  // suffixIcon: IconButton(
+                  //   onPressed: () async {
+                  //     if (isRecording) {
+                  //       await _stopRecording();
+                  //     } else {
+                  //       await _startRecording();
+                  //     }
+                  //   },
+                  //   icon: Icon(
+                  //     isRecording ? Icons.stop : Icons.mic_none,
+                  //     color: isRecording ? Colors.red : ColorManager.fieldTextColor,
+                  //     size: widget.dimens.k26,
+                  //   ),
+                  // ),
                 ),
               ),
             ),
             widget.dimens.k10.horizontalBoxPadding,
             CircleAvatar(
               radius: widget.dimens.k22,
-              backgroundColor:
-              isTyping ? ColorManager.primary : ColorManager.textColor,
+              backgroundColor: isTyping ? ColorManager.primary : ColorManager.textColor,
               child: IconButton(
                 icon: Image.asset(
                   Assets.sendMessage,
@@ -437,5 +486,16 @@ class _ChatDetailViewState extends State<ChatDetailView> {
         ),
       ),
     );
+  }
+
+  @override
+  void onError(String error) {
+    MyToast.showToast(message: error);
+    d("Send Message");
+    d(error);
+  }
+  @override
+  void onSuccess(String result) {
+
   }
 }

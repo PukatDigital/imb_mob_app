@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:ideal_marriage_bureau/application/app_theme/color_scheme.dart';
 import 'package:ideal_marriage_bureau/application/core/extensions/extensions.dart';
 import '../../../../base/base_widget.dart';
 import '../../../constants/asset_manager.dart';

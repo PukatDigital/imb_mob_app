@@ -1,49 +1,70 @@
 import 'package:flutter/material.dart';
 import 'package:ideal_marriage_bureau/application/core/extensions/extensions.dart';
+import 'package:ideal_marriage_bureau/data/models/chat_model/conversation_list_model.dart';
 import 'package:provider/provider.dart';
 import '../../../../application/app_theme/color_scheme.dart';
 import '../../../../application/core/result.dart';
 import '../../../../base/base_widget.dart';
 import '../../../../widgets/toast.dart';
 import '../../../constants/asset_manager.dart';
-import '../auth/auth_view_model.dart';
 import 'chat_list_change.dart';
 import 'chat_view.dart';
+import 'chat_view_model.dart';
+
 class ChatListView extends BaseStateFullWidget {
   ChatListView({super.key});
   @override
   State<ChatListView> createState() => _ChatListViewState();
 }
+
 class _ChatListViewState extends State<ChatListView>
-    implements Result<String> {
-  late AuthViewModel authVM;
+    implements Result<String>,ErrorResult {
+  late ChatViewModel authVM;
   TextEditingController searchController = TextEditingController();
-  final List<Map<String, dynamic>> profiles = List.generate(
-    8,
-        (index) => {
-      "name": "Maryam Baloch",
-      "lastMessage": "Mostly reading or traveling. What about you?",
-      "isOnline": index % 2 == 0, // demo online/offline
-      "image": Assets.home2,
-    },
-  );
-  List<Map<String, dynamic>> filteredProfiles = [];
+
+  List<Data> filteredProfiles = [];
+
   @override
   void initState() {
     super.initState();
-    filteredProfiles = profiles;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      authVM = context.read<ChatViewModel>();
+      authVM.getConversationList(this);
+
+
+    });
+
+    searchController.addListener(_filterList);
+  }
+
+  void _filterList() {
+    final query = searchController.text.toLowerCase();
+    setState(() {
+      filteredProfiles = authVM.conversationListModel.data
+          ?.where((e) =>
+          (e.fullName ?? "").toLowerCase().contains(query))
+          .toList() ??
+          [];
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<AuthViewModel>(
+    return
+      Consumer<ChatViewModel>(
       builder: (_, provider, __) {
         authVM = provider;
+
+
+        final list = searchController.text.isEmpty
+            ? (provider.conversationListModel.data ?? [])
+            : filteredProfiles;
+
         return Scaffold(
           backgroundColor: Colors.white,
           body: Stack(
             children: [
-              _mainContent(),
+              _mainContent(list),
             ],
           ),
         );
@@ -51,7 +72,7 @@ class _ChatListViewState extends State<ChatListView>
     );
   }
 
-  Widget _mainContent() {
+  Widget _mainContent(List<Data> list) {
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -70,12 +91,13 @@ class _ChatListViewState extends State<ChatListView>
             widget.dimens.k50.verticalBoxPadding,
             _header(),
             widget.dimens.k15.verticalBoxPadding,
-            Expanded(child: _chatList()),
+            Expanded(child: _chatList(list)),
           ],
         ),
       ),
     );
   }
+
   Widget _header() {
     return Row(
       children: [
@@ -90,36 +112,31 @@ class _ChatListViewState extends State<ChatListView>
             ),
           ),
         ),
-        // GestureDetector(
-        //   onTap: (){
-        //
-        //   },
-        //   child: CircleAvatar(
-        //     backgroundColor: ColorManager.primary.withOpacity(.2),
-        //     radius: widget.dimens.k20,
-        //     child: Icon(
-        //       Icons.more_vert,
-        //       color: ColorManager.primary,
-        //     ),
-        //   ),
-        // ),
       ],
     );
   }
-  Widget _chatList() {
+
+  Widget _chatList(List<Data> list) {
+    if (list.isEmpty) {
+      return const Center(child: Text("No conversations yet"));
+    }
     return ListView.builder(
       padding: EdgeInsets.zero,
-      itemCount: filteredProfiles.length,
+      itemCount: list.length,
       itemBuilder: (_, index) {
-        return _chatTile(filteredProfiles[index]);
+        return _chatTile(list[index]);
       },
     );
   }
-  Widget _chatTile(Map<String, dynamic> item) {
+
+  Widget _chatTile(Data item) {
+
+    final bool isOnline = item.isOnline == 1;
+    final Color statusColor = isOnline ? Colors.green : Colors.red;
+
     return Padding(
       padding: EdgeInsets.symmetric(vertical: widget.dimens.k10),
-      child:
-      GestureDetector(
+      child: GestureDetector(
         onLongPress: () async {
           await showModalBottomSheet(
             context: context,
@@ -129,48 +146,30 @@ class _ChatListViewState extends State<ChatListView>
             isDismissible: true,
             enableDrag: true,
             builder: (context) {
-              return  ChatListChangeView(userName: "John Doe",);
+              return ChatListChangeView(userName: item.fullName ?? "");
             },
           );
         },
-
-        // onLongPress: ()async{
-        //   await
-        //   await showModalBottomSheet(
-        //     context: context,
-        //     isScrollControlled: true,
-        //     backgroundColor: Colors.transparent,
-        //     isDismissible: true,   // ✅ allow outside tap dismiss
-        //     enableDrag: true,      // ✅ allow swipe down dismiss
-        //     builder: (_) {
-        //       return GestureDetector(
-        //         onTap: () {}, // ✅ prevent sheet content tap from closing
-        //         child: FractionallySizedBox(
-        //           heightFactor: 0.95,
-        //           child: ChatListChangeView(),
-        //         ),
-        //       );
-        //     },
-        //   );
-        // },
-        onTap: (){
+        onTap: () {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (_) => ChatDetailView(profile: item),
+              builder: (_) => ChatDetailView(conversation: item),
             ),
           );
-
         },
-        child:
-        Row(
+        child: Row(
           children: [
-            // PROFILE IMAGE + ONLINE STATUS
+
             Stack(
               children: [
                 CircleAvatar(
                   radius: widget.dimens.k20,
-                  backgroundImage: AssetImage(item["image"]),
+                  backgroundImage: (item.avatarUrl != null &&
+                      item.avatarUrl.toString().isNotEmpty)
+                      ? NetworkImage(item.avatarUrl.toString())
+                  as ImageProvider
+                      : AssetImage(Assets.profile),
                 ),
                 Positioned(
                   bottom: 2,
@@ -180,8 +179,7 @@ class _ChatListViewState extends State<ChatListView>
                     backgroundColor: Colors.white,
                     child: CircleAvatar(
                       radius: 3,
-                      backgroundColor:
-                      item["isOnline"] ? Colors.green : ColorManager.fieldTextColor,
+                      backgroundColor: statusColor,
                     ),
                   ),
                 ),
@@ -190,22 +188,22 @@ class _ChatListViewState extends State<ChatListView>
 
             widget.dimens.k12.horizontalBoxPadding,
 
-            // NAME & LAST MESSAGE
+
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    item["name"],
+                    item.fullName ?? "",
                     style: context.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w600,
-                      fontSize:    widget.dimens.k17,
-                      color: ColorManager.textColor
+                      fontSize: widget.dimens.k17,
+                      color: ColorManager.textColor,
                     ),
                   ),
                   widget.dimens.k4.verticalBoxPadding,
                   Text(
-                    item["lastMessage"],
+                    item.lastMessage ?? "",
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: context.textTheme.bodySmall?.copyWith(
@@ -220,6 +218,7 @@ class _ChatListViewState extends State<ChatListView>
       ),
     );
   }
+
   @override
   void onError(String error) {
     MyToast.showToast(message: error);
@@ -228,5 +227,11 @@ class _ChatListViewState extends State<ChatListView>
   @override
   void onSuccess(String result) {
     MyToast.showToast(message: result);
+  }
+
+  @override
+  void dispose() {
+    searchController.dispose();
+    super.dispose();
   }
 }

@@ -1,4 +1,3 @@
-import 'dart:io';
 
 class ProblemDetailModel {
   String? type;
@@ -16,12 +15,12 @@ class ProblemDetailModel {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['type'] = this.type;
-    data['success'] = this.success;
-    data['message'] = this.message;
-    if (this.detail != null) {
-      data['data'] = this.detail!.toJson(); // ← 'data'
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['type'] = type;
+    data['success'] = success;
+    data['message'] = message;
+    if (detail != null) {
+      data['data'] = detail!.toJson(); // ← 'data'
     }
     return data;
   }
@@ -77,21 +76,21 @@ class Detail {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['name'] = this.name;
-    data['subject'] = this.subject;
-    data['problem_category'] = this.problemCategory;
-    data['description'] = this.description;
-    data['remarks'] = this.remarks;
-    data['attachment'] = this.attachment;
-    data['status'] = this.status;
-    data['priority'] = this.priority;
-    data['posting_date'] = this.postingDate;
-    data['posting_time'] = this.postingTime;
-    data['profile_id'] = this.profileId;
-    data['user_id'] = this.userId;
-    data['reported_by'] = this.reportedBy;
-    data['attachment_url'] = this.attachmentUrl;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['name'] = name;
+    data['subject'] = subject;
+    data['problem_category'] = problemCategory;
+    data['description'] = description;
+    data['remarks'] = remarks;
+    data['attachment'] = attachment;
+    data['status'] = status;
+    data['priority'] = priority;
+    data['posting_date'] = postingDate;
+    data['posting_time'] = postingTime;
+    data['profile_id'] = profileId;
+    data['user_id'] = userId;
+    data['reported_by'] = reportedBy;
+    data['attachment_url'] = attachmentUrl;
     return data;
   }
 }

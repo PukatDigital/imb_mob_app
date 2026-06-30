@@ -14,6 +14,7 @@ import '../data/remote_data_source/i_api.dart';
 import '../main.dart';
 import '../nav-service/i_nav_service.dart';
 import '../nav-service/nav_service.dart';
+import '../presentation/views/chat/chat_view_model.dart';
 
 final inject = GetIt.instance;
 
@@ -25,4 +26,5 @@ Future<void> setupLocator() async {
   inject.registerLazySingleton<IPrefHelper>(() => PrefHelper(inject()));
   inject.registerLazySingleton<IApiService>(() => ApiService.create(externalValues: ExternalValues()));
   inject.registerLazySingleton<IApi>(() => Apis(inject()));
+  inject.registerFactory<ChatViewModel>(() => ChatViewModel());
 }

@@ -19,12 +19,12 @@ class ProblemList {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['type'] = this.type;
-    data['success'] = this.success;
-    data['message'] = this.message;
-    if (this.problemListData != null) {
-      data['data'] = this.problemListData!.map((v) => v.toJson()).toList();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['type'] = type;
+    data['success'] = success;
+    data['message'] = message;
+    if (problemListData != null) {
+      data['data'] = problemListData!.map((v) => v.toJson()).toList();
     }
     return data;
   }
@@ -49,12 +49,12 @@ class ProblemListData {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['name'] = this.name;
-    data['subject'] = this.subject;
-    data['status'] = this.status;
-    data['priority'] = this.priority;
-    data['creation'] = this.creation;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['name'] = name;
+    data['subject'] = subject;
+    data['status'] = status;
+    data['priority'] = priority;
+    data['creation'] = creation;
     return data;
   }
 }

@@ -36,7 +36,7 @@ class StringManager {
   static const String qualification1 = "What's your qualification?";
   static const String continueWithPhone = "Continue with phone number?";
   static const String continueWithemail = "Continue with email?";
-  static const String forgotSub = "No worries! Enter your email or phone number and we’ll send you a reset link";
+  static const String forgotSub = "No worries! Enter your email and we’ll send you a reset link";
 
   static const String coachDetails = "Coach Details";
   static const String enterDetails = "Please enter your details";
@@ -176,13 +176,14 @@ class StringManager {
   static const String onboardingHint = "Real people. Real connections. Real love.";
   static const String loginHint = "Welcome Back to Ideal Marriage Bureau";
   static const String loginSubHint = "Where real connections begin with trust.";
-  static const String username = "Email or Phone Number";
+  static const String username = "Email";
+  // static const String username = "Email or Phone Number";
   static const String loginWithGoogle = "Continue with Google";
   static const String verificationCode = "Verification Code";
-  static const String genderName = "Whats your gender? ";
-  static const String firstName = "What is your first name? ";
-  static const String lastNameText = "What is your Last name? ";
-  static const String enterFirstName = "Enter your first name";
+  static const String genderName = "What's your Gender? ";
+  static const String firstName = "What Is Your First Name? ";
+  static const String lastNameText = "What Is your Last name? ";
+  static const String enterFirstName = "Enter Your First Name";
   static const String enterLastName = "Enter your Last name";
   static const String bornWhen= "When were you born?";
   static const String motherTongue= "What’s your mother tongue?";

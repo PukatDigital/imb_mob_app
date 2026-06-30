@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ideal_marriage_bureau/application/core/extensions/extensions.dart';
 import '../../../../application/app_theme/color_scheme.dart';
-import '../../../constants/asset_manager.dart';
 import '../../../widgets/primary_button.dart';
 
 class ProfileCoverCard extends StatefulWidget {

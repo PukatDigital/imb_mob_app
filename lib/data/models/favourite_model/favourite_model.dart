@@ -10,14 +10,14 @@ class FavouriteProfileModel {
     type = json['type'];
     success = json['success'];
     message = json['message'];
-    data = json['data'] != null ? new Data.fromJson(json['data']) : null;
+    data = json['data'] != null ? Data.fromJson(json['data']) : null;
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['type'] = this.type;
-    data['success'] = this.success;
-    data['message'] = this.message;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['type'] = type;
+    data['success'] = success;
+    data['message'] = message;
     if (this.data != null) {
       data['data'] = this.data!.toJson();
     }
@@ -48,7 +48,7 @@ class Data {
     if (json['favourite_profiles'] != null) {
       favouriteProfiles = <FavouriteProfiles>[];
       json['favourite_profiles'].forEach((v) {
-        favouriteProfiles!.add(new FavouriteProfiles.fromJson(v));
+        favouriteProfiles!.add(FavouriteProfiles.fromJson(v));
       });
     }
     totalFavouriteProfiles = json['total_favourite_profiles'];
@@ -56,16 +56,16 @@ class Data {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['profile_id'] = this.profileId;
-    data['user_id'] = this.userId;
-    data['profile_name'] = this.profileName;
-    if (this.favouriteProfiles != null) {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['profile_id'] = profileId;
+    data['user_id'] = userId;
+    data['profile_name'] = profileName;
+    if (favouriteProfiles != null) {
       data['favourite_profiles'] =
-          this.favouriteProfiles!.map((v) => v.toJson()).toList();
+          favouriteProfiles!.map((v) => v.toJson()).toList();
     }
-    data['total_favourite_profiles'] = this.totalFavouriteProfiles;
-    data['no_of_times_added_as_favourite'] = this.noOfTimesAddedAsFavourite;
+    data['total_favourite_profiles'] = totalFavouriteProfiles;
+    data['no_of_times_added_as_favourite'] = noOfTimesAddedAsFavourite;
     return data;
   }
 }
@@ -102,15 +102,15 @@ class FavouriteProfiles {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['profile_id'] = this.profileId;
-    data['user_id'] = this.userId;
-    data['profile_name'] = this.profileName;
-    data['profile_picture'] = this.profilePicture;
-    data['date_of_birth'] = this.dateOfBirth;
-    data['age'] = this.age;
-    data['ethnicity'] = this.ethnicity;
-    data['added_on'] = this.addedOn;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['profile_id'] = profileId;
+    data['user_id'] = userId;
+    data['profile_name'] = profileName;
+    data['profile_picture'] = profilePicture;
+    data['date_of_birth'] = dateOfBirth;
+    data['age'] = age;
+    data['ethnicity'] = ethnicity;
+    data['added_on'] = addedOn;
     return data;
   }
 }

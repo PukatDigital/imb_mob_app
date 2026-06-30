@@ -71,7 +71,7 @@ class _ProblemListViewState extends State<ProblemListView> implements Result {
 
                       // All problems from provider
                       final allProblems =
-                          provider.problemListModel?.problemListData ?? [];
+                          provider.problemListModel.problemListData ?? [];
 
                       // ✅ Filter applied inline inside Consumer
                       final List<ProblemListData> items = searchQuery.isEmpty

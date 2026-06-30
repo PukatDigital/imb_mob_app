@@ -15,10 +15,10 @@ class PlansListDetailsModel {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['type'] = this.type;
-    data['success'] = this.success;
-    data['message'] = this.message;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['type'] = type;
+    data['success'] = success;
+    data['message'] = message;
     if (this.data != null) {
       data['data'] = this.data!.toJson();
     }
@@ -62,16 +62,16 @@ class Data {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['name'] = this.name;
-    data['title'] = this.title;
-    data['plan_type'] = this.planType;
-    data['bonus'] = this.bonus;
-    data['effective_price'] = this.effectivePrice;
-    data['amount'] = this.amount;
-    data['boost'] = this.boost;
-    data['description'] = this.description;
-    data['active'] = this.active;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['name'] = name;
+    data['title'] = title;
+    data['plan_type'] = planType;
+    data['bonus'] = bonus;
+    data['effective_price'] = effectivePrice;
+    data['amount'] = amount;
+    data['boost'] = boost;
+    data['description'] = description;
+    data['active'] = active;
     return data;
   }
 }

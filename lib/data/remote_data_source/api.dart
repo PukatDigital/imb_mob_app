@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import 'package:ideal_marriage_bureau/data/models/chat_model/conversation_list_model.dart';
 import 'package:ideal_marriage_bureau/data/models/get_profile_model/get_all_profile_list_model.dart';
 import 'package:ideal_marriage_bureau/data/models/get_profile_model/profile_details_model.dart';
 import 'package:ideal_marriage_bureau/data/models/plans_model/bank_details.dart';
@@ -38,6 +39,7 @@ import '../../application/network/error-handler/error_handler.dart';
 import '../../application/network/result.dart';
 
 import '../models/block_model/block_model.dart';
+import '../models/chat_model/message_history_model.dart';
 import '../models/explore_model/explore_model.dart';
 import '../models/favourite_model/favourite_model.dart';
 import '../models/get_profile_model/deactivate_profile_model.dart';
@@ -58,6 +60,7 @@ class Apis implements IApi {
   Apis(this.apiService) : dio = apiService.get();
 
   late final Dio dio;
+
 
   @override
   Future<ApiResponse> signInByEmail(Map<String, dynamic> data) async {
@@ -828,6 +831,7 @@ class Apis implements IApi {
       return Error(e.toString());
     }
   }
+  @override
   Future<ApiResponse> getDeactivateProfile(Map<String, dynamic> data) async {
     apiService.setIsTokenRequired(value: true);
     try {
@@ -1280,6 +1284,69 @@ class Apis implements IApi {
     } on DioException catch (e) {
       return Error(getErrorMessage(e));
     } catch (e) {
+      return Error(e.toString());
+    }
+  }
+  @override
+  Future<ApiResponse> getConversationListData() async {
+    apiService.setIsTokenRequired(value: true);
+    try {
+      final responseData = await dio.get(
+        apiService.chatUrl("/api/chat/conversations"), // ✅ full absolute URL pass kiya
+      );
+      d("RAW Response: ${responseData.data}");
+      return Success(ConversationListModel.fromJson(responseData.data));
+    } on DioException catch (e) {
+      d("DioException Type: ${e.type}");
+      d("Status Code: ${e.response?.statusCode}");
+      d("Response Data: ${e.response?.data}");
+      d("Request URL: ${e.requestOptions.uri}");
+      return Error(getErrorMessage(e));
+    } catch (e) {
+      d("Unknown Error: $e");
+      return Error(e.toString());
+    }
+  }
+  @override
+  Future<ApiResponse> getMessageHistory(
+      int conversationId, Map<String, dynamic> queryParams) async {
+    apiService.setIsTokenRequired(value: true);
+    try {
+      final responseData = await dio.get(
+        apiService.chatUrl("/api/chat/messages/$conversationId"), // ✅ id ab parameter se aa raha hai
+        queryParameters: queryParams,
+      );
+      d(responseData.data);
+      return Success(MessageHistoryModel.fromJson(responseData.data)); // ✅ sahi model
+    } on DioException catch (e) {
+      return Error(getErrorMessage(e));
+    } catch (e) {
+      return Error(e.toString());
+    }
+  }
+  @override
+  Future<ApiResponse> sentMessage(Map<String, dynamic> data) async {
+    apiService.setIsTokenRequired(value: true);
+    d(data);
+    try {
+      final responseData = await dio.post(
+        apiService.chatUrl("/api/chat/messages"),
+        data: data,
+      );
+      d(responseData.data);
+      return Success(responseData.data["data"]["message"].toString());
+    } on DioException catch (e) {
+      d(e);
+      final resData = e.response?.data;
+      if (resData is Map && resData['error'] != null) {
+        return Error(resData['error'].toString());
+      }
+      if (resData is Map && resData['message'] != null) {
+        return Error(resData['message'].toString());
+      }
+      return Error(getErrorMessage(e));
+    } catch (e) {
+      d(e);
       return Error(e.toString());
     }
   }

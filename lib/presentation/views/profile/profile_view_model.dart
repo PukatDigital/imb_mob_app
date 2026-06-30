@@ -2,7 +2,6 @@ import 'package:ideal_marriage_bureau/application/core/extensions/extensions.dar
 import 'package:ideal_marriage_bureau/application/core/result.dart';
 import 'package:ideal_marriage_bureau/application/network/result.dart';
 import 'package:ideal_marriage_bureau/base/base_view_model.dart';
-import 'package:ideal_marriage_bureau/data/models/get_profile_model/get_all_profile_list_model.dart';
 import 'package:ideal_marriage_bureau/data/models/get_profile_model/profile_details_model.dart';
 
 import '../../../application/common/log.dart';
