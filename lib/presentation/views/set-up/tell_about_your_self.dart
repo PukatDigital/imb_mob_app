@@ -432,7 +432,7 @@ class TellAboutYourSelfViewState extends State<TellAboutYourSelfView>
                 widget.dimens.k3.verticalBoxPadding,
                 CustomDropDown<String>(
                   list: newDocVM.ethnicitiesModel.data?.ethnicities
-                      ?.map((e) => e.name ?? '')
+                      ?.map((e) => e.name ?? ' ')
                       .toList() ??
                       [],
                   selectedItem: ethnicity,
