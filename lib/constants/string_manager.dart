@@ -178,10 +178,10 @@ class StringManager {
   static const String username = "Email or Phone Number";
   static const String loginWithGoogle = "Continue with Google";
   static const String verificationCode = "Verification Code";
-  static const String genderName = "Whats your gender? ";
-  static const String firstName = "What is your first name? ";
-  static const String lastNameText = "What is your Last name? ";
-  static const String enterFirstName = "Enter your first name";
+  static const String genderName = "What's your Gender? ";
+  static const String firstName = "What Is Your First Name? ";
+  static const String lastNameText = "What Is your Last name? ";
+  static const String enterFirstName = "Enter Your First Name";
   static const String enterLastName = "Enter your Last name";
   static const String bornWhen= "When were you born?";
   static const String motherTongue= "What’s your mother tongue?";

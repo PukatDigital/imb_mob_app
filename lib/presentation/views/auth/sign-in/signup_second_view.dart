@@ -59,7 +59,7 @@ class _StepTwoViewState extends State<StepTwoView>  implements ErrorResult {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "What's your qualification?",
+                  "What's Your Qualification?",
                   style: Theme.of(context).textTheme.bodyLarge,
                 ),
                 const SizedBox(height: 8),
@@ -69,7 +69,7 @@ class _StepTwoViewState extends State<StepTwoView>  implements ErrorResult {
                       .toList() ??
                       [],
                   selectedItem:  widget.formData.selectedQualification,
-                  hintText: "Select your qualification",
+                  hintText: "Select Your Qualification",
                   onChanged: (val) => setState(() =>  widget.formData.selectedQualification = val),
                 ),
                 // CustomDropDown<String>(
@@ -102,7 +102,7 @@ class _StepTwoViewState extends State<StepTwoView>  implements ErrorResult {
                       .toList() ??
                       [],
                   selectedItem:  widget.formData.selectedCountry,
-                  hintText: "Select your country",
+                  hintText: "Select Your Country",
                   onChanged: (val) => setState(() =>  widget.formData.selectedCountry = val),
                 ),
                 // CustomDropDown<String>(
@@ -134,7 +134,7 @@ class _StepTwoViewState extends State<StepTwoView>  implements ErrorResult {
                       .toList() ??
                       [],
                   selectedItem:  widget.formData.selectedCity,
-                  hintText: "Select your country",
+                  hintText: "Select Your City",
                   onChanged: (val) => setState(() =>  widget.formData.selectedCity = val),
                 ),
                 // CustomDropDown<String>(
