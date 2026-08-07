@@ -470,7 +470,7 @@ class _ChatDetailViewState extends State<ChatDetailView> implements Result<Strin
             ),
             widget.dimens.k10.horizontalBoxPadding,
             CircleAvatar(
-              radius: widget.dimens.k22,
+              radius: widget.dimens.k23,
               backgroundColor: isTyping ? ColorManager.primary : ColorManager.textColor,
               child: IconButton(
                 icon: Image.asset(
